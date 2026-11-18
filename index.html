@@ -351,6 +351,54 @@
         .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .chip-scroll { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; padding-bottom: 2px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
+        /* Pedido al proveedor */
+        #orderModal .modal-body { gap: 10px; }
+        #poEdit { display: flex; flex-direction: column; gap: 10px; }
+        .po-sec-head { display: flex; justify-content: space-between; align-items: center; }
+        .po-label { font-size: 11px; font-weight: 900; color: var(--text-mid); text-transform: uppercase; letter-spacing: .04em; }
+        .po-link { background: none; border: 1px solid var(--border-subtle); color: var(--cyan-tech); border-radius: 10px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
+        .po-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .po-chips .f-chip.po-new { border-style: dashed; color: var(--cyan-tech); }
+        .po-hint { font-size: 11px; color: var(--text-low); margin: 2px 0 0; line-height: 1.45; }
+        .po-banner { font-size: 11.5px; padding: 8px 10px; border-radius: 10px; background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.35); color: var(--text-high); }
+        .po-banner-ok { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.35); }
+        .po-banner a { color: var(--cyan-tech); font-weight: 800; cursor: pointer; text-decoration: underline; }
+        .po-count { font-size: 11.5px; font-weight: 800; color: #f59e0b; }
+        .po-list { display: flex; flex-direction: column; gap: 8px; }
+        .po-item { background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; }
+        .po-top { display: flex; gap: 8px; justify-content: space-between; align-items: flex-start; }
+        .po-top b { display: block; font-size: 12.5px; line-height: 1.3; }
+        .po-top small { display: block; font-size: 10.5px; color: var(--text-low); margin-top: 2px; }
+        .po-x { width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: #ef4444; font-weight: 900; cursor: pointer; font-family: inherit; }
+        .po-ctrl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .po-qty { display: flex; align-items: center; gap: 4px; }
+        .po-qty .qs-btn { width: 36px; height: 36px; font-size: 20px; }
+        .po-qty input { width: 52px; height: 36px; text-align: center; font-size: 16px; font-weight: 900; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-high); font-family: inherit; }
+        .po-pres { height: 36px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-high); font-size: 13px; font-weight: 700; padding: 0 6px; font-family: inherit; max-width: 150px; }
+        .po-cont { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--text-mid); }
+        .po-cont input { width: 48px; height: 36px; text-align: center; font-size: 15px; font-weight: 800; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-high); font-family: inherit; }
+        .po-line { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #10b981; }
+        .po-empty { font-size: 12px; color: var(--text-low); text-align: center; padding: 10px; margin: 0; }
+        .po-search input { width: 100%; box-sizing: border-box; height: 40px; border-radius: 12px; border: 1px dashed var(--border-subtle); background: var(--bg-input); color: var(--text-high); padding: 0 12px; font-size: 14px; font-family: inherit; }
+        #poSearchResults { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+        .po-result { text-align: left; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-high); border-radius: 10px; padding: 8px 10px; cursor: pointer; font-family: inherit; }
+        .po-result span { display: block; font-size: 12.5px; font-weight: 800; }
+        .po-result small { font-size: 10.5px; color: var(--text-low); }
+        .po-sec { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border-subtle); padding-top: 10px; }
+        .po-date { height: 32px; border-radius: 9999px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-mid); padding: 0 10px; font-size: 12px; font-weight: 800; font-family: inherit; }
+        .po-date.active { background: var(--cyan-tech); border-color: var(--cyan-tech); color: #04121c; }
+        .po-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .po-grid label { display: flex; flex-direction: column; gap: 3px; font-size: 10.5px; font-weight: 800; color: var(--text-low); }
+        .po-grid .po-full { grid-column: 1 / -1; }
+        .po-grid input, .po-grid select { height: 38px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-high); padding: 0 10px; font-size: 14px; font-family: inherit; min-width: 0; }
+        .po-preview { white-space: pre-wrap; word-break: break-word; font-family: inherit; font-size: 12px; line-height: 1.5; background: #0b141a; color: #e9edef; border-radius: 12px; padding: 12px; margin: 0; border-left: 3px solid #25d366; }
+        .pv-card { display: flex; gap: 6px; align-items: center; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 9px 10px; }
+        .pv-card b { display: block; font-size: 13px; }
+        .pv-card small { display: block; font-size: 10.5px; color: var(--text-low); margin-top: 2px; }
+        .pv-btn { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border-subtle); background: var(--bg-card); cursor: pointer; flex-shrink: 0; }
+        .pv-next { display: flex; justify-content: space-between; align-items: center; gap: 8px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-high); border-radius: 12px; padding: 10px 12px; cursor: pointer; font-family: inherit; text-align: left; }
+        .pv-next b { display: block; font-size: 13px; }
+        .pv-next small { font-size: 10.5px; color: var(--text-low); }
         .f-chip { flex-shrink: 0; padding: 7px 12px; border-radius: 9999px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-mid); font-size: 11.5px; font-weight: 800; cursor: pointer; font-family: inherit; white-space: nowrap; }
         .f-chip.active { background: var(--cyan-tech); border-color: var(--cyan-tech); color: #04121c; }
         .f-chip[data-f="low"].active { background: #f59e0b; border-color: #f59e0b; color: #111; }
@@ -1629,24 +1677,101 @@
     <div id="orderModal" class="modal-overlay hidden">
         <div class="modal-box">
             <div class="modal-header">
-                <span><i class="fa-solid fa-clipboard-list" style="color: #f59e0b; margin-right: 6px;"></i> Pedido Sugerido</span>
-                <button type="button" onclick="closeOrderModal()" style="background: none; border: none; color: var(--text-low); font-size: 18px; cursor: pointer;">
+                <span><i class="fa-solid fa-clipboard-list" style="color: #f59e0b; margin-right: 6px;"></i> Pedido al proveedor</span>
+                <button type="button" onclick="closeOrderModal()" style="background: none; border: none; color: var(--text-low); font-size: 18px; cursor: pointer;" aria-label="Cerrar">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 11px; color: var(--text-low); line-height: 1.5;">
-                    Productos agotados o por debajo del stock mínimo. La cantidad sugerida lleva el stock al <b>doble del mínimo</b>
-                    (o a una caja si no tiene mínimo), redondeada a cajas completas cuando aplica.
-                </p>
-                <div id="orderList" style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;"></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <button type="button" onclick="shareOrderWhatsApp()" class="btn-green-action" style="padding: 9px; font-size: 12px;">
-                        <i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp
-                    </button>
-                    <button type="button" onclick="exportOrderXLSX()" class="btn-dark-action" style="padding: 9px; font-size: 12px;">
+                <div id="poEdit">
+                    <div class="po-sec-head">
+                        <span class="po-label">Proveedor</span>
+                        <button type="button" class="po-link" onclick="openProvidersModal(false)">🚚 Mis proveedores</button>
+                    </div>
+                    <div id="poProviders" class="po-chips"></div>
+                    <p id="poNoProv" class="po-hint hidden">Crea tu primer proveedor con <b>＋ Nuevo</b> para enviarle el pedido directo a su WhatsApp.</p>
+
+                    <div id="poRestored" class="po-banner po-banner-ok hidden">💾 Recuperamos el pedido que estabas armando · <a onclick="restartOrder()">Empezar de nuevo</a></div>
+                    <div id="poOthers" class="po-banner hidden"></div>
+
+                    <p style="font-size: 11px; color: var(--text-low); line-height: 1.5; margin: 4px 0 0;">
+                        Productos agotados o bajo el mínimo. La cantidad sugerida lleva el stock al <b>doble del mínimo</b>, redondeada a la presentación. Puedes cambiar todo.
+                    </p>
+                    <div id="poCount" class="po-count"></div>
+                    <div id="poList" class="po-list"></div>
+
+                    <div class="po-search">
+                        <input id="poSearch" type="search" placeholder="＋ Agregar otro producto…" oninput="ordSearch()" autocomplete="off">
+                        <div id="poSearchResults"></div>
+                    </div>
+
+                    <div class="po-sec">
+                        <span class="po-label">📅 ¿Para cuándo?</span>
+                        <div id="poWhen" class="po-chips">
+                            <button type="button" class="f-chip" data-rel="0" onclick="ordSetRel(0)">Hoy</button>
+                            <button type="button" class="f-chip" data-rel="1" onclick="ordSetRel(1)">Mañana</button>
+                            <button type="button" class="f-chip" data-rel="2" onclick="ordSetRel(2)">Pasado mañana</button>
+                            <input id="poDate" type="date" class="po-date" onchange="ordSetDate(this.value)" aria-label="Elegir fecha">
+                        </div>
+                        <small id="poDateLabel" class="po-hint" style="text-transform: capitalize;"></small>
+                    </div>
+
+                    <div class="po-sec">
+                        <span class="po-label">📍 Datos de entrega</span>
+                        <div class="po-grid">
+                            <label class="po-full">Negocio<input id="poNegocio" type="text" placeholder="Nombre de tu negocio" onchange="ordSetField('negocio', this.value)"></label>
+                            <label class="po-full">Sede / local<select id="poSede" onchange="ordSetSede(this.value)"></select></label>
+                            <label class="po-full">Dirección de entrega<input id="poDireccion" type="text" placeholder="Ej: Calle 10 # 20-30" onchange="ordSetField('direccion', this.value)"></label>
+                            <label class="po-full">A nombre de<input id="poNombre" type="text" placeholder="Quién recibe" onchange="ordSetField('aNombreDe', this.value)"></label>
+                            <label class="po-full">Nota (opcional)<input id="poNote" type="text" placeholder="Ej: Entregar en la mañana" oninput="ordSetField('note', this.value)"></label>
+                        </div>
+                    </div>
+
+                    <button type="button" id="poPreviewBtn" class="po-link" style="width: 100%; padding: 8px;" onclick="toggleOrderPreview()">👁️ Ver cómo queda el mensaje</button>
+                    <pre id="poPreview" class="po-preview hidden"></pre>
+
+                    <button type="button" id="poSendBtn" onclick="sendOrderWhatsApp()" class="btn-green-action" style="width: 100%; padding: 12px; font-size: 13px;"></button>
+                    <button type="button" onclick="exportOrderXLSX()" class="btn-dark-action" style="width: 100%; padding: 9px; font-size: 12px;">
                         <i class="fa-solid fa-file-excel"></i> Descargar Excel
                     </button>
+                </div>
+
+                <div id="poSent" class="hidden" style="text-align: center;">
+                    <div style="font-size: 44px; line-height: 1;">✅</div>
+                    <h3 id="poSentTitle" style="margin: 8px 0 4px; font-size: 16px;"></h3>
+                    <p id="poSentInfo" class="po-hint"></p>
+                    <button type="button" class="po-link" onclick="resendLastOrder()">↻ Abrir WhatsApp otra vez</button>
+                    <p class="po-label" style="text-align: left; margin-top: 14px;">Sigue con el siguiente proveedor</p>
+                    <div id="poSentNext" style="display: flex; flex-direction: column; gap: 6px; text-align: left;"></div>
+                    <button type="button" class="btn-dark-action" style="width: 100%; padding: 9px; font-size: 12px; margin-top: 10px;" onclick="closeOrderModal()">Terminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PROVEEDORES -->
+    <div id="providersModal" class="modal-overlay hidden" style="z-index: 1001;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>🚚 Mis proveedores</span>
+                <button type="button" onclick="closeProvidersModal()" style="background: none; border: none; color: var(--text-low); font-size: 18px; cursor: pointer;" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="pvList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                <button type="button" id="pvAddBtn" class="btn-gold-action" style="width: 100%; padding: 10px; font-size: 12px;" onclick="newProvider()">＋ Agregar proveedor</button>
+                <div id="pvForm" class="po-sec hidden">
+                    <span id="pvFormTitle" class="po-label">Nuevo proveedor</span>
+                    <div class="po-grid">
+                        <label class="po-full">Nombre<input id="pvName" type="text" placeholder="Ej: Distribuidora Andina"></label>
+                        <label class="po-full">WhatsApp<input id="pvPhone" type="tel" inputmode="tel" placeholder="Ej: 3001234567"></label>
+                        <label class="po-full">¿Qué me vende?<input id="pvNote" type="text" placeholder="Ej: Aseo y desechables"></label>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                        <button type="button" class="btn-dark-action" style="padding: 9px; font-size: 12px;" onclick="cancelProvider()">Cancelar</button>
+                        <button type="button" class="btn-green-action" style="padding: 9px; font-size: 12px;" onclick="saveProvider()">Guardar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -5480,117 +5605,744 @@
         }
 
         // ---------- Pedido sugerido ----------
-        function getSuggestedOrder() {
-            return inventory.filter(Boolean).filter(i => getStockStatus(i)).map(i => {
-                const units = parseInt(i.units) || 0;
-                const min = parseInt(i.minStock) || 0;
-                const perBox = parseInt(i.cxUnitsPerBox) || 12;
-                const usesBoxes = !isNA(i.cx);
-                let qty = min > 0 ? Math.max(min * 2 - units, 1) : perBox;
-                let boxes = null;
-                if (usesBoxes) {
-                    boxes = Math.max(1, Math.ceil(qty / perBox));
-                    qty = boxes * perBox;
-                }
-                return { item: i, units, min, perBox, qty, boxes, status: getStockStatus(i) };
-            }).sort((a, b) =>
-                normCat(a.item.category).localeCompare(normCat(b.item.category)) ||
-                String(a.item.name || '').localeCompare(String(b.item.name || ''), 'es', { sensitivity: 'base' }));
-        }
+        // ==========================================
+        // PEDIDO AL PROVEEDOR (editable, varios proveedores, WhatsApp)
+        // ==========================================
+        const BASE_PRES = [
+            { clave: 'unidad',  label: 'Unidad',    singular: 'und',     plural: 'und',      noCont: true },
+            { clave: 'caja',    label: 'Caja (CX)', singular: 'caja',    plural: 'cajas' },
+            { clave: 'paquete', label: 'Paquete',   singular: 'paquete', plural: 'paquetes' },
+            { clave: 'canasta', label: 'Canasta',   singular: 'canasta', plural: 'canastas' },
+            { clave: 'sixpack', label: 'Sixpack',   singular: 'sixpack', plural: 'sixpacks', def: 6 },
+            { clave: 'paca',    label: 'Paca',      singular: 'paca',    plural: 'pacas' },
+            { clave: 'bolsa',   label: 'Bolsa',     singular: 'bolsa',   plural: 'bolsas' },
+            { clave: 'docena',  label: 'Docena',    singular: 'docena',  plural: 'docenas', def: 12 },
+            { clave: 'bulto',   label: 'Bulto',     singular: 'bulto',   plural: 'bultos' },
+            { clave: 'botella', label: 'Botella',   singular: 'botella', plural: 'botellas', noCont: true },
+            { clave: 'garrafa', label: 'Garrafa',   singular: 'garrafa', plural: 'garrafas', noCont: true }
+        ];
 
-        function openOrderModal() {
-            const list = document.getElementById('orderList');
-            const order = getSuggestedOrder();
-            if (order.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-low); text-align: center; padding: 16px;">
-                    🎉 No hay productos agotados ni por debajo del mínimo.<br><br>
-                    <span style="font-size: 11px;">Tip: edita un producto y llena <b>Stock mínimo</b> para que la app te avise.</span></p>`;
-            } else {
-                let lastCat = null;
-                list.innerHTML = order.map(o => {
-                    const catHeader = normCat(o.item.category) !== lastCat
-                        ? `<div style="font-size: 10px; font-weight: 900; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 6px;">${esc(o.item.category || 'General')}</div>`
-                        : '';
-                    lastCat = normCat(o.item.category);
-                    return `${catHeader}
-                        <div class="order-item">
-                            <div style="min-width: 0;">
-                                <span style="font-weight: 800; color: var(--text-high); display: block; white-space: normal;">${esc(o.item.name)}</span>
-                                <span style="font-size: 10px; color: var(--text-low);">${esc(o.item.sap)} • Hay ${o.units} und${o.min ? ` • Mín ${o.min}` : ''}</span>
-                                <span class="badge ${o.status.cls}" style="font-size: 9px; margin-left: 4px;">${o.status.label}</span>
-                            </div>
-                            <div class="order-qty">
-                                <strong>${o.boxes ? `${o.boxes} CX` : `${o.qty} und`}</strong>
-                                <span style="font-size: 10px; color: var(--text-low);">${o.boxes ? `${o.qty} und` : ''}</span>
-                            </div>
-                        </div>`;
-                }).join('') + `<p style="font-size: 11px; color: var(--text-mid); text-align: right; font-weight: 800; margin-top: 4px;">${order.length} producto(s) para pedir</p>`;
+        let ordCfg = null;         // configuración del negocio (proveedores, presentaciones, entrega)
+        let ordProv = null;        // nombre del proveedor elegido
+        let ordItems = [];         // [{ key, qty, pres, cont }]
+        let ordDate = { rel: 0 };  // { rel: días desde hoy } o { date: 'AAAA-MM-DD' }
+        let ordNote = '';
+        let ordRestored = false;
+        let ordView = 'edit';      // 'edit' | 'sent'
+        let ordLastSent = null;
+        let ordPreview = false;
+        let ordHistoryPushed = false;
+
+        // ---------- Plurales en español ----------
+        function pluralEs(word) {
+            const w = String(word || '').trim();
+            if (!w) return w;
+            const lower = w.toLowerCase();
+            const noAcc = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u' };
+            if (/[aeiouáéó]$/.test(lower)) return w + 's';                 // caja → cajas, café → cafés
+            if (/z$/.test(lower)) return w.slice(0, -1) + 'ces';            // luz → luces
+            if (/[áéíóú][ns]$/.test(lower)) {                               // bidón → bidones
+                const i = lower.length - 2;
+                return w.slice(0, i) + noAcc[lower[i]] + w.slice(i + 1) + 'es';
             }
+            if (/[aeiou]y$/.test(lower)) return w + 's';                    // display → displays
+            if (/[sx]$/.test(lower)) return w;                              // ya termina en s
+            if (!/[lnrdj]$/.test(lower)) return w + 's';                    // pack → packs
+            return w + 'es';                                                // barril → barriles
+        }
+
+        // ---------- Configuración del negocio ----------
+        function ordCfgKey() {
+            return getUserStorageKey(currentUser ? currentUser.username : 'anon') + '_pedidos_cfg';
+        }
+
+        function defaultOrderConfig() {
+            let store = '';
+            try { store = (JSON.parse(localStorage.getItem('dl_label_prefs') || '{}').store) || ''; } catch (e) {}
+            return {
+                proveedores: [], presentaciones: [], aNombreDe: currentUser ? (currentUser.name || '') : '',
+                negocio: store, sedes: [{ nombre: 'Principal', direccion: '' }], sedeActual: 'Principal', updatedTs: 0
+            };
+        }
+
+        function loadOrderConfigLocal() {
+            let cfg = null;
+            try { cfg = JSON.parse(localStorage.getItem(ordCfgKey())); } catch (e) {}
+            const def = defaultOrderConfig();
+            cfg = Object.assign(def, cfg || {});
+            if (!Array.isArray(cfg.sedes) || !cfg.sedes.length) cfg.sedes = def.sedes;
+            if (!cfg.sedes.some(s => s.nombre === cfg.sedeActual)) cfg.sedeActual = cfg.sedes[0].nombre;
+            return cfg;
+        }
+
+        function orderConfigRef() {
+            try { return (db && currentUser && currentUser.uid && hasPremiumAccess()) ? db.collection(`users/${currentUser.uid}/config`).doc('pedidos') : null; } catch (e) { return null; }
+        }
+
+        async function syncOrderConfigFromCloud() {
+            const ref = orderConfigRef();
+            if (!ref) return;
+            try {
+                const snap = await ref.get();
+                if (snap.exists) {
+                    const cloud = snap.data();
+                    if ((cloud.updatedTs || 0) > (ordCfg.updatedTs || 0)) {
+                        ordCfg = Object.assign(defaultOrderConfig(), cloud);
+                        localStorage.setItem(ordCfgKey(), JSON.stringify(ordCfg));
+                        if (!document.getElementById('orderModal').classList.contains('hidden')) renderOrder();
+                    } else if ((ordCfg.updatedTs || 0) > (cloud.updatedTs || 0)) {
+                        ref.set(ordCfg).catch(() => {});
+                    }
+                } else if (ordCfg.updatedTs) {
+                    ref.set(ordCfg).catch(() => {});
+                }
+            } catch (e) {
+                console.log("Configuración de pedidos sin conexión:", e);
+            }
+        }
+
+        function saveOrderConfig() {
+            ordCfg.updatedTs = Date.now();
+            try { localStorage.setItem(ordCfgKey(), JSON.stringify(ordCfg)); } catch (e) {}
+            const ref = orderConfigRef();
+            // Con la persistencia de Firestore, si no hay internet queda en cola y se sube al reconectar
+            if (ref) ref.set(ordCfg).catch(e => console.log("Configuración de pedidos pendiente:", e));
+        }
+
+        function currentSede() {
+            return ordCfg.sedes.find(s => s.nombre === ordCfg.sedeActual) || ordCfg.sedes[0];
+        }
+
+        // ---------- Presentaciones ----------
+        function allPres() {
+            return BASE_PRES.concat((ordCfg.presentaciones || []).map(p => ({
+                clave: p.clave, label: p.singular.charAt(0).toUpperCase() + p.singular.slice(1), singular: p.singular, plural: p.plural
+            })));
+        }
+
+        function presOf(clave) {
+            return allPres().find(p => p.clave === clave) || BASE_PRES[0];
+        }
+
+        function presText(line) {
+            const p = presOf(line.pres);
+            const word = line.qty === 1 ? p.singular : p.plural;
+            return `${line.qty} ${word}` + (p.noCont ? '' : ` x${line.cont} und`);
+        }
+
+        // ---------- Productos ----------
+        function ordItemByKey(key) {
+            return inventory.find(i => i && countKey(i) === key) || null;
+        }
+
+        function suggestLine(it) {
+            const units = parseInt(it.units) || 0;
+            const min = parseInt(it.minStock) || 0;
+            const perBox = parseInt(it.cxUnitsPerBox) || 12;
+            const need = min > 0 ? Math.max(min * 2 - units, 1) : perBox;
+            let pres = it.pedido_unidad && allPres().some(p => p.clave === it.pedido_unidad) ? it.pedido_unidad : (isNA(it.cx) ? 'unidad' : 'caja');
+            const p = presOf(pres);
+            const cont = p.noCont ? 1 : (parseInt(it.pedido_contenido) > 0 ? parseInt(it.pedido_contenido) : (pres === 'caja' ? perBox : (p.def || perBox)));
+            return { key: countKey(it), qty: Math.max(1, Math.ceil(need / cont)), pres, cont };
+        }
+
+        function lowItems() {
+            return inventory.filter(Boolean).filter(i => getStockStatus(i));
+        }
+
+        function sameProv(a, b) {
+            return normCat(a) === normCat(b);
+        }
+
+        function belongsTo(it, prov) {
+            return !it.pedido_proveedor || !prov || sameProv(it.pedido_proveedor, prov);
+        }
+
+        function sortByCatName(a, b) {
+            return normCat(a.category).localeCompare(normCat(b.category)) ||
+                String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base' });
+        }
+
+        function buildFreshOrder(prov) {
+            return lowItems().filter(i => belongsTo(i, prov)).sort(sortByCatName).map(suggestLine);
+        }
+
+        function otherProvLow(prov) {
+            if (!prov) return [];
+            const inOrder = new Set(ordItems.map(l => l.key));
+            return lowItems().filter(i => i.pedido_proveedor && !sameProv(i.pedido_proveedor, prov) && !inOrder.has(countKey(i)));
+        }
+
+        // ---------- Borrador (solo en este celular) ----------
+        function ordDraftKey(prov) {
+            return `${getUserStorageKey(currentUser ? currentUser.username : 'anon')}_pedido_borrador_${normCat(ordCfg.sedeActual)}_${normCat(prov || 'sin-proveedor')}`;
+        }
+
+        function ordLastProvKey() {
+            return getUserStorageKey(currentUser ? currentUser.username : 'anon') + '_pedido_ultimo_prov';
+        }
+
+        function saveOrderDraft() {
+            try {
+                localStorage.setItem(ordDraftKey(ordProv), JSON.stringify({ items: ordItems, date: ordDate, note: ordNote, ts: Date.now() }));
+                localStorage.setItem(ordLastProvKey(), ordProv || '');
+            } catch (e) {}
+        }
+
+        function loadOrderDraft(prov) {
+            try {
+                const d = JSON.parse(localStorage.getItem(ordDraftKey(prov)));
+                return d && Array.isArray(d.items) ? d : null;
+            } catch (e) { return null; }
+        }
+
+        function clearOrderDraft(prov) {
+            try { localStorage.removeItem(ordDraftKey(prov)); } catch (e) {}
+        }
+
+        function selectOrderProvider(prov, opts = {}) {
+            ordProv = prov || null;
+            const draft = opts.fresh ? null : loadOrderDraft(ordProv);
+            if (draft) {
+                ordItems = draft.items.filter(l => ordItemByKey(l.key));
+                ordDate = draft.date || { rel: 0 };
+                ordNote = draft.note || '';
+                ordRestored = true;
+            } else {
+                ordItems = buildFreshOrder(ordProv);
+                ordDate = { rel: 0 };
+                ordNote = '';
+                ordRestored = false;
+            }
+            ordView = 'edit';
+            ordPreview = false;
+            try { localStorage.setItem(ordLastProvKey(), ordProv || ''); } catch (e) {}
+            renderOrder();
+        }
+
+        function restartOrder() {
+            clearOrderDraft(ordProv);
+            selectOrderProvider(ordProv, { fresh: true });
+            showToast('🔄 Pedido reiniciado con los productos bajos');
+        }
+
+        // ---------- Abrir / cerrar (con botón atrás del celular) ----------
+        function openOrderModal() {
+            flushAllAdjust();
+            ordCfg = loadOrderConfigLocal();
+            let last = null;
+            try { last = localStorage.getItem(ordLastProvKey()); } catch (e) {}
+            const provs = ordCfg.proveedores || [];
+            const start = (last && provs.some(p => sameProv(p.nombre, last))) ? provs.find(p => sameProv(p.nombre, last)).nombre : (provs[0] ? provs[0].nombre : null);
+            selectOrderProvider(start);
             document.getElementById('orderModal').classList.remove('hidden');
+            if (!ordHistoryPushed) {
+                try { history.pushState({ dlModal: 'order' }, ''); ordHistoryPushed = true; } catch (e) {}
+            }
+            syncOrderConfigFromCloud();
         }
 
-        function closeOrderModal() {
+        function closeOrderModal(fromPopstate) {
+            if (ordView === 'edit' && ordCfg) saveOrderDraft();
             document.getElementById('orderModal').classList.add('hidden');
+            closeProvidersModal();
+            if (ordHistoryPushed && !fromPopstate) {
+                ordHistoryPushed = false;
+                try { history.back(); } catch (e) {}
+            } else {
+                ordHistoryPushed = false;
+            }
         }
 
-        function shareOrderWhatsApp() {
-            const order = getSuggestedOrder();
-            if (order.length === 0) {
-                uiAlert("No hay productos para pedir.");
+        window.addEventListener('popstate', () => {
+            const m = document.getElementById('orderModal');
+            if (m && !m.classList.contains('hidden')) closeOrderModal(true);
+        });
+
+        // ---------- Edición ----------
+        function ordChanged(rerender = true) {
+            saveOrderDraft();
+            if (rerender) renderOrder(); else { renderOrderSummary(); renderOrderPreview(); }
+        }
+
+        function ordSetQty(i, val) {
+            const n = parseInt(val);
+            ordItems[i].qty = isNaN(n) ? 1 : Math.max(1, n);
+            ordChanged();
+        }
+
+        function ordStep(i, d) {
+            ordItems[i].qty = Math.max(1, (ordItems[i].qty || 1) + d);
+            ordChanged();
+        }
+
+        function ordSetCont(i, val) {
+            const n = parseInt(val);
+            ordItems[i].cont = isNaN(n) || n < 1 ? 1 : n;
+            ordChanged(false);
+            const tot = document.getElementById('poTot' + i);
+            if (tot) tot.textContent = `= ${ordItems[i].qty * ordItems[i].cont} und`;
+        }
+
+        async function ordSetPres(i, sel) {
+            const line = ordItems[i];
+            if (sel.value === '__new') {
+                const name = await uiPrompt("Otra presentación\nEscribe el nombre de la presentación (ej: Bidón, Display, Fardo). Quedará guardada para siempre.", '', { okText: 'Guardar' });
+                const clean = String(name || '').trim().toLowerCase();
+                if (!clean) { sel.value = line.pres; return; }
+                const existing = allPres().find(p => normCat(p.singular) === normCat(clean) || normCat(p.label) === normCat(clean));
+                if (existing) {
+                    line.pres = existing.clave;
+                } else {
+                    const pres = { clave: 'x:' + clean, singular: clean, plural: pluralEs(clean) };
+                    ordCfg.presentaciones = (ordCfg.presentaciones || []).concat(pres);
+                    saveOrderConfig();
+                    line.pres = pres.clave;
+                    showToast(`✅ Presentación "${clean}" guardada`);
+                }
+            } else {
+                line.pres = sel.value;
+            }
+            const p = presOf(line.pres);
+            const it = ordItemByKey(line.key);
+            if (p.noCont) line.cont = 1;
+            else if (line.pres === 'caja' && it) line.cont = parseInt(it.cxUnitsPerBox) || line.cont || 12;
+            else if (p.def) line.cont = p.def;
+            else if (!line.cont || line.cont < 2) line.cont = (it && parseInt(it.cxUnitsPerBox)) || 12;
+            ordChanged();
+        }
+
+        function ordRemove(i) {
+            const removed = ordItems.splice(i, 1)[0];
+            ordChanged();
+            const it = ordItemByKey(removed.key);
+            showToast(`Quitado: ${it ? it.name : 'producto'}`, 'Deshacer', () => {
+                ordItems.splice(i, 0, removed);
+                ordChanged();
+            });
+        }
+
+        function ordAddProduct(key) {
+            const it = ordItemByKey(key);
+            if (!it || ordItems.some(l => l.key === key)) return;
+            ordItems.push(suggestLine(it));
+            document.getElementById('poSearch').value = '';
+            document.getElementById('poSearchResults').innerHTML = '';
+            ordChanged();
+            showToast(`➕ ${it.name} agregado al pedido`);
+        }
+
+        function ordAddOthers() {
+            otherProvLow(ordProv).sort(sortByCatName).forEach(it => ordItems.push(suggestLine(it)));
+            ordChanged();
+        }
+
+        function ordSearch() {
+            const q = normCat(document.getElementById('poSearch').value);
+            const box = document.getElementById('poSearchResults');
+            if (!q) { box.innerHTML = ''; return; }
+            const inOrder = new Set(ordItems.map(l => l.key));
+            const res = inventory.filter(i => i && !inOrder.has(countKey(i)) &&
+                (normCat(i.name).includes(q) || normCat(i.sap).includes(q) || String(i.barcode || '').includes(q))).slice(0, 8);
+            box.innerHTML = res.length ? res.map(i => `
+                <button type="button" class="po-result" data-key="${esc(countKey(i))}" onclick="ordAddProduct(this.dataset.key)">
+                    <span>${esc(i.name)}</span><small>Hay ${parseInt(i.units) || 0} und${i.pedido_proveedor ? ' • ' + esc(i.pedido_proveedor) : ''}</small>
+                </button>`).join('') : '<p class="po-empty">No encontré productos con ese nombre.</p>';
+        }
+
+        // ---------- Entrega ----------
+        function ordDateValue() {
+            if (ordDate.date) {
+                const [y, m, d] = ordDate.date.split('-').map(Number);
+                return new Date(y, m - 1, d);
+            }
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + (ordDate.rel || 0));
+            return d;
+        }
+
+        function ordSetRel(days) {
+            ordDate = { rel: days };
+            ordChanged();
+        }
+
+        function ordSetDate(val) {
+            if (!val) return;
+            ordDate = { date: val };
+            ordChanged();
+        }
+
+        function ordSetField(field, val) {
+            if (field === 'note') { ordNote = val; saveOrderDraft(); renderOrderPreview(); return; }
+            if (field === 'direccion') { currentSede().direccion = val.trim(); }
+            else ordCfg[field] = val.trim();
+            saveOrderConfig();
+            renderOrderPreview();
+        }
+
+        async function ordSetSede(val) {
+            if (val === '__new') {
+                const name = await uiPrompt("Nueva sede\nEscribe el nombre de la sede o local (ej: Sede Centro):", '', { okText: 'Agregar' });
+                const clean = String(name || '').trim();
+                if (!clean) { renderOrder(); return; }
+                if (!ordCfg.sedes.some(s => normCat(s.nombre) === normCat(clean))) ordCfg.sedes.push({ nombre: clean, direccion: '' });
+                val = ordCfg.sedes.find(s => normCat(s.nombre) === normCat(clean)).nombre;
+            }
+            saveOrderDraft();
+            ordCfg.sedeActual = val;
+            saveOrderConfig();
+            selectOrderProvider(ordProv);
+        }
+
+        // ---------- Mensaje ----------
+        function buildOrderMessage() {
+            const h = new Date().getHours();
+            const saludo = h < 12 ? 'Buenos días' : (h < 19 ? 'Buenas tardes' : 'Buenas noches');
+            const negocio = ordCfg.negocio || (currentUser ? currentUser.name : '') || 'mi negocio';
+            const sede = currentSede();
+            const showSede = sede && sede.nombre && !(ordCfg.sedes.length === 1 && normCat(sede.nombre) === 'principal');
+            let lugar = `*${negocio}*` + (showSede ? ` · ${sede.nombre}` : '') + (sede && sede.direccion ? ` (${sede.direccion})` : '');
+            const nombre = (ordCfg.aNombreDe || '').trim();
+            const fecha = ordDateValue().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const lines = [
+                `${saludo}${ordProv ? ' ' + ordProv : ''}, para realizar el siguiente pedido para ${lugar}${nombre ? ' a nombre de ' + nombre : ''}.`,
+                `📅 Para el ${fecha}`,
+                ''
+            ];
+            ordItems.forEach(l => {
+                const it = ordItemByKey(l.key);
+                if (it) lines.push(`• ${String(it.name || '').toUpperCase()}: ${presText(l)}`);
+            });
+            lines.push('', `Total: ${ordItems.length} ${ordItems.length === 1 ? 'producto' : 'productos'}`);
+            if (ordNote.trim()) lines.push(`📝 ${ordNote.trim()}`);
+            lines.push('', 'Muchas gracias, quedo pendiente. 🙏');
+            return lines.join('\n');
+        }
+
+        function toggleOrderPreview() {
+            ordPreview = !ordPreview;
+            renderOrderPreview();
+        }
+
+        function waPhone(raw) {
+            let d = String(raw || '').replace(/\D/g, '');
+            if (d.length === 10) d = '57' + d;
+            return d;
+        }
+
+        function sendOrderWhatsApp() {
+            if (!ordItems.length) { uiAlert("⚠️ El pedido está vacío\nAgrega al menos un producto."); return; }
+            const prov = (ordCfg.proveedores || []).find(p => sameProv(p.nombre, ordProv));
+            if (!prov) { uiAlert("⚠️ Elige un proveedor\nSelecciona o crea el proveedor al que le vas a enviar el pedido."); return; }
+            const msg = buildOrderMessage();
+            const phone = waPhone(prov.whatsapp);
+            // Se abre de inmediato (en el mismo toque) para que el celular no lo bloquee
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+
+            // Cada producto recuerda proveedor, presentación y contenido
+            const changed = [];
+            ordItems.forEach(l => {
+                const it = ordItemByKey(l.key);
+                if (!it) return;
+                if (it.pedido_unidad !== l.pres || Number(it.pedido_contenido) !== l.cont || it.pedido_proveedor !== prov.nombre) {
+                    it.pedido_unidad = l.pres;
+                    it.pedido_contenido = l.cont;
+                    it.pedido_proveedor = prov.nombre;
+                    changed.push(it);
+                }
+            });
+            if (changed.length) {
+                saveUserInventoryToLocal();
+                if (db && currentUser && currentUser.uid && hasPremiumAccess()) {
+                    const col = getCollectionName();
+                    for (let k = 0; k < changed.length; k += 400) {
+                        const batch = db.batch();
+                        changed.slice(k, k + 400).forEach(it => {
+                            const id = getDocId(it);
+                            if (id) batch.set(db.collection(col).doc(id), {
+                                pedido_unidad: it.pedido_unidad, pedido_contenido: it.pedido_contenido, pedido_proveedor: it.pedido_proveedor
+                            }, { merge: true });
+                        });
+                        batch.commit().catch(e => console.log("Datos del pedido pendientes de subir:", e));
+                    }
+                }
+            }
+            ordLastSent = { prov: prov.nombre, count: ordItems.length, msg, phone };
+            clearOrderDraft(prov.nombre);
+            ordView = 'sent';
+            renderOrder();
+        }
+
+        function resendLastOrder() {
+            if (!ordLastSent) return;
+            window.open(`https://wa.me/${ordLastSent.phone}?text=${encodeURIComponent(ordLastSent.msg)}`, '_blank');
+        }
+
+        // ---------- Proveedores ----------
+        let provEditing = null; // nombre del proveedor en edición, '' = nuevo
+
+        function openProvidersModal(startNew) {
+            provEditing = startNew ? '' : null;
+            renderProviders();
+            document.getElementById('providersModal').classList.remove('hidden');
+            if (startNew) setTimeout(() => document.getElementById('pvName').focus(), 100);
+        }
+
+        function closeProvidersModal() {
+            const m = document.getElementById('providersModal');
+            if (m) m.classList.add('hidden');
+            provEditing = null;
+        }
+
+        function renderProviders() {
+            const list = document.getElementById('pvList');
+            const provs = ordCfg.proveedores || [];
+            list.innerHTML = provs.length ? provs.map((p, i) => {
+                const n = inventory.filter(it => it && it.pedido_proveedor && sameProv(it.pedido_proveedor, p.nombre)).length;
+                return `
+                <div class="pv-card">
+                    <div style="min-width:0;flex:1;">
+                        <b>${esc(p.nombre)}</b>
+                        <small><i class="fa-brands fa-whatsapp"></i> ${esc(p.whatsapp || 'Sin número')}${p.nota ? ' • ' + esc(p.nota) : ''}</small>
+                        <small>${n} producto(s) asignados</small>
+                    </div>
+                    <button type="button" class="pv-btn" onclick="editProvider(${i})" aria-label="Editar">✏️</button>
+                    <button type="button" class="pv-btn" onclick="deleteProvider(${i})" aria-label="Eliminar">🗑️</button>
+                </div>`;
+            }).join('') : '<p class="po-empty">Aún no tienes proveedores. Agrega el primero.</p>';
+            const form = document.getElementById('pvForm');
+            form.classList.toggle('hidden', provEditing === null);
+            document.getElementById('pvAddBtn').classList.toggle('hidden', provEditing !== null);
+            if (provEditing !== null) {
+                const p = provs.find(x => x.nombre === provEditing) || { nombre: '', whatsapp: '', nota: '' };
+                document.getElementById('pvFormTitle').textContent = provEditing ? 'Editar proveedor' : 'Nuevo proveedor';
+                document.getElementById('pvName').value = p.nombre;
+                document.getElementById('pvPhone').value = p.whatsapp || '';
+                document.getElementById('pvNote').value = p.nota || '';
+            }
+        }
+
+        function newProvider() { provEditing = ''; renderProviders(); document.getElementById('pvName').focus(); }
+        function editProvider(i) { provEditing = ordCfg.proveedores[i].nombre; renderProviders(); }
+        function cancelProvider() { provEditing = null; renderProviders(); }
+
+        function renameProviderOnProducts(oldName, newName) {
+            const changed = [];
+            inventory.forEach(it => {
+                if (it && it.pedido_proveedor && sameProv(it.pedido_proveedor, oldName)) {
+                    if (newName) it.pedido_proveedor = newName; else delete it.pedido_proveedor;
+                    changed.push(it);
+                }
+            });
+            if (!changed.length) return;
+            saveUserInventoryToLocal();
+            if (db && currentUser && currentUser.uid && hasPremiumAccess()) {
+                const col = getCollectionName();
+                const batch = db.batch();
+                changed.slice(0, 450).forEach(it => {
+                    const id = getDocId(it);
+                    if (id) batch.set(db.collection(col).doc(id), { pedido_proveedor: newName || firebase.firestore.FieldValue.delete() }, { merge: true });
+                });
+                batch.commit().catch(() => {});
+            }
+        }
+
+        function saveProvider() {
+            const nombre = document.getElementById('pvName').value.trim();
+            const whatsapp = document.getElementById('pvPhone').value.trim();
+            const nota = document.getElementById('pvNote').value.trim();
+            if (!nombre) { uiAlert("⚠️ Falta el nombre\nEscribe el nombre del proveedor."); return; }
+            const digits = whatsapp.replace(/\D/g, '');
+            if (whatsapp && digits.length < 7) { uiAlert("⚠️ WhatsApp no válido\nEscribe el número con 10 dígitos (ej: 3001234567)."); return; }
+            const provs = ordCfg.proveedores || [];
+            const dup = provs.find(p => sameProv(p.nombre, nombre) && p.nombre !== provEditing);
+            if (dup) { uiAlert("⚠️ Ya existe\nYa tienes un proveedor con ese nombre."); return; }
+            const wasNew = !provEditing;
+            if (provEditing) {
+                const p = provs.find(x => x.nombre === provEditing);
+                const old = p.nombre;
+                Object.assign(p, { nombre, whatsapp, nota });
+                if (old !== nombre) {
+                    renameProviderOnProducts(old, nombre);
+                    const d = loadOrderDraft(old);
+                    if (d) { clearOrderDraft(old); try { localStorage.setItem(ordDraftKey(nombre), JSON.stringify(d)); } catch (e) {} }
+                    if (sameProv(ordProv, old)) ordProv = nombre;
+                }
+            } else {
+                provs.push({ nombre, whatsapp, nota });
+            }
+            ordCfg.proveedores = provs;
+            saveOrderConfig();
+            provEditing = null;
+            renderProviders();
+            if (wasNew) {
+                closeProvidersModal();
+                saveOrderDraft();
+                selectOrderProvider(nombre);
+                showToast(`✅ Proveedor ${nombre} agregado`);
+            } else {
+                renderOrder();
+            }
+        }
+
+        async function deleteProvider(i) {
+            const p = ordCfg.proveedores[i];
+            if (!(await uiConfirm(`Eliminar proveedor\n¿Eliminar a ${p.nombre}? Sus productos quedarán sin proveedor asignado.`, { danger: true, okText: 'Eliminar' }))) return;
+            ordCfg.proveedores.splice(i, 1);
+            saveOrderConfig();
+            renameProviderOnProducts(p.nombre, null);
+            clearOrderDraft(p.nombre);
+            if (sameProv(ordProv, p.nombre)) selectOrderProvider(ordCfg.proveedores[0] ? ordCfg.proveedores[0].nombre : null);
+            renderProviders();
+            renderOrder();
+        }
+
+        // ---------- Pantalla ----------
+        function renderOrderSummary() {
+            const el = document.getElementById('poCount');
+            if (el) el.textContent = `${ordItems.length} ${ordItems.length === 1 ? 'producto' : 'productos'} en el pedido`;
+        }
+
+        function renderOrderPreview() {
+            const box = document.getElementById('poPreview');
+            const btn = document.getElementById('poPreviewBtn');
+            if (!box) return;
+            box.classList.toggle('hidden', !ordPreview);
+            btn.textContent = ordPreview ? '🙈 Ocultar mensaje' : '👁️ Ver cómo queda el mensaje';
+            if (ordPreview) box.textContent = buildOrderMessage();
+        }
+
+        function renderOrder() {
+            const provs = ordCfg.proveedores || [];
+            document.getElementById('poEdit').classList.toggle('hidden', ordView !== 'edit');
+            document.getElementById('poSent').classList.toggle('hidden', ordView !== 'sent');
+
+            if (ordView === 'sent') {
+                document.getElementById('poSentTitle').textContent = `Pedido enviado a ${ordLastSent.prov}`;
+                document.getElementById('poSentInfo').textContent = `${ordLastSent.count} producto(s). El mensaje también quedó copiado por si necesitas pegarlo.`;
+                const others = provs.filter(p => !sameProv(p.nombre, ordLastSent.prov));
+                document.getElementById('poSentNext').innerHTML = others.length ? others.map(p => {
+                    const n = lowItems().filter(i => i.pedido_proveedor && sameProv(i.pedido_proveedor, p.nombre)).length;
+                    const hasDraft = !!loadOrderDraft(p.nombre);
+                    return `<button type="button" class="pv-next" data-p="${esc(p.nombre)}" onclick="selectOrderProvider(this.dataset.p)">
+                        <span><b>${esc(p.nombre)}</b><small>${n ? n + ' producto(s) bajos' : 'Sin productos bajos asignados'}${hasDraft ? ' • 💾 pedido guardado' : ''}</small></span>
+                        <i class="fa-solid fa-chevron-right"></i></button>`;
+                }).join('') : '<p class="po-empty">No tienes otros proveedores registrados.</p>';
                 return;
             }
-            const fecha = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            let lastCat = null;
-            const lines = [`*PEDIDO - ${currentUser ? currentUser.name : 'DL STOCK PRO'}*`, `Fecha: ${fecha}`, ''];
-            order.forEach(o => {
-                if (normCat(o.item.category) !== lastCat) {
-                    lastCat = normCat(o.item.category);
-                    lines.push(`*${String(o.item.category || 'General').toUpperCase()}*`);
-                }
-                const qty = o.boxes ? `${o.boxes} caja(s) x${o.perBox} (${o.qty} und)` : `${o.qty} und`;
-                lines.push(`• ${o.item.name} — ${qty}`);
-            });
-            lines.push('', `Total: ${order.length} producto(s)`, '_Generado con DL STOCK PRO_');
-            const url = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
-            window.open(url, '_blank');
+
+            // Proveedores
+            document.getElementById('poProviders').innerHTML = provs.map(p =>
+                `<button type="button" class="f-chip${sameProv(p.nombre, ordProv) ? ' active' : ''}" data-p="${esc(p.nombre)}" onclick="saveOrderDraft(); selectOrderProvider(this.dataset.p)">${esc(p.nombre)}</button>`
+            ).join('') + `<button type="button" class="f-chip po-new" onclick="openProvidersModal(true)">＋ Nuevo</button>`;
+            document.getElementById('poNoProv').classList.toggle('hidden', !!provs.length);
+
+            // Aviso de borrador recuperado
+            document.getElementById('poRestored').classList.toggle('hidden', !ordRestored);
+
+            // Productos bajos de otros proveedores
+            const others = otherProvLow(ordProv);
+            const ob = document.getElementById('poOthers');
+            ob.classList.toggle('hidden', !others.length);
+            if (others.length) ob.innerHTML = `${others.length} producto(s) bajos son de otros proveedores · <a onclick="ordAddOthers()">Agregarlos aquí</a>`;
+
+            // Lista
+            const presOptions = allPres().map(p => `<option value="${esc(p.clave)}">${esc(p.label)}</option>`).join('') +
+                '<option value="__new">➕ Otra presentación…</option>';
+            document.getElementById('poList').innerHTML = ordItems.length ? ordItems.map((l, i) => {
+                const it = ordItemByKey(l.key);
+                if (!it) return '';
+                const st = getStockStatus(it);
+                const p = presOf(l.pres);
+                const min = parseInt(it.minStock) || 0;
+                return `
+                <div class="po-item">
+                    <div class="po-top">
+                        <div style="min-width:0;">
+                            <b>${esc(it.name)}</b>
+                            <small>${esc(it.sap || it.barcode)} • Hay ${parseInt(it.units) || 0} und${min ? ' • Mín ' + min : ''}
+                                ${st ? `<span class="badge ${st.cls}" style="font-size:9px;">${st.label}</span>` : ''}</small>
+                        </div>
+                        <button type="button" class="po-x" onclick="ordRemove(${i})" aria-label="Quitar del pedido">✕</button>
+                    </div>
+                    <div class="po-ctrl">
+                        <div class="po-qty">
+                            <button type="button" class="qs-btn qs-minus" onclick="ordStep(${i}, -1)" aria-label="Menos">−</button>
+                            <input type="number" min="1" inputmode="numeric" value="${l.qty}" onchange="ordSetQty(${i}, this.value)" onfocus="this.select()">
+                            <button type="button" class="qs-btn qs-plus" onclick="ordStep(${i}, 1)" aria-label="Más">+</button>
+                        </div>
+                        <select class="po-pres" onchange="ordSetPres(${i}, this)">${presOptions.replace(`value="${esc(l.pres)}"`, `value="${esc(l.pres)}" selected`)}</select>
+                        ${p.noCont ? '' : `<label class="po-cont">x <input type="number" min="1" inputmode="numeric" value="${l.cont}" oninput="ordSetCont(${i}, this.value)" onfocus="this.select()"> und</label>`}
+                    </div>
+                    <div class="po-line"><span>${esc(presText(l))}</span>${p.noCont ? '' : `<span id="poTot${i}">= ${l.qty * l.cont} und</span>`}</div>
+                </div>`;
+            }).join('') : `<p class="po-empty">${ordProv ? `No hay productos bajos para ${esc(ordProv)}.` : 'No hay productos bajos.'} Usa el buscador para agregar productos.</p>`;
+            renderOrderSummary();
+
+            // Entrega
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const sel = ordDateValue();
+            const rel = Math.round((sel - today) / 86400000);
+            document.querySelectorAll('#poWhen .f-chip').forEach(c => c.classList.toggle('active', !ordDate.date && Number(c.dataset.rel) === rel));
+            const dIn = document.getElementById('poDate');
+            dIn.value = `${sel.getFullYear()}-${String(sel.getMonth() + 1).padStart(2, '0')}-${String(sel.getDate()).padStart(2, '0')}`;
+            dIn.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            dIn.classList.toggle('active', !!ordDate.date);
+            document.getElementById('poDateLabel').textContent = sel.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('poNegocio').value = ordCfg.negocio || '';
+            document.getElementById('poSede').innerHTML = ordCfg.sedes.map(s => `<option value="${esc(s.nombre)}"${s.nombre === ordCfg.sedeActual ? ' selected' : ''}>${esc(s.nombre)}</option>`).join('') + '<option value="__new">＋ Nueva sede…</option>';
+            document.getElementById('poDireccion').value = currentSede().direccion || '';
+            document.getElementById('poNombre').value = ordCfg.aNombreDe || '';
+            document.getElementById('poNote').value = ordNote;
+
+            // Botón enviar
+            const btn = document.getElementById('poSendBtn');
+            const prov = provs.find(p => sameProv(p.nombre, ordProv));
+            btn.innerHTML = prov ? `📲 Enviar pedido a ${esc(prov.nombre)} por WhatsApp` : '📲 Elige un proveedor para enviar';
+            btn.disabled = !prov || !ordItems.length;
+            btn.style.opacity = btn.disabled ? '0.55' : '1';
+            renderOrderPreview();
         }
 
         function exportOrderXLSX() {
-            const order = getSuggestedOrder();
-            if (order.length === 0) {
-                uiAlert("No hay productos para pedir.");
-                return;
-            }
-            const headers = ['Categoría', 'Producto', 'Código Interno', 'Código de Barras', 'Stock Actual', 'Stock Mínimo', 'Estado', 'Pedir (Cajas)', 'Und. por Caja', 'Pedir (Und)'];
+            if (!ordItems.length) { uiAlert("No hay productos en el pedido."); return; }
+            const headers = ['Categoría', 'Producto', 'Código Interno', 'Código de Barras', 'Stock Actual', 'Stock Mínimo', 'Cantidad', 'Presentación', 'Und. por presentación', 'Total Und'];
             const lastCol = colLetter(headers.length - 1);
-            const rows = [];
-            rows.push([{ v: 'DL STOCK PRO — Pedido Sugerido', s: XS.title }]);
-            rows.push([{ v: `${currentUser ? (currentUser.name || '') : ''} • ${order.length} productos • Generado: ${nowLabel()}`, s: XS.subtitle }]);
-            rows.push([]);
-            rows.push(headers.map(h => ({ v: h, s: XS.header })));
-            order.forEach(o => {
+            const rows = [
+                [{ v: `Pedido${ordProv ? ' a ' + ordProv : ''} — ${ordCfg.negocio || (currentUser ? currentUser.name : '')}`, s: XS.title }],
+                [{ v: `Para el ${ordDateValue().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} • ${ordItems.length} productos • Generado: ${nowLabel()}`, s: XS.subtitle }],
+                [],
+                headers.map(h => ({ v: h, s: XS.header }))
+            ];
+            ordItems.forEach((l, idx) => {
+                const it = ordItemByKey(l.key);
+                if (!it) return;
+                const p = presOf(l.pres);
+                const rn = 5 + idx;
                 rows.push([
-                    { v: o.item.category || 'General', s: XS.text },
-                    { v: String(o.item.name || '').toUpperCase(), s: XS.bold },
-                    { v: String(o.item.sap || ''), s: XS.code },
-                    { v: String(o.item.barcode || ''), s: XS.center },
-                    { v: o.units, t: 'n', s: XS.und },
-                    o.min ? { v: o.min, t: 'n', s: XS.numCenter } : { v: '—', s: XS.na },
-                    { v: o.status.label, s: o.status.key === 'out' ? XS.crit : XS.prox },
-                    o.boxes ? { v: o.boxes, t: 'n', s: XS.cx } : { v: 'No aplica', s: XS.na },
-                    { v: o.perBox, t: 'n', s: XS.numCenter },
-                    { v: o.qty, t: 'n', s: XS.r1 }
+                    { v: it.category || 'General', s: XS.text },
+                    { v: String(it.name || '').toUpperCase(), s: XS.bold },
+                    { v: String(it.sap || ''), s: XS.code },
+                    { v: String(it.barcode || ''), s: XS.center },
+                    { v: parseInt(it.units) || 0, t: 'n', s: XS.und },
+                    (parseInt(it.minStock) || 0) ? { v: parseInt(it.minStock), t: 'n', s: XS.numCenter } : { v: '—', s: XS.na },
+                    { v: l.qty, t: 'n', s: XS.cx },
+                    { v: l.qty === 1 ? p.singular : p.plural, s: XS.center },
+                    { v: l.cont, t: 'n', s: XS.numCenter },
+                    { f: `G${rn}*I${rn}`, v: l.qty * l.cont, s: XS.r1 }
                 ]);
             });
             const blob = buildWorkbook('Pedido', rows, {
-                title: 'DL STOCK PRO - Pedido sugerido',
-                widths: [24, 40, 14, 17, 12, 12, 12, 13, 12, 12],
+                title: 'DL STOCK PRO - Pedido',
+                widths: [24, 40, 14, 17, 12, 12, 10, 14, 14, 11],
                 merges: [`A1:${lastCol}1`, `A2:${lastCol}2`],
                 freezeRow: 4,
-                autoFilter: `A4:${lastCol}${4 + order.length}`,
+                autoFilter: `A4:${lastCol}${4 + ordItems.length}`,
                 rowHeights: { 0: 26, 3: 30 }
             });
-            downloadBlob(blob, `DL_PEDIDO_${fileUserTag()}_${localDateStamp()}.xlsx`);
+            downloadBlob(blob, `DL_PEDIDO_${(ordProv || 'proveedor').replace(/[^a-zA-Z0-9]+/g, '_')}_${localDateStamp()}.xlsx`);
         }
 
         // ==========================================

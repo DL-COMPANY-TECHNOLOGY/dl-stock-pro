@@ -374,6 +374,8 @@
         .kpi-value.money { font-size: 18px; }
         .kpi-sub { font-size: 10.5px; color: var(--text-low); font-weight: 600; }
         .kpi-sub b { color: var(--kpi-color); }
+        .kpi-blur { filter: blur(6px); opacity: 0.55; user-select: none; }
+        .kpi-card.locked { background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), transparent 70%), var(--bg-card); }
         .quick-filter-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: var(--bg-card); border: 1px dashed var(--border-subtle); border-radius: 14px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; font-weight: 700; color: var(--text-mid); }
         .quick-filter-bar .qf-actions { display: flex; gap: 6px; flex-wrap: wrap; }
         .stock-flag { display: inline-block; margin-top: 3px; font-size: 9px !important; }
@@ -3885,12 +3887,15 @@
                 <div><strong style="color:#38bdf8">${sobrantes.length}</strong><small>sobrantes</small></div>
                 <div><strong style="color:#ef4444">${faltantes.length}</strong><small>faltantes</small></div>`;
             document.getElementById('countValue').innerHTML = diffs.length
-                ? `Diferencia en valor: <b style="color:${valueNet >= 0 ? '#10b981' : '#ef4444'}">${valueNet >= 0 ? '+' : '−'}${money(Math.abs(valueNet))}</b>`
+                ? (hasPremiumAccess()
+                    ? `Diferencia en valor: <b style="color:${valueNet >= 0 ? '#10b981' : '#ef4444'}">${valueNet >= 0 ? '+' : '−'}${money(Math.abs(valueNet))}</b>`
+                    : `Diferencia en valor: <a onclick="openSubscriptionModal()" style="color:#f59e0b;font-weight:900;cursor:pointer;">👑 Disponible en PREMIUM</a>`)
                 : '✅ Todo lo contado coincide con el sistema.';
             document.getElementById('countPendingNote').textContent = pending
                 ? `${pending} producto(s) no se contaron.`
                 : 'Contaste todos los productos.';
-            diffs.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+            if (hasPremiumAccess()) diffs.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+            else diffs.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
             document.getElementById('countDiffList').innerHTML = diffs.length ? diffs.slice(0, 150).map(r => `
                 <div class="order-item">
                     <div style="min-width:0;">
@@ -3899,7 +3904,7 @@
                     </div>
                     <div class="order-qty">
                         <strong style="color:${r.diff > 0 ? '#38bdf8' : '#ef4444'}">${r.diff > 0 ? '+' : ''}${r.diff}</strong>
-                        <span style="font-size:10px;color:var(--text-low);">${r.value >= 0 ? '+' : '−'}${money(Math.abs(r.value))}</span>
+                        ${hasPremiumAccess() ? `<span style="font-size:10px;color:var(--text-low);">${r.value >= 0 ? '+' : '−'}${money(Math.abs(r.value))}</span>` : ''}
                     </div>
                 </div>`).join('') : '';
             document.getElementById('countApplyBtn').disabled = diffs.length === 0;
@@ -3958,12 +3963,20 @@
                     { f: `G${rn}*H${rn}`, v: r.value, s: XS.money }
                 ]);
             });
+            let cWidths = [22, 38, 14, 17, 12, 11, 11, 14, 16];
+            let cLast = lastCol;
+            if (!hasPremiumAccess()) {
+                // Columna "Valor Diferencia": exclusivo PREMIUM
+                for (let r = 3; r < out.length; r++) out[r].splice(8, 1);
+                cWidths.splice(8, 1);
+                cLast = colLetter(cWidths.length - 1);
+            }
             const blob = buildWorkbook('Conteo', out, {
                 title: 'DL STOCK PRO - Conteo físico',
-                widths: [22, 38, 14, 17, 12, 11, 11, 14, 16],
-                merges: [`A1:${lastCol}1`, `A2:${lastCol}2`],
+                widths: cWidths,
+                merges: [`A1:${cLast}1`, `A2:${cLast}2`],
                 freezeRow: 4,
-                autoFilter: `A4:${lastCol}${4 + rows.length}`,
+                autoFilter: `A4:${cLast}${4 + rows.length}`,
                 rowHeights: { 0: 26, 3: 30 }
             });
             downloadBlob(blob, `DL_CONTEO_${fileUserTag()}_${localDateStamp()}.xlsx`);
@@ -5322,10 +5335,20 @@
             return true;
         }
 
+        // Funciones de valor del inventario: solo PREMIUM (y el administrador)
+        function hasPremiumAccess() {
+            return !!(currentUser && (currentUser.isMaster || currentUser.plan === 'premium'));
+        }
+
         // ---------- Orden de la lista ----------
         let sortMode = (() => { try { return localStorage.getItem('dl_sort_mode') || 'name'; } catch (e) { return 'name'; } })();
 
         function setSortMode(mode) {
+            if (mode === 'value' && !hasPremiumAccess()) {
+                document.getElementById('sortSelect').value = sortMode;
+                uiAlert("👑 Exclusivo PREMIUM\nOrdenar por valor en stock está disponible en el plan PREMIUM.");
+                return;
+            }
             sortMode = mode;
             try { localStorage.setItem('dl_sort_mode', mode); } catch (e) {}
             renderTable();
@@ -5356,7 +5379,7 @@
                     return (da - db2) || byName;
                 }
                 case 'updated': return (updatedMillis(b) - updatedMillis(a)) || byName;
-                case 'value': return (((parseInt(b.units) || 0) * (Number(b.price) || 0)) - ((parseInt(a.units) || 0) * (Number(a.price) || 0))) || byName;
+                case 'value': if (!hasPremiumAccess()) return byName; return (((parseInt(b.units) || 0) * (Number(b.price) || 0)) - ((parseInt(a.units) || 0) * (Number(a.price) || 0))) || byName;
                 default: return byName;
             }
         }
@@ -5364,7 +5387,15 @@
         function syncFilterChips() {
             document.querySelectorAll('#filterChips .f-chip').forEach(c => c.classList.toggle('active', c.dataset.f === quickFilter));
             const sel = document.getElementById('sortSelect');
-            if (sel && sel.value !== sortMode) sel.value = sortMode;
+            if (sel) {
+                const valOpt = sel.querySelector('option[value="value"]');
+                if (valOpt) {
+                    valOpt.disabled = !hasPremiumAccess();
+                    valOpt.textContent = hasPremiumAccess() ? 'Mayor valor en stock' : 'Mayor valor en stock 👑 Premium';
+                }
+                if (sortMode === 'value' && !hasPremiumAccess()) sortMode = 'name';
+                if (sel.value !== sortMode) sel.value = sortMode;
+            }
         }
 
         function renderKPIs() {
@@ -5381,7 +5412,7 @@
             const withMin = items.filter(i => (parseInt(i.minStock) || 0) > 0).length;
 
             const card = (opts) => `
-                <${opts.click ? 'button type="button"' : 'div'} class="kpi-card${opts.click ? ' clickable' : ''}${opts.active ? ' active' : ''}"
+                <${opts.click ? 'button type="button"' : 'div'} class="kpi-card${opts.click ? ' clickable' : ''}${opts.active ? ' active' : ''}${opts.locked ? ' locked' : ''}"
                     style="--kpi-color: ${opts.color};" ${opts.click ? `onclick="${opts.click}"` : ''}>
                     <div class="kpi-top">
                         <span class="kpi-label">${opts.label}</span>
@@ -5398,11 +5429,19 @@
                     sub: `<b>${totalUnits.toLocaleString('es-CO')}</b> unidades en total`,
                     click: quickFilter !== 'all' ? "setQuickFilter('all')" : '', active: false
                 }),
-                card({
-                    label: 'Valor inventario', icon: 'fa-sack-dollar', color: '#10b981', money: true,
-                    value: money(totalValue),
-                    sub: 'Stock × precio regular'
-                }),
+                // Valor del inventario: exclusivo del plan PREMIUM
+                hasPremiumAccess()
+                    ? card({
+                        label: 'Valor inventario', icon: 'fa-sack-dollar', color: '#10b981', money: true,
+                        value: money(totalValue),
+                        sub: 'Stock × precio regular'
+                    })
+                    : card({
+                        label: 'Valor inventario', icon: 'fa-crown', color: '#f59e0b', money: true, locked: true,
+                        value: '<span class="kpi-blur">$000.000.000</span>',
+                        sub: '<b>👑 Exclusivo PREMIUM</b> • Toca para desbloquear',
+                        click: 'openSubscriptionModal()'
+                    }),
                 card({
                     label: 'Stock bajo', icon: 'fa-triangle-exclamation', color: '#f59e0b',
                     value: (outCount + lowCount).toLocaleString('es-CO'),
@@ -6375,16 +6414,26 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
             totalRow[14] = { f: `SUM(O${first}:O${last})`, v: totalValue, s: XS.totalMoney };
             rows.push(totalRow);
 
+            let widths = [13, 17, 38, 22, 22, 12, 11, 11, 10, 10, 14, 13, 14, 14, 16, 13, 16, 22, 11, 14];
+            let xlLastCol = lastCol;
+            if (!hasPremiumAccess()) {
+                // Columna O (Valor del Stock) y su total: exclusivo PREMIUM
+                for (let r = HEADER_ROW - 1; r < rows.length; r++) rows[r].splice(14, 1);
+                rows[rows.length - 1][13] = { v: '', s: XS.totalLabel };
+                widths.splice(14, 1);
+                xlLastCol = colLetter(widths.length - 1);
+            }
+
             const heights = {};
             heights[0] = 26;
             heights[HEADER_ROW - 1] = 32;
 
             const blob = buildWorkbook('Inventario', rows, {
                 title: 'DL STOCK PRO - Inventario',
-                widths: [13, 17, 38, 22, 22, 12, 11, 11, 10, 10, 14, 13, 14, 14, 16, 13, 16, 22, 11, 14],
-                merges: [`A1:${lastCol}1`, `A2:${lastCol}2`],
+                widths: widths,
+                merges: [`A1:${xlLastCol}1`, `A2:${xlLastCol}2`],
                 freezeRow: HEADER_ROW,
-                autoFilter: `A${HEADER_ROW}:${lastCol}${last}`,
+                autoFilter: `A${HEADER_ROW}:${xlLastCol}${last}`,
                 rowHeights: heights,
                 moneyFmt: moneyFmt
             });

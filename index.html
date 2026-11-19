@@ -2282,7 +2282,19 @@
                  .replace(/\bPRÓXIMO\b/g, 'próximo').replace(/\bCRÍTICO\b/g, 'crítico').replace(/\bVENCIDO\b/g, 'vencido');
             return t.replace(/\s+/g, ' ').trim();
         }
+        let guideSpeakToken = 0, guideAutoTimer = null;
+        // Al terminar de leer, pasa solo al siguiente paso (menos en el último)
+        function guideAutoNext(token) {
+            if (token !== guideSpeakToken || !guide) return;
+            guideSpeakToken++;
+            clearTimeout(guideAutoTimer);
+            if (guide.i >= guide.steps.length - 1) return;
+            const g = guide, i = guide.i;
+            guideAutoTimer = setTimeout(() => { if (guide === g && guide.i === i) guideGo(1); }, 900);
+        }
         function guideSilence() {
+            guideSpeakToken++;
+            clearTimeout(guideAutoTimer);
             guideVoicePending = false;
             try { if (guideVoiceSupported()) speechSynthesis.cancel(); } catch (e) {}
         }
@@ -2290,17 +2302,26 @@
             if (!guideVoiceSupported() || !guideVoiceOn() || !step) return;
             try {
                 speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(guideSpeechText(step));
+                clearTimeout(guideAutoTimer);
+                const text = guideSpeechText(step);
+                const token = ++guideSpeakToken;
+                const u = new SpeechSynthesisUtterance(text);
+                u.onend = () => guideAutoNext(token);
+                // Respaldo: algunos celulares no avisan cuando terminan de hablar
+                const words = text.split(' ').length;
+                setTimeout(() => guideAutoNext(token), 4000 + words * 520);
                 const v = guidePickVoice();
                 try { if (v) u.voice = v; } catch (e) {}
                 u.lang = v ? v.lang : 'es-CO';
                 u.rate = 1;
                 u.pitch = 1;
                 // Sin un toque previo el celular no deja hablar: se lee al primer toque
-                u.onerror = e => { if (e.error === 'not-allowed') guideVoicePending = true; };
+                u.onerror = e => {
+                    if (e.error === 'not-allowed') { guideVoicePending = true; if (token === guideSpeakToken) guideSpeakToken++; }
+                };
                 guideVoicePending = false;
                 speechSynthesis.speak(u);
-                if (navigator.userActivation && !navigator.userActivation.hasBeenActive) guideVoicePending = true;
+                if (navigator.userActivation && !navigator.userActivation.hasBeenActive) { guideVoicePending = true; guideSpeakToken++; }
             } catch (e) {}
         }
         function guideVoiceBtnUpdate() {

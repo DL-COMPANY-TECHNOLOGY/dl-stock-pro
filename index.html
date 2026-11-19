@@ -351,6 +351,50 @@
         .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .chip-scroll { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; padding-bottom: 2px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
+        /* Guía interactiva */
+        #guideLayer { display: none; }
+        #guideLayer.open { display: block; }
+        .guide-block { position: fixed; inset: 0; z-index: 15000; background: transparent; touch-action: none; }
+        #guideLayer.dim .guide-block { background: rgba(2, 6, 12, 0.78); }
+        .guide-hole { position: fixed; z-index: 15001; pointer-events: none; border-radius: 14px; border: 2px solid var(--cyan-tech);
+            box-shadow: 0 0 0 9999px rgba(2, 6, 12, 0.78), 0 0 18px rgba(56, 189, 248, 0.65);
+            transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease; animation: guidePulse 1.6s ease-in-out infinite; }
+        @keyframes guidePulse {
+            0%, 100% { box-shadow: 0 0 0 9999px rgba(2, 6, 12, 0.78), 0 0 10px 0 rgba(56, 189, 248, 0.55); }
+            50% { box-shadow: 0 0 0 9999px rgba(2, 6, 12, 0.78), 0 0 22px 5px rgba(56, 189, 248, 0.85); }
+        }
+        .guide-card { position: fixed; z-index: 15002; width: min(360px, calc(100vw - 24px)); box-sizing: border-box; background: var(--bg-card); color: var(--text-high);
+            border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 18px; padding: 14px 14px 10px; box-shadow: 0 18px 50px rgba(0,0,0,.5);
+            transition: left .25s ease, top .25s ease; opacity: 0; }
+        .guide-card.show { animation: guideIn .22s ease forwards; }
+        @keyframes guideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .guide-card.centered { left: 50% !important; top: 50% !important; width: min(340px, calc(100vw - 32px)) !important; text-align: center; }
+        .guide-card.centered.show { animation: guideInC .25s ease forwards; transform: translate(-50%, -50%); }
+        @keyframes guideInC { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+        .guide-emoji { font-size: 52px; line-height: 1; margin: 4px 0 8px; }
+        .guide-count { font-size: 10.5px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan-tech); }
+        .guide-title { font-size: 16px; font-weight: 900; margin: 4px 0 4px; }
+        .guide-text { font-size: 13px; line-height: 1.5; color: var(--text-mid); }
+        .guide-text b { color: var(--text-high); }
+        .guide-actions { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+        .guide-skip { background: none; border: none; color: var(--text-low); font-size: 12px; font-weight: 800; cursor: pointer; padding: 8px 4px; font-family: inherit; }
+        .guide-prev { width: 40px; height: 38px; border-radius: 11px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-high); font-size: 22px; font-weight: 900; cursor: pointer; font-family: inherit; line-height: 1; }
+        .guide-prev:disabled { opacity: .35; cursor: default; }
+        .guide-next { height: 38px; padding: 0 16px; border-radius: 11px; border: none; background: var(--cyan-tech); color: #04121c; font-size: 13px; font-weight: 900; cursor: pointer; font-family: inherit; }
+        .guide-card.centered .guide-actions { justify-content: center; }
+        .guide-dots { display: flex; justify-content: center; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
+        .guide-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-subtle); transition: all .2s; }
+        .guide-dots i.on { width: 16px; border-radius: 4px; background: var(--cyan-tech); }
+        body.light-theme .guide-hole { border-color: #0284c7; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.72), 0 0 16px rgba(2, 132, 199, 0.6); animation-name: guidePulseL; }
+        @keyframes guidePulseL {
+            0%, 100% { box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.72), 0 0 8px 0 rgba(2, 132, 199, 0.5); }
+            50% { box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.72), 0 0 20px 5px rgba(2, 132, 199, 0.8); }
+        }
+        body.light-theme #guideLayer.dim .guide-block { background: rgba(15, 23, 42, 0.72); }
+        body.light-theme .guide-card { border-color: rgba(2, 132, 199, 0.45); box-shadow: 0 18px 50px rgba(15,23,42,.3); }
+        body.light-theme .guide-count { color: #0284c7; }
+        body.light-theme .guide-next, body.light-theme .guide-dots i.on { background: #0284c7; color: #fff; }
+        .auth-help-btn { background: none; border: 1px dashed var(--border-subtle); color: var(--text-mid); border-radius: 12px; padding: 9px; width: 100%; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 10px; }
         /* Pedido al proveedor */
         #orderModal .modal-body { gap: 10px; }
         #poEdit { display: flex; flex-direction: column; gap: 10px; }
@@ -692,7 +736,7 @@
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-low); margin-bottom: 4px;">Contraseña</label>
                     <input type="password" id="authPassword" required autocomplete="current-password" placeholder="••••••••" class="auth-input">
-                    <button type="button" onclick="handleForgotPassword()" style="background: none; border: none; color: var(--cyan-tech); font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 6px; padding: 0;">¿Olvidaste tu contraseña?</button>
+                    <button type="button" id="authForgotBtn" onclick="handleForgotPassword()" style="background: none; border: none; color: var(--cyan-tech); font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 6px; padding: 0;">¿Olvidaste tu contraseña?</button>
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px;">
@@ -736,6 +780,7 @@
                     Ingresar a DL STOCK PRO &gt;
                 </button>
             </form>
+            <button type="button" class="auth-help-btn" onclick="showLoginGuide()">❔ ¿Cómo empiezo?</button>
         </div>
         <!-- FIRMA DEL DESARROLLADOR (pantalla de acceso) -->
         <div class="dev-footer-mini">
@@ -778,22 +823,23 @@
                     <button type="button" id="btnAdminPanel" onclick="promptAdminAccess()" class="header-btn hidden" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);" title="Panel de Administrador">
                         <i class="fa-solid fa-shield-halved"></i>
                     </button>
-                    <button type="button" onclick="openSubscriptionModal()" class="header-btn" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);" title="Ver Planes y Suscripciones">
+                    <button type="button" id="headerPlansBtn" onclick="openSubscriptionModal()" class="header-btn" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);" title="Ver Planes y Suscripciones">
                         <i class="fa-solid fa-crown"></i>
                     </button>
-                    <button type="button" onclick="openConfigModal()" class="header-btn" title="Gestionar Categorías y Zonas">
+                    <button type="button" id="headerConfigBtn" onclick="openConfigModal()" class="header-btn" title="Gestionar Categorías y Zonas">
                         <i class="fa-solid fa-sliders"></i>
                     </button>
                     <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="header-btn" title="Cambiar Tema (Blanco / Negro)">
                         <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
                     </button>
-                    <button type="button" onclick="openBackupModal()" class="header-btn" style="color: var(--cyan-tech);" title="Copia de Seguridad">
+                    <button type="button" id="headerBackupBtn" onclick="openBackupModal()" class="header-btn" style="color: var(--cyan-tech);" title="Copia de Seguridad">
                         <i class="fa-solid fa-download"></i>
                     </button>
-                    <button type="button" onclick="openAlertsModal()" class="header-btn" title="Alertas de Vencimiento">
+                    <button type="button" id="headerAlertsBtn" onclick="openAlertsModal()" class="header-btn" title="Alertas de Vencimiento">
                         <i class="fa-solid fa-bell"></i>
                         <span id="badgeCriticos" class="hidden" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">0</span>
                     </button>
+                    <button type="button" id="headerGuideBtn" onclick="startGuide('inicio', true)" class="header-btn" title="Guía de la app" style="font-size:15px;">🧭</button>
                     <button type="button" onclick="handleLogout()" class="header-btn" style="color: #ef4444;" title="Cerrar Sesión">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
@@ -837,7 +883,7 @@
                     </label>
                 </div>
 
-                <div class="quick-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div id="deskAddActions" class="quick-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <label class="btn-gold-action" style="text-align: center; cursor: pointer;">
                         <i class="fa-solid fa-camera"></i> 📸 Tomar Foto
                         <input type="file" accept="image/*" capture="environment" onchange="handleFullLabelScan(event)" style="display: none;">
@@ -852,7 +898,7 @@
                     <button type="button" onclick="openProductModal()" class="btn-green-action" style="flex: 1;">
                         <i class="fa-solid fa-plus"></i> Registro Manual
                     </button>
-                    <button type="button" onclick="openScannerModal('quickSearch')" class="btn-dark-action">
+                    <button type="button" id="deskScanBtn" onclick="openScannerModal('quickSearch')" class="btn-dark-action">
                         <i class="fa-solid fa-magnifying-glass"></i> Buscar Código
                     </button>
                 </div>
@@ -870,19 +916,19 @@
                     </span>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span id="productCount" class="badge badge-cyan">0 productos</span>
-                        <button type="button" onclick="openHistoryModal()" class="btn-dark-action" style="padding: 5px 9px; font-size: 11px;" title="Historial de movimientos">
+                        <button type="button" id="deskHistoryBtn" onclick="openHistoryModal()" class="btn-dark-action" style="padding: 5px 9px; font-size: 11px;" title="Historial de movimientos">
                             <i class="fa-solid fa-clock-rotate-left"></i> Historial
                         </button>
-                        <button type="button" onclick="openCountModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Conteo físico">
+                        <button type="button" id="deskCountBtn" onclick="openCountModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Conteo físico">
                             <i class="fa-solid fa-list-check"></i> Conteo
                         </button>
-                        <button type="button" onclick="openLabelsModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Etiquetas de precio">
+                        <button type="button" id="deskLabelsBtn" onclick="openLabelsModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Etiquetas de precio">
                             <i class="fa-solid fa-tag"></i> Etiquetas
                         </button>
-                        <button type="button" onclick="openImportModal()" class="btn-dark-action" style="padding: 5px 9px; font-size: 11px;" title="Importar desde Excel">
+                        <button type="button" id="deskImportBtn" onclick="openImportModal()" class="btn-dark-action" style="padding: 5px 9px; font-size: 11px;" title="Importar desde Excel">
                             <i class="fa-solid fa-file-import"></i> Importar
                         </button>
-                        <button type="button" onclick="exportCSV()" class="btn-green-action" style="padding: 5px 9px; font-size: 11px;" title="Exportar a Excel">
+                        <button type="button" id="deskExcelBtn" onclick="exportCSV()" class="btn-green-action" style="padding: 5px 9px; font-size: 11px;" title="Exportar a Excel">
                             <i class="fa-solid fa-file-excel"></i> Excel
                         </button>
                     </div>
@@ -940,11 +986,11 @@
 
         <!-- BARRA DE NAVEGACIÓN INFERIOR (CELULAR) -->
         <nav class="bottom-nav" aria-label="Navegación principal">
-            <button type="button" class="bn-item" onclick="navHome()"><i class="fa-solid fa-house"></i><span>Inicio</span></button>
-            <button type="button" class="bn-item" onclick="navScan()"><i class="fa-solid fa-barcode"></i><span>Escanear</span></button>
-            <button type="button" class="bn-add" onclick="navAdd()" aria-label="Agregar producto"><span class="bn-add-plus">+</span></button>
-            <button type="button" class="bn-item" onclick="navAlerts()"><i class="fa-solid fa-bell"></i><span>Alertas</span><b id="navAlertBadge" class="bn-badge hidden">0</b></button>
-            <button type="button" class="bn-item" onclick="openMoreMenu()"><i class="fa-solid fa-bars"></i><span>Más</span></button>
+            <button type="button" id="navHomeBtn" class="bn-item" onclick="navHome()"><i class="fa-solid fa-house"></i><span>Inicio</span></button>
+            <button type="button" id="navScanBtn" class="bn-item" onclick="navScan()"><i class="fa-solid fa-barcode"></i><span>Escanear</span></button>
+            <button type="button" id="navAddBtn" class="bn-add" onclick="navAdd()" aria-label="Agregar producto"><span class="bn-add-plus">+</span></button>
+            <button type="button" id="navAlertsBtn" class="bn-item" onclick="navAlerts()"><i class="fa-solid fa-bell"></i><span>Alertas</span><b id="navAlertBadge" class="bn-badge hidden">0</b></button>
+            <button type="button" id="navMoreBtn" class="bn-item" onclick="openMoreMenu()"><i class="fa-solid fa-bars"></i><span>Más</span></button>
         </nav>
 
         <!-- MENÚ AGREGAR -->
@@ -952,6 +998,7 @@
             <div class="sheet">
                 <div class="sheet-handle"></div>
                 <div class="sheet-title">Agregar producto</div>
+                <div id="addSheetItems">
                 <label class="sheet-item">
                     <span class="sheet-ico" style="--c:#f59e0b"><i class="fa-solid fa-camera"></i></span>
                     <span><b>Tomar foto de la etiqueta</b><small>La app lee código, nombre y precios</small></span>
@@ -970,6 +1017,7 @@
                     <span class="sheet-ico" style="--c:#10b981"><i class="fa-solid fa-keyboard"></i></span>
                     <span><b>Registro manual</b><small>Escribe los datos del producto</small></span>
                 </button>
+                </div>
             </div>
         </div>
 
@@ -979,17 +1027,18 @@
                 <div class="sheet-handle"></div>
                 <div class="sheet-title">Menú<small id="moreUserInfo"></small></div>
                 <div class="sheet-grid">
-                    <button type="button" class="sheet-tile" onclick="moreAction(openSubscriptionModal)"><i class="fa-solid fa-crown" style="color:#f59e0b"></i><span>Planes</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openHistoryModal)"><i class="fa-solid fa-clock-rotate-left" style="color:#38bdf8"></i><span>Historial</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(exportCSV)"><i class="fa-solid fa-file-excel" style="color:#10b981"></i><span>Excel</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openImportModal)"><i class="fa-solid fa-file-import" style="color:#10b981"></i><span>Importar</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openCountModal)"><i class="fa-solid fa-list-check" style="color:#38bdf8"></i><span>Conteo</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openLabelsModal)"><i class="fa-solid fa-tag" style="color:#ef4444"></i><span>Etiquetas</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openOrderModal)"><i class="fa-solid fa-clipboard-list" style="color:#f59e0b"></i><span>Pedido</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openBackupModal)"><i class="fa-solid fa-shield-halved" style="color:#38bdf8"></i><span>Copia</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(openConfigModal)"><i class="fa-solid fa-sliders" style="color:#a78bfa"></i><span>Categorías</span></button>
-                    <button type="button" class="sheet-tile" onclick="moreAction(toggleTheme)"><i class="fa-solid fa-circle-half-stroke" style="color:#f59e0b"></i><span id="moreThemeLabel">Tema</span></button>
-                    <a class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
+                    <button type="button" id="morePlansItem" class="sheet-tile" onclick="moreAction(openSubscriptionModal)"><i class="fa-solid fa-crown" style="color:#f59e0b"></i><span>Planes</span></button>
+                    <button type="button" id="moreHistoryItem" class="sheet-tile" onclick="moreAction(openHistoryModal)"><i class="fa-solid fa-clock-rotate-left" style="color:#38bdf8"></i><span>Historial</span></button>
+                    <button type="button" id="moreExcelItem" class="sheet-tile" onclick="moreAction(exportCSV)"><i class="fa-solid fa-file-excel" style="color:#10b981"></i><span>Excel</span></button>
+                    <button type="button" id="moreImportItem" class="sheet-tile" onclick="moreAction(openImportModal)"><i class="fa-solid fa-file-import" style="color:#10b981"></i><span>Importar</span></button>
+                    <button type="button" id="moreCountItem" class="sheet-tile" onclick="moreAction(openCountModal)"><i class="fa-solid fa-list-check" style="color:#38bdf8"></i><span>Conteo</span></button>
+                    <button type="button" id="moreLabelsItem" class="sheet-tile" onclick="moreAction(openLabelsModal)"><i class="fa-solid fa-tag" style="color:#ef4444"></i><span>Etiquetas</span></button>
+                    <button type="button" id="moreOrderItem" class="sheet-tile" onclick="moreAction(openOrderModal)"><i class="fa-solid fa-clipboard-list" style="color:#f59e0b"></i><span>Pedido</span></button>
+                    <button type="button" id="moreBackupItem" class="sheet-tile" onclick="moreAction(openBackupModal)"><i class="fa-solid fa-shield-halved" style="color:#38bdf8"></i><span>Copia</span></button>
+                    <button type="button" id="moreCategoriesItem" class="sheet-tile" onclick="moreAction(openConfigModal)"><i class="fa-solid fa-sliders" style="color:#a78bfa"></i><span>Categorías</span></button>
+                    <button type="button" id="moreThemeItem" class="sheet-tile" onclick="moreAction(toggleTheme)"><i class="fa-solid fa-circle-half-stroke" style="color:#f59e0b"></i><span id="moreThemeLabel">Tema</span></button>
+                    <a id="moreSupportItem" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
+                    <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide('inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
                     <button type="button" id="moreAdminItem" class="sheet-tile hidden" onclick="moreAction(promptAdminAccess)"><i class="fa-solid fa-user-shield" style="color:#38bdf8"></i><span>Admin</span></button>
                 </div>
                 <a class="sheet-legal" href="legal.html" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-solid fa-scale-balanced"></i> Términos, privacidad y reembolsos</a>
@@ -1922,6 +1971,324 @@
         }
         // Cualquier uiAlert() que quede usa el aviso propio
         window.alert = (m) => { uiAlert(m); };
+
+        // ==========================================
+        // GUÍA INTERACTIVA
+        // Para cambiar o agregar pasos, edita GUIDES. Cada paso:
+        //   targets: [{ sel: 'selector CSS', menu: 'add' | 'more' }]  → se usa el primero que esté visible
+        //            (varios selectores separados por coma se iluminan juntos)
+        //   title, text (usa **negrita**), emoji (pasos centrados sin recuadro)
+        //   textFn(): texto dinámico   ·   skipIf(): true para saltar el paso
+        // ==========================================
+        const GUIDES = {
+            login: [
+                { targets: [{ sel: '#tabLogin' }], title: 'Iniciar sesión', text: 'Si ya tienes cuenta, entra con tu **correo** y **contraseña**.' },
+                { targets: [{ sel: '#tabRegister' }], title: 'Crear cuenta', text: '¿Eres nuevo? **Regístrate gratis** con tu correo y una contraseña de **6 caracteres o más**.' },
+                { targets: [{ sel: '#authForgotBtn' }], title: '¿Olvidaste tu contraseña?', text: 'Toca aquí y **te llega un correo** para crear una nueva.' }
+            ],
+            inicio: [
+                { emoji: '👋', title: '¡Bienvenido a DL STOCK PRO!', textFn: () => `Tu plan actual es **${guidePlanName()}**. Te muestro en un minuto cómo usar la app.` },
+                { targets: [{ sel: '#navAddBtn' }, { sel: '#deskAddActions, #deskAddActions + .quick-actions' }], title: 'Agrega tus productos', text: '**Empieza aquí**: agrega tus productos con foto, escáner o a mano.' },
+                { targets: [{ sel: '#addSheetItems', menu: 'add', mobileOnly: true }], title: '4 formas de agregar', text: '**Foto de la etiqueta** (la app lee código, nombre y precios), **foto de la galería**, **escanear el código** o **registro manual**.' },
+                { targets: [{ sel: '#navScanBtn' }, { sel: '#deskScanBtn' }], title: 'Escanear', text: 'Busca un producto con la **cámara**. Tiene **linterna y zoom**. Si el código no existe, lo registras como nuevo.' },
+                { targets: [{ sel: '#searchInput' }], title: 'Buscador', text: 'Busca por **nombre, ubicación o código**. No importan las tildes.' },
+                { targets: [{ sel: '#kpiGrid' }], title: 'Resumen', text: '**Total de productos**, valor del inventario, **stock bajo o agotado** y **por vencer**. Toca una tarjeta para filtrar.' },
+                { targets: [{ sel: '#filterChips, #sortSelect' }], title: 'Filtros y orden', text: 'Filtra por **stock bajo**, **por vencer** o **en promoción**, y ordena como prefieras.' },
+                { targets: [{ sel: '#inventoryCards .inv-card:first-child' }, { sel: '#inventoryTableBody tr[data-idx]:first-child' }], title: 'Tus productos', text: 'Usa **+ y −** para sumar o restar unidades con un toque (con opción de **Deshacer**). Tócalo para ajustar por **cajas o sixpack (R1)**, o para editarlo.' },
+                { targets: [{ sel: '#navAlertsBtn' }, { sel: '#headerAlertsBtn' }], title: 'Alertas de vencimiento', text: 'Aquí ves lo que se vence: **PRÓXIMO** (30 días), **CRÍTICO** (15) y **VENCIDO**.' },
+                { targets: [{ sel: '#moreOrderItem', menu: 'more' }], title: 'Pedido', text: 'Arma el **pedido para tu proveedor** con lo que se está acabando y envíalo por **WhatsApp**.' },
+                { targets: [{ sel: '#deskCountBtn' }, { sel: '#moreCountItem', menu: 'more' }], title: 'Conteo', text: 'Haz el **conteo físico** de tu bodega: la app te muestra **sobrantes, faltantes** y la diferencia en dinero.' },
+                { targets: [{ sel: '#deskLabelsBtn' }, { sel: '#moreLabelsItem', menu: 'more' }], title: 'Etiquetas', text: 'Imprime **etiquetas de precio** para la estantería, con promoción y código de barras.' },
+                { targets: [{ sel: '#moreExcelItem, #moreImportItem', menu: 'more', mobileOnly: true }, { sel: '#deskImportBtn, #deskExcelBtn' }], title: 'Importar y Excel', text: '**Sube tus productos desde Excel** o descarga tu inventario y el historial.' },
+                { targets: [{ sel: '#headerBackupBtn' }, { sel: '#moreBackupItem', menu: 'more' }], title: 'Copia de seguridad', text: 'Descarga una **copia de seguridad** y restáurala en cualquier celular.' },
+                { targets: [{ sel: '#headerConfigBtn' }, { sel: '#moreCategoriesItem', menu: 'more' }], title: 'Categorías y zonas', text: 'Crea tus **categorías** y **zonas de bodega** (pasillo, bloque, estante).' },
+                { targets: [{ sel: '#headerPlansBtn' }, { sel: '#morePlansItem', menu: 'more' }], title: 'Planes', textFn: () => 'Mira qué incluye cada plan. Con **PREMIUM** tu inventario queda **en la nube** y sincronizado entre varios celulares.' + (guidePlan() === 'gratis' ? ' Tu plan permite **hasta 100 productos**.' : '') },
+                { targets: [{ sel: '#syncStatusBadge' }], title: 'Dónde se guardan tus datos', text: 'Aquí ves si tus datos están guardados **en el celular** o **en la nube**.' },
+                { targets: [{ sel: '#themeToggleBtn' }, { sel: '#moreThemeItem', menu: 'more' }], title: 'Tema', text: 'Cambia entre **modo oscuro** y **claro**.' },
+                { emoji: '✅', title: '¡Listo para empezar!', text: 'Ya conoces lo básico. Puedes repetir esta guía cuando quieras desde **Más → 🧭 Guía**.', finalLabel: 'Agregar mi primer producto', finalAction: () => navAdd() }
+            ],
+            pro: [
+                { emoji: '🎉', title: '¡Ahora tienes el plan PRO!', text: 'Te muestro **lo nuevo** que tienes.' },
+                { emoji: '♾️', title: 'Productos ilimitados', text: 'Ya no tienes el límite de 100: registra **todos los productos** que necesites.' },
+                { targets: [{ sel: '#headerBackupBtn' }, { sel: '#moreBackupItem', menu: 'more' }], title: 'Copias de seguridad', text: 'Descarga una **copia de seguridad** de tu inventario y restáurala en cualquier celular.' }
+            ],
+            premium: [
+                { emoji: '🎉', title: '¡Ahora tienes el plan PREMIUM!', text: 'Te muestro **lo nuevo** que tienes.' },
+                { targets: [{ sel: '#syncStatusBadge' }], title: 'Nube y tiempo real', text: 'Tu inventario queda **en la nube** y se **sincroniza en tiempo real** entre varios celulares. Aquí ves el estado.' },
+                { targets: [{ sel: '#moreSupportItem', menu: 'more' }], title: 'Soporte prioritario', text: 'Tienes **soporte prioritario por WhatsApp**. Escríbenos desde aquí cuando lo necesites.' }
+            ]
+        };
+        const PLAN_RANK = { gratis: 0, pro: 1, premium: 2 };
+
+        let guide = null; // { name, steps, i, menu, histPushed, onDone }
+
+        function guidePlan() {
+            if (!currentUser) return 'gratis';
+            return currentUser.isMaster ? 'premium' : (currentUser.plan || 'gratis');
+        }
+        function guidePlanName() {
+            return currentUser && currentUser.isMaster ? 'ADMIN' : guidePlan().toUpperCase();
+        }
+        function guideKey(name) {
+            const uid = currentUser && currentUser.uid ? currentUser.uid : 'dispositivo';
+            return `guia_${name}_${uid}`;
+        }
+        function guideMd(t) {
+            return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+        }
+        function guideVisible(el) {
+            if (!el || !el.getClientRects().length) return false;
+            const r = el.getBoundingClientRect();
+            if (r.width < 2 || r.height < 2) return false;
+            const cs = getComputedStyle(el);
+            return cs.visibility !== 'hidden' && cs.display !== 'none';
+        }
+
+        // ¿Hay algo abierto encima de la app? (modal, menú, aviso, escáner)
+        function guideBlocked() {
+            if (document.querySelector('.ui-dialog-overlay')) return true;
+            const open = [...document.querySelectorAll('.modal-overlay, .sheet-overlay')].some(m => !m.classList.contains('hidden') && guideVisible(m));
+            return open;
+        }
+
+        function guideOpenMenu(menu) {
+            if (menu === 'add') navAdd();
+            else if (menu === 'more') openMoreMenu();
+        }
+        function guideCloseMenu(menu) {
+            if (menu === 'add') closeAddSheet();
+            else if (menu === 'more') closeMoreMenu();
+        }
+
+        // Elige el objetivo de un paso; abre el menú si hace falta
+        async function guideResolve(step) {
+            if (!step.targets) {
+                if (guide.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
+                return { center: true };
+            }
+            const mobile = window.matchMedia('(max-width: 768px)').matches;
+            for (const t of step.targets) {
+                if (t.mobileOnly && !mobile) continue;
+                if (t.menu) {
+                    if (guide.menu && guide.menu !== t.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
+                    if (guide.menu !== t.menu) {
+                        guideOpenMenu(t.menu);
+                        guide.menu = t.menu;
+                        await new Promise(r => setTimeout(r, 280));
+                    }
+                } else if (guide.menu) {
+                    guideCloseMenu(guide.menu); guide.menu = null;
+                    await new Promise(r => setTimeout(r, 150));
+                }
+                const els = [...document.querySelectorAll(t.sel)].filter(guideVisible);
+                if (els.length) return { els };
+            }
+            if (guide.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
+            return null;
+        }
+
+        function guideEnsureDom() {
+            if (document.getElementById('guideLayer')) return;
+            const layer = document.createElement('div');
+            layer.id = 'guideLayer';
+            layer.innerHTML = `
+                <div class="guide-block"></div>
+                <div id="guideHole" class="guide-hole hidden"></div>
+                <div id="guideCard" class="guide-card" role="dialog" aria-live="polite">
+                    <div id="guideEmoji" class="guide-emoji hidden"></div>
+                    <div id="guideCount" class="guide-count"></div>
+                    <div id="guideTitle" class="guide-title"></div>
+                    <div id="guideText" class="guide-text"></div>
+                    <div class="guide-actions">
+                        <button type="button" class="guide-skip" onclick="endGuide(true)">Saltar guía</button>
+                        <span style="flex:1"></span>
+                        <button type="button" id="guidePrev" class="guide-prev" onclick="guideGo(-1)" aria-label="Paso anterior">‹</button>
+                        <button type="button" id="guideNext" class="guide-next" onclick="guideGo(1)">Siguiente ›</button>
+                    </div>
+                    <div id="guideDots" class="guide-dots"></div>
+                </div>`;
+            document.body.appendChild(layer);
+        }
+
+        function startGuide(name, manual) {
+            let steps = GUIDES[name];
+            // De GRATIS directo a PREMIUM: una sola guía con lo de PRO y lo de PREMIUM
+            if (name === 'premium-full') steps = [GUIDES.premium[0]].concat(GUIDES.pro.slice(1), GUIDES.premium.slice(1));
+            if (!steps || guide) return;
+            if (manual) { closeMoreMenu(); closeAddSheet(); }
+            guideEnsureDom();
+            guide = { name, steps, i: 0, dir: 1, menu: null, histPushed: false };
+            document.getElementById('guideLayer').classList.add('open');
+            document.body.classList.add('guide-open');
+            try { history.pushState({ dlGuide: true }, ''); guide.histPushed = true; } catch (e) {}
+            guideShow();
+        }
+
+        async function guideShow() {
+            if (!guide) return;
+            const g = guide;
+            const step = g.steps[g.i];
+            const skip = step.skipIf && step.skipIf();
+            const res = skip ? null : await guideResolve(step);
+            if (guide !== g) return;
+            if (!res) {
+                // Paso sin elemento visible: se salta solo
+                const ni = g.i + g.dir;
+                if (ni < 0) { g.dir = 1; g.i = 0; return guideShow(); }
+                if (ni >= g.steps.length) return endGuide(false);
+                g.i = ni;
+                return guideShow();
+            }
+            g.res = res;
+            if (res.els) {
+                res.els[0].scrollIntoView({ block: 'center', inline: 'nearest' });
+                await new Promise(r => setTimeout(r, 200));
+                if (guide !== g) return;
+            }
+            const card = document.getElementById('guideCard');
+            const emoji = document.getElementById('guideEmoji');
+            emoji.classList.toggle('hidden', !step.emoji);
+            emoji.textContent = step.emoji || '';
+            document.getElementById('guideCount').textContent = `Guía · ${g.i + 1} de ${g.steps.length}`;
+            document.getElementById('guideTitle').textContent = step.title;
+            document.getElementById('guideText').innerHTML = guideMd(step.textFn ? step.textFn() : step.text);
+            const last = g.i === g.steps.length - 1;
+            document.getElementById('guidePrev').disabled = g.i === 0;
+            document.getElementById('guideNext').textContent = last ? (step.finalLabel || 'Entendido ✓') : 'Siguiente ›';
+            document.querySelector('#guideCard .guide-skip').classList.toggle('hidden', last);
+            document.getElementById('guideDots').innerHTML = g.steps.map((_, k) => `<i class="${k === g.i ? 'on' : ''}"></i>`).join('');
+            card.classList.toggle('centered', !!res.center);
+            card.classList.remove('show');
+            void card.offsetWidth;
+            card.classList.add('show');
+            guidePlace();
+            // Los menús entran con animación: se reacomoda cuando terminan de abrir
+            setTimeout(() => { if (guide === g) guidePlace(); }, 380);
+        }
+
+        function guidePlace() {
+            if (!guide || !guide.res) return;
+            const hole = document.getElementById('guideHole');
+            const card = document.getElementById('guideCard');
+            const vw = window.innerWidth, vh = window.innerHeight;
+            document.getElementById('guideLayer').classList.toggle('dim', !!guide.res.center);
+            if (guide.res.center) {
+                hole.classList.add('hidden');
+                card.style.left = ''; card.style.top = '';
+                return;
+            }
+            const rects = guide.res.els.filter(guideVisible).map(e => e.getBoundingClientRect());
+            if (!rects.length) { guideShow(); return; }
+            const pad = 6;
+            let l = Math.min(...rects.map(r => r.left)) - pad, t = Math.min(...rects.map(r => r.top)) - pad;
+            let r = Math.max(...rects.map(r => r.right)) + pad, b = Math.max(...rects.map(r => r.bottom)) + pad;
+            l = Math.max(4, l); t = Math.max(4, t); r = Math.min(vw - 4, r); b = Math.min(vh - 4, b);
+            hole.classList.remove('hidden');
+            Object.assign(hole.style, { left: l + 'px', top: t + 'px', width: (r - l) + 'px', height: Math.max(8, b - t) + 'px' });
+            const cw = Math.min(360, vw - 24);
+            card.style.width = cw + 'px';
+            const ch = card.offsetHeight;
+            const gap = 12;
+            let top;
+            if (b + gap + ch <= vh - 8) top = b + gap;                  // abajo
+            else if (t - gap - ch >= 8) top = t - gap - ch;             // arriba
+            else top = Math.max(8, Math.min(vh - ch - 8, (vh - ch) / 2)); // no cabe: centrada
+            let left = (l + r) / 2 - cw / 2;
+            left = Math.max(12, Math.min(vw - cw - 12, left));
+            card.style.left = left + 'px';
+            card.style.top = top + 'px';
+        }
+
+        function guideGo(d) {
+            if (!guide) return;
+            const step = guide.steps[guide.i];
+            if (d > 0 && guide.i === guide.steps.length - 1) {
+                const action = step.finalAction;
+                endGuide(false);
+                if (action) setTimeout(action, 200);
+                return;
+            }
+            const ni = guide.i + d;
+            if (ni < 0 || ni >= guide.steps.length) return;
+            guide.i = ni;
+            guide.dir = d > 0 ? 1 : -1;
+            guideShow();
+        }
+
+        function endGuide(skipped, fromPopstate) {
+            if (!guide) return;
+            const g = guide;
+            guide = null;
+            if (g.menu) guideCloseMenu(g.menu);
+            try { localStorage.setItem(guideKey(g.name), skipped ? 'saltada' : 'vista'); } catch (e) {}
+            const layer = document.getElementById('guideLayer');
+            if (layer) layer.classList.remove('open');
+            document.body.classList.remove('guide-open');
+            if (g.histPushed && !fromPopstate) { try { history.back(); } catch (e) {} }
+            if (!skipped) showToast('🧭 Puedes repetir la guía en Más → Guía');
+            // Si quedó otra guía pendiente (ej: subió de plan), se revisa luego
+            setTimeout(scheduleGuides, 1500);
+        }
+
+        window.addEventListener('popstate', () => { if (guide) endGuide(true, true); });
+        window.addEventListener('resize', () => { if (guide) requestAnimationFrame(guidePlace); });
+        window.addEventListener('orientationchange', () => { if (guide) setTimeout(guidePlace, 300); });
+        window.addEventListener('scroll', () => { if (guide) requestAnimationFrame(guidePlace); }, true);
+        document.addEventListener('keydown', e => {
+            if (!guide) return;
+            if (e.key === 'Escape') endGuide(true);
+            else if (e.key === 'ArrowRight') guideGo(1);
+            else if (e.key === 'ArrowLeft') guideGo(-1);
+        });
+
+        // ¿Qué guía toca mostrar ahora?
+        function pendingGuide() {
+            const inApp = document.body.classList.contains('in-app');
+            if (!inApp) {
+                const auth = document.getElementById('authScreen');
+                if (!auth || auth.classList.contains('hidden')) return null;
+                return localStorage.getItem('guia_login_dispositivo') ? null : 'login';
+            }
+            if (!currentUser) return null;
+            const plan = guidePlan();
+            const planKey = guideKey('plan');
+            const lastPlan = localStorage.getItem(planKey);
+            if (!localStorage.getItem(guideKey('inicio'))) {
+                localStorage.setItem(planKey, plan);
+                return 'inicio';
+            }
+            if (lastPlan === null) { localStorage.setItem(planKey, plan); return null; }
+            if ((PLAN_RANK[plan] || 0) > (PLAN_RANK[lastPlan] || 0)) {
+                localStorage.setItem(planKey, plan);
+                return (PLAN_RANK[lastPlan] || 0) < 1 && plan === 'premium' ? 'premium-full' : plan;
+            }
+            if (lastPlan !== plan) localStorage.setItem(planKey, plan);
+            return null;
+        }
+
+        let guideTimer = null, guideTries = 0;
+        function scheduleGuides() {
+            clearTimeout(guideTimer);
+            guideTries = 0;
+            guideTimer = setTimeout(guideTick, 1200);
+        }
+        function guideTick() {
+            if (guide) return;
+            // Espera: algo abierto encima, sincronización inicial o pantalla de carga
+            const badge = document.getElementById('syncStatusBadge');
+            const syncing = badge && document.body.classList.contains('in-app') && /Conectando/.test(badge.textContent);
+            if (guideBlocked() || syncing) {
+                if (++guideTries < 60) guideTimer = setTimeout(guideTick, 1500);
+                return;
+            }
+            const name = pendingGuide();
+            if (!name) return;
+            if (name === 'login') { try { localStorage.setItem('guia_login_dispositivo', '1'); } catch (e) {} }
+            startGuide(name);
+        }
+        function showLoginGuide() {
+            startGuide('login', true);
+        }
 
         // ==========================================
         // BARRA DE NAVEGACIÓN INFERIOR (CELULAR)
@@ -3171,6 +3538,7 @@
                 document.body.classList.remove('in-app');
                 closeMoreMenu();
             }
+            scheduleGuides();
         }
 
         // Avisos de plan vencido o por vencer (una vez por día)

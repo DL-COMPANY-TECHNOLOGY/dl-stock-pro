@@ -371,6 +371,10 @@
         .guide-card.centered { left: 50% !important; top: 50% !important; width: min(340px, calc(100vw - 32px)) !important; text-align: center; }
         .guide-card.centered.show { animation: guideInC .25s ease forwards; transform: translate(-50%, -50%); }
         @keyframes guideInC { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+        .guide-voice { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-input); font-size: 16px; cursor: pointer; line-height: 1; }
+        .guide-voice.off { opacity: .6; }
+        .guide-card .guide-count, .guide-card .guide-title { padding-right: 36px; }
+        .guide-card.centered .guide-count, .guide-card.centered .guide-title { padding-right: 0; }
         .guide-emoji { font-size: 52px; line-height: 1; margin: 4px 0 8px; }
         .guide-count { font-size: 10.5px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan-tech); }
         .guide-title { font-size: 16px; font-weight: 900; margin: 4px 0 4px; }
@@ -2095,6 +2099,7 @@
                 <div class="guide-block"></div>
                 <div id="guideHole" class="guide-hole hidden"></div>
                 <div id="guideCard" class="guide-card" role="dialog" aria-live="polite">
+                    <button type="button" id="guideVoiceBtn" class="guide-voice" onclick="guideToggleVoice()" aria-label="Voz de la guía"></button>
                     <div id="guideEmoji" class="guide-emoji hidden"></div>
                     <div id="guideCount" class="guide-count"></div>
                     <div id="guideTitle" class="guide-title"></div>
@@ -2162,6 +2167,8 @@
             void card.offsetWidth;
             card.classList.add('show');
             guidePlace();
+            guideVoiceBtnUpdate();
+            guideSpeak(step);
             // Los menús entran con animación: se reacomoda cuando terminan de abrir
             setTimeout(() => { if (guide === g) guidePlace(); }, 380);
         }
@@ -2219,6 +2226,7 @@
             if (!guide) return;
             const g = guide;
             guide = null;
+            guideSilence();
             if (g.menu) guideCloseMenu(g.menu);
             try { localStorage.setItem(guideKey(g.name), skipped ? 'saltada' : 'vista'); } catch (e) {}
             const layer = document.getElementById('guideLayer');
@@ -2240,6 +2248,84 @@
             else if (e.key === 'ArrowRight') guideGo(1);
             else if (e.key === 'ArrowLeft') guideGo(-1);
         });
+
+        // ---------- Voz de la guía (lectura en voz alta del navegador) ----------
+        let guideVoicePending = false;
+        let guideVoiceCache = null;
+        function guideVoiceOn() {
+            try { return localStorage.getItem('guia_voz') !== 'off'; } catch (e) { return true; }
+        }
+        function guideVoiceSupported() {
+            return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        }
+        function guidePickVoice() {
+            if (guideVoiceCache) return guideVoiceCache;
+            const voices = speechSynthesis.getVoices() || [];
+            const es = voices.filter(v => /^es/i.test(v.lang));
+            const pref = ['es-CO', 'es-419', 'es-MX', 'es-US', 'es-AR', 'es-CL', 'es-PE', 'es-ES'];
+            for (const code of pref) {
+                const list = es.filter(v => v.lang.replace('_', '-').toLowerCase() === code.toLowerCase());
+                const v = list.find(x => /google/i.test(x.name)) || list[0];
+                if (v) return (guideVoiceCache = v);
+            }
+            return (guideVoiceCache = es[0] || null);
+        }
+        if (guideVoiceSupported()) {
+            speechSynthesis.onvoiceschanged = () => { guideVoiceCache = null; };
+        }
+        function guideSpeechText(step) {
+            const div = document.createElement('div');
+            div.innerHTML = guideMd(step.textFn ? step.textFn() : step.text);
+            let t = `${step.title}${/[.!?]$/.test(step.title) ? '' : '.'} ${div.textContent}`;
+            t = t.replace(/DL STOCK PRO/g, 'DL Stock Pro').replace(/\+ y −/g, 'más y menos').replace(/→/g, ', luego, ').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu, '')
+                 .replace(/\bR1\b/g, 'R 1').replace(/\bPRO\b/g, 'Pro').replace(/\bPREMIUM\b/g, 'Premium').replace(/\bGRATIS\b/g, 'Gratis').replace(/\bADMIN\b/g, 'administrador')
+                 .replace(/\bPRÓXIMO\b/g, 'próximo').replace(/\bCRÍTICO\b/g, 'crítico').replace(/\bVENCIDO\b/g, 'vencido');
+            return t.replace(/\s+/g, ' ').trim();
+        }
+        function guideSilence() {
+            guideVoicePending = false;
+            try { if (guideVoiceSupported()) speechSynthesis.cancel(); } catch (e) {}
+        }
+        function guideSpeak(step) {
+            if (!guideVoiceSupported() || !guideVoiceOn() || !step) return;
+            try {
+                speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(guideSpeechText(step));
+                const v = guidePickVoice();
+                try { if (v) u.voice = v; } catch (e) {}
+                u.lang = v ? v.lang : 'es-CO';
+                u.rate = 1;
+                u.pitch = 1;
+                // Sin un toque previo el celular no deja hablar: se lee al primer toque
+                u.onerror = e => { if (e.error === 'not-allowed') guideVoicePending = true; };
+                guideVoicePending = false;
+                speechSynthesis.speak(u);
+                if (navigator.userActivation && !navigator.userActivation.hasBeenActive) guideVoicePending = true;
+            } catch (e) {}
+        }
+        function guideVoiceBtnUpdate() {
+            const b = document.getElementById('guideVoiceBtn');
+            if (!b) return;
+            b.classList.toggle('hidden', !guideVoiceSupported());
+            const on = guideVoiceOn();
+            b.textContent = on ? '🔊' : '🔇';
+            b.title = on ? 'Apagar la voz' : 'Prender la voz';
+            b.classList.toggle('off', !on);
+        }
+        function guideToggleVoice() {
+            const on = !guideVoiceOn();
+            try { localStorage.setItem('guia_voz', on ? 'on' : 'off'); } catch (e) {}
+            guideVoiceBtnUpdate();
+            if (on && guide) guideSpeak(guide.steps[guide.i]);
+            else guideSilence();
+        }
+        document.addEventListener('pointerdown', e => {
+            if (!guide || !guideVoicePending) return;
+            if (e.target.closest && e.target.closest('#guideNext, #guidePrev, #guideVoiceBtn, .guide-skip')) return;
+            guideVoicePending = false;
+            guideSpeak(guide.steps[guide.i]);
+        }, true);
+        document.addEventListener('visibilitychange', () => { if (document.hidden) guideSilence(); });
 
         // ¿Qué guía toca mostrar ahora?
         function pendingGuide() {

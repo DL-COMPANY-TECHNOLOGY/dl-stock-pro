@@ -2065,7 +2065,10 @@
         }
 
         // Elige el objetivo de un paso; abre el menú si hace falta
+        // Nota: `guide` puede volverse null o cambiar mientras esta función espera
+        // (clic rápido en Siguiente/Saltar/Atrás) — se revalida tras cada await.
         async function guideResolve(step) {
+            if (!guide) return null;
             if (!step.targets) {
                 if (guide.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
                 return { center: true };
@@ -2073,21 +2076,24 @@
             const mobile = window.matchMedia('(max-width: 768px)').matches;
             for (const t of step.targets) {
                 if (t.mobileOnly && !mobile) continue;
+                if (!guide) return null;
                 if (t.menu) {
                     if (guide.menu && guide.menu !== t.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
-                    if (guide.menu !== t.menu) {
+                    if (guide && guide.menu !== t.menu) {
                         guideOpenMenu(t.menu);
                         guide.menu = t.menu;
                         await new Promise(r => setTimeout(r, 280));
+                        if (!guide) return null;
                     }
                 } else if (guide.menu) {
                     guideCloseMenu(guide.menu); guide.menu = null;
                     await new Promise(r => setTimeout(r, 150));
+                    if (!guide) return null;
                 }
                 const els = [...document.querySelectorAll(t.sel)].filter(guideVisible);
                 if (els.length) return { els };
             }
-            if (guide.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
+            if (guide && guide.menu) { guideCloseMenu(guide.menu); guide.menu = null; }
             return null;
         }
 

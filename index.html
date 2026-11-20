@@ -2057,7 +2057,7 @@
 
         // ==========================================
         // BÚSQUEDA AUTOMÁTICA DEL PRODUCTO POR CÓDIGO DE BARRAS
-        // 1) Catálogo DL (lo que otros negocios ya registraron)  2) Open Food Facts y bases hermanas
+        // 1) Open Food Facts y bases hermanas  2) Catálogo DL (lo que otros negocios ya registraron)
         // ==========================================
         const LOOKUP_SOURCES = [
             { host: 'https://world.openfoodfacts.org', label: 'Open Food Facts' },
@@ -2110,7 +2110,8 @@
 
         async function lookupProductByBarcode(code) {
             if (code in lookupCache) return lookupCache[code];
-            const res = (await lookupCatalog(code)) || (navigator.onLine === false ? null : await lookupOpenFacts(code));
+            // Primero Open Food Facts (y bases hermanas); si no está, el catálogo DL; si no, se escribe a mano
+            const res = (navigator.onLine === false ? null : await lookupOpenFacts(code)) || (await lookupCatalog(code));
             lookupCache[code] = res;
             return res;
         }

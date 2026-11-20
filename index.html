@@ -351,6 +351,11 @@
         .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .chip-scroll { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; padding-bottom: 2px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
+        /* Búsqueda automática por código de barras */
+        .lookup-status { margin-top: 6px; font-size: 11.5px; line-height: 1.45; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--border-subtle); color: var(--text-mid); background: var(--bg-input); }
+        .lookup-status.is-hit { border-color: rgba(16,185,129,.5); background: rgba(16,185,129,.1); color: var(--text-high); }
+        .lookup-status.is-miss { border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.1); }
+        .lookup-status.hidden { display: none; }
         /* Funciones bloqueadas en plan GRATIS */
         body.plan-free [data-pro] { position: relative; opacity: .62; }
         body.plan-free [data-pro]::after { content: '🔒 PRO'; position: absolute; top: -7px; right: -5px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff;
@@ -1278,11 +1283,12 @@
                     <label style="display: block; font-weight: 800; font-size: 11px; margin-bottom: 4px; color: var(--text-low);">1. CÓDIGO DE BARRAS (EAN)</label>
                     <div style="display: flex; gap: 6px;">
                         <input type="text" id="prodBarcode" required placeholder="770123456001" 
-                               oninput="cleanBarcodeSpaces(this); checkDuplicateOnInput('barcode')" class="input-text">
+                               oninput="cleanBarcodeSpaces(this); checkDuplicateOnInput('barcode')" onchange="autoFillFromBarcode(this.value)" class="input-text">
                         <button type="button" onclick="openScannerModal('barcode')" class="btn-green-action" style="padding: 0 16px;" title="Escanear Código de Barras">
                             <i class="fa-solid fa-camera"></i>
                         </button>
                     </div>
+                    <div id="prodLookupStatus" class="lookup-status hidden"></div>
                 </div>
 
                 <div>
@@ -2047,6 +2053,125 @@
             uiConfirm(`🔒 ${f.name} es del plan PRO\nCon PRO desbloqueas Excel, importar productos, etiquetas de precio, pedido al proveedor por WhatsApp, soporte y productos ilimitados. ${price}`,
                 { okText: '👑 Ver planes', cancelText: 'Ahora no' }).then(ok => { if (ok) openSubscriptionModal(); });
             return false;
+        }
+
+        // ==========================================
+        // BÚSQUEDA AUTOMÁTICA DEL PRODUCTO POR CÓDIGO DE BARRAS
+        // 1) Catálogo DL (lo que otros negocios ya registraron)  2) Open Food Facts y bases hermanas
+        // ==========================================
+        const LOOKUP_SOURCES = [
+            { host: 'https://world.openfoodfacts.org', label: 'Open Food Facts' },
+            { host: 'https://world.openbeautyfacts.org', label: 'Open Beauty Facts' },
+            { host: 'https://world.openproductsfacts.org', label: 'Open Products Facts' }
+        ];
+        const lookupCache = {};
+        let lookupSeq = 0;
+
+        function withTimeout(promise, ms) {
+            return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+        }
+
+        function validLookupCode(code) {
+            const c = String(code || '').replace(/\D/g, '');
+            return c.length >= 8 && c.length <= 14 ? c : '';
+        }
+
+        function buildLookupName(p) {
+            let name = String(p.product_name_es || p.product_name || p.generic_name_es || p.generic_name || '').trim();
+            if (!name) return '';
+            const brand = String(p.brands || '').split(',')[0].trim();
+            const qty = String(p.quantity || '').trim();
+            const n = normCat(name);
+            if (brand && !n.includes(normCat(brand))) name += ' ' + brand;
+            if (qty && !n.replace(/\s/g, '').includes(normCat(qty).replace(/\s/g, ''))) name += ' X ' + qty;
+            return name.replace(/\s+/g, ' ').toUpperCase().slice(0, 120);
+        }
+
+        async function lookupCatalog(code) {
+            if (!db || !currentUser || !currentUser.uid) return null;
+            try {
+                const snap = await withTimeout(db.collection('catalogo').doc(code).get(), 4000);
+                if (snap.exists && snap.data().name) return { name: snap.data().name, category: snap.data().category || '', source: 'catálogo DL' };
+            } catch (e) {}
+            return null;
+        }
+
+        async function lookupOpenFacts(code) {
+            const tries = LOOKUP_SOURCES.map(src => withTimeout(
+                fetch(`${src.host}/api/v2/product/${code}.json?fields=product_name,product_name_es,generic_name,generic_name_es,brands,quantity`)
+                    .then(r => r.ok ? r.json() : null), 6000)
+                .then(d => {
+                    const name = d && d.status === 1 && d.product ? buildLookupName(d.product) : '';
+                    if (!name) throw new Error('no');
+                    return { name, category: '', source: src.label };
+                }));
+            try { return await Promise.any(tries); } catch (e) { return null; }
+        }
+
+        async function lookupProductByBarcode(code) {
+            if (code in lookupCache) return lookupCache[code];
+            const res = (await lookupCatalog(code)) || (navigator.onLine === false ? null : await lookupOpenFacts(code));
+            lookupCache[code] = res;
+            return res;
+        }
+
+        function setLookupStatus(html, cls) {
+            const el = document.getElementById('prodLookupStatus');
+            if (!el) return;
+            el.className = 'lookup-status' + (html ? ' ' + (cls || '') : ' hidden');
+            el.innerHTML = html || '';
+        }
+
+        // Llena el formulario de un producto NUEVO con lo que encuentre del código
+        async function autoFillFromBarcode(raw, opts = {}) {
+            const code = validLookupCode(raw);
+            if (!code || editingIndex !== null) { setLookupStatus(''); return; }
+            if (inventory.some(p => p && String(p.barcode || '') === code)) return; // ya existe: lo maneja el aviso de duplicado
+            const seq = ++lookupSeq;
+            setLookupStatus('<i class="fa-solid fa-spinner fa-spin"></i> Buscando el producto…', 'is-loading');
+            const res = await lookupProductByBarcode(code);
+            // Si mientras tanto cambió el código, se cerró o se abrió otro producto, no se toca nada
+            const modalOpen = !document.getElementById('productModal').classList.contains('hidden');
+            if (seq !== lookupSeq || !modalOpen || editingIndex !== null || validLookupCode(document.getElementById('prodBarcode').value) !== code) return;
+            if (!res) {
+                setLookupStatus('No encontramos este código en la base de datos. Escribe el nombre del producto.', 'is-miss');
+                return;
+            }
+            const nameEl = document.getElementById('prodName');
+            if (!nameEl.value.trim() || opts.overwriteName) nameEl.value = res.name;
+            const sapEl = document.getElementById('prodSap');
+            if (!sapEl.value.trim()) sapEl.value = code;
+            if (res.category) {
+                const catEl = document.getElementById('prodCategory');
+                const opt = [...catEl.options].find(o => o.value && normCat(o.value) === normCat(res.category));
+                if (opt && (!catEl.value || catEl.selectedIndex <= 0)) { catEl.value = opt.value; if (typeof handleCategoryChange === 'function') handleCategoryChange(); }
+            }
+            setLookupStatus(`✅ <b>${esc(res.name)}</b><br>Encontrado en ${esc(res.source)}. Revisa el <b>precio</b> y el <b>stock</b> y guarda.`, 'is-hit');
+            showToast(`✅ Producto encontrado: ${res.name}. Pon el precio y el stock.`);
+            const priceEl = document.getElementById('prodPrice');
+            if (priceEl && !priceEl.value) setTimeout(() => { try { priceEl.focus(); priceEl.scrollIntoView({ block: 'center' }); } catch (e) {} }, 150);
+        }
+
+        // Cada producto nuevo con código de barras alimenta el catálogo común (sin precios ni stock)
+        async function contributeToCatalog(item) {
+            const code = validLookupCode(item.barcode);
+            if (!code || !db || !currentUser || !currentUser.uid || !item.name) return;
+            if (lookupCache[code] && lookupCache[code].source === 'catálogo DL') return;
+            try {
+                const ref = db.collection('catalogo').doc(code);
+                const snap = await withTimeout(ref.get(), 4000);
+                if (snap.exists) return;
+                const data = {
+                    name: String(item.name).toUpperCase().slice(0, 120),
+                    createdBy: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                if (item.category) data.category = String(item.category).slice(0, 60);
+                await ref.set(data);
+                lookupCache[code] = { name: data.name, category: data.category || '', source: 'catálogo DL' };
+            } catch (e) {
+                console.log("Catálogo no actualizado:", e);
+            }
         }
 
         // ---------- Plan GRATIS: máximo 20 productos registrados con escáner o foto de etiqueta (para siempre) ----------
@@ -5314,6 +5439,7 @@
                 }
                 togglePromoField();
                 recalcPrices();
+                if (extractedBarcode) autoFillFromBarcode(extractedBarcode, { overwriteName: true });
 
             } catch (err) {
                 overlay.classList.add('hidden');
@@ -5461,6 +5587,8 @@
             flushAllAdjust();
             editingIndex = index;
             scanSourcePending = false;
+            lookupSeq++;
+            setLookupStatus('');
             document.getElementById('productForm').reset();
             document.getElementById('nameSuggestionsBox').classList.add('hidden');
             renderCategoryOptions();
@@ -5618,6 +5746,7 @@
             } else {
                 inventory.unshift(item);
                 if (scanSourcePending) countScanRegister();
+                contributeToCatalog(item);
             }
             scanSourcePending = false;
 
@@ -7982,6 +8111,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
                 document.getElementById('prodBarcode').value = cleanCode;
                 if (editingIndex === null) scanSourcePending = true;
                 checkDuplicateOnInput('barcode');
+                autoFillFromBarcode(cleanCode);
             } else if (scannerTarget === 'quickSearch') {
                 const found = inventory.find(p => {
                     if (!p) return false;
@@ -7997,6 +8127,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
                         openProductModal();
                         document.getElementById('prodBarcode').value = cleanCode;
                         scanSourcePending = true;
+                        autoFillFromBarcode(cleanCode);
                     }
                 }
             }

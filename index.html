@@ -351,6 +351,12 @@
         .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .chip-scroll { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; padding-bottom: 2px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
+        /* Funciones bloqueadas en plan GRATIS */
+        body.plan-free [data-pro] { position: relative; opacity: .62; }
+        body.plan-free [data-pro]::after { content: '🔒 PRO'; position: absolute; top: -7px; right: -5px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff;
+            font-size: 8.5px; font-weight: 900; padding: 2px 6px; border-radius: 9999px; letter-spacing: .02em; box-shadow: 0 2px 6px rgba(2,132,199,.4); pointer-events: none; line-height: 1.3; }
+        body.plan-free .sheet-tile[data-pro]::after { top: 6px; right: 6px; }
+        body.plan-free.in-app .btn-floating-whatsapp { display: none; }
         /* Precios con descuento de lanzamiento */
         .promo-banner { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: linear-gradient(135deg, rgba(239,68,68,.14), rgba(245,158,11,.14)); border: 1.5px solid rgba(245,158,11,.5); }
         .promo-banner > div > b { display: block; font-size: 13px; color: var(--text-high); }
@@ -944,13 +950,13 @@
                         <button type="button" id="deskCountBtn" onclick="openCountModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Conteo físico">
                             <i class="fa-solid fa-list-check"></i> Conteo
                         </button>
-                        <button type="button" id="deskLabelsBtn" onclick="openLabelsModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Etiquetas de precio">
+                        <button type="button" id="deskLabelsBtn" data-pro="labels" onclick="openLabelsModal()" class="btn-dark-action list-extra" style="padding: 5px 9px; font-size: 11px;" title="Etiquetas de precio">
                             <i class="fa-solid fa-tag"></i> Etiquetas
                         </button>
-                        <button type="button" id="deskImportBtn" onclick="openImportModal()" class="btn-dark-action" style="padding: 5px 9px; font-size: 11px;" title="Importar desde Excel">
+                        <button type="button" id="deskImportBtn" data-pro="import" onclick="openImportModal()" class="btn-dark-action" style="padding: 5px 9px; font-size: 11px;" title="Importar desde Excel">
                             <i class="fa-solid fa-file-import"></i> Importar
                         </button>
-                        <button type="button" id="deskExcelBtn" onclick="exportCSV()" class="btn-green-action" style="padding: 5px 9px; font-size: 11px;" title="Exportar a Excel">
+                        <button type="button" id="deskExcelBtn" data-pro="excel" onclick="exportCSV()" class="btn-green-action" style="padding: 5px 9px; font-size: 11px;" title="Exportar a Excel">
                             <i class="fa-solid fa-file-excel"></i> Excel
                         </button>
                     </div>
@@ -1051,15 +1057,15 @@
                 <div class="sheet-grid">
                     <button type="button" id="morePlansItem" class="sheet-tile" onclick="moreAction(openSubscriptionModal)"><i class="fa-solid fa-crown" style="color:#f59e0b"></i><span>Planes</span></button>
                     <button type="button" id="moreHistoryItem" class="sheet-tile" onclick="moreAction(openHistoryModal)"><i class="fa-solid fa-clock-rotate-left" style="color:#38bdf8"></i><span>Historial</span></button>
-                    <button type="button" id="moreExcelItem" class="sheet-tile" onclick="moreAction(exportCSV)"><i class="fa-solid fa-file-excel" style="color:#10b981"></i><span>Excel</span></button>
-                    <button type="button" id="moreImportItem" class="sheet-tile" onclick="moreAction(openImportModal)"><i class="fa-solid fa-file-import" style="color:#10b981"></i><span>Importar</span></button>
+                    <button type="button" id="moreExcelItem" data-pro="excel" class="sheet-tile" onclick="moreAction(exportCSV)"><i class="fa-solid fa-file-excel" style="color:#10b981"></i><span>Excel</span></button>
+                    <button type="button" id="moreImportItem" data-pro="import" class="sheet-tile" onclick="moreAction(openImportModal)"><i class="fa-solid fa-file-import" style="color:#10b981"></i><span>Importar</span></button>
                     <button type="button" id="moreCountItem" class="sheet-tile" onclick="moreAction(openCountModal)"><i class="fa-solid fa-list-check" style="color:#38bdf8"></i><span>Conteo</span></button>
-                    <button type="button" id="moreLabelsItem" class="sheet-tile" onclick="moreAction(openLabelsModal)"><i class="fa-solid fa-tag" style="color:#ef4444"></i><span>Etiquetas</span></button>
-                    <button type="button" id="moreOrderItem" class="sheet-tile" onclick="moreAction(openOrderModal)"><i class="fa-solid fa-clipboard-list" style="color:#f59e0b"></i><span>Pedido</span></button>
+                    <button type="button" id="moreLabelsItem" data-pro="labels" class="sheet-tile" onclick="moreAction(openLabelsModal)"><i class="fa-solid fa-tag" style="color:#ef4444"></i><span>Etiquetas</span></button>
+                    <button type="button" id="moreOrderItem" data-pro="order" class="sheet-tile" onclick="moreAction(openOrderModal)"><i class="fa-solid fa-clipboard-list" style="color:#f59e0b"></i><span>Pedido</span></button>
                     <button type="button" id="moreBackupItem" class="sheet-tile" onclick="moreAction(openBackupModal)"><i class="fa-solid fa-shield-halved" style="color:#38bdf8"></i><span>Copia</span></button>
                     <button type="button" id="moreCategoriesItem" class="sheet-tile" onclick="moreAction(openConfigModal)"><i class="fa-solid fa-sliders" style="color:#a78bfa"></i><span>Categorías</span></button>
                     <button type="button" id="moreThemeItem" class="sheet-tile" onclick="moreAction(toggleTheme)"><i class="fa-solid fa-circle-half-stroke" style="color:#f59e0b"></i><span id="moreThemeLabel">Tema</span></button>
-                    <a id="moreSupportItem" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
+                    <a id="moreSupportItem" data-pro="support" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
                     <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide('inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
                     <button type="button" id="moreAdminItem" class="sheet-tile hidden" onclick="moreAction(promptAdminAccess)"><i class="fa-solid fa-user-shield" style="color:#38bdf8"></i><span>Admin</span></button>
                 </div>
@@ -1118,7 +1124,8 @@
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; line-height: 1.6;">
                         <li><strong>Hasta 100 productos.</strong></li>
                         <li>Guardado en este celular (sin nube).</li>
-                        <li>Escáner, alertas de vencimiento y stock bajo, pedido, conteo y etiquetas.</li>
+                        <li>Escáner, alertas de vencimiento y stock bajo, conteo e historial.</li>
+                        <li style="color: var(--text-low);">🔒 Sin Excel, importar, etiquetas, pedido al proveedor ni soporte.</li>
                     </ul>
                 </div>
 
@@ -1129,6 +1136,8 @@
                     </div>
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; margin-bottom: 12px; line-height: 1.6;">
                         <li>Productos Ilimitados (sin tope de 100).</li>
+                        <li><strong>Excel, importar productos, etiquetas de precio y pedido al proveedor por WhatsApp.</strong></li>
+                        <li>Soporte por WhatsApp.</li>
                         <li>Almacenamiento local ultrarrápido sin internet.</li>
                         <li>Exportación e importación de copias JSON.</li>
                     </ul>
@@ -1568,7 +1577,7 @@
                     <div id="countDiffList" style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; max-height: 40vh; overflow-y: auto;"></div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <button type="button" onclick="showCountStep('work')" class="btn-dark-action" style="padding: 10px; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i> Seguir contando</button>
-                        <button type="button" onclick="exportCountXLSX()" class="btn-dark-action" style="padding: 10px; font-size: 12px;"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                        <button type="button" data-pro="excel" onclick="exportCountXLSX()" class="btn-dark-action" style="padding: 10px; font-size: 12px;"><i class="fa-solid fa-file-excel"></i> Excel</button>
                     </div>
                     <button type="button" id="countApplyBtn" onclick="applyCount()" class="btn-green-action" style="padding: 12px; font-size: 13px;"><i class="fa-solid fa-check-double"></i> Aplicar ajustes al inventario</button>
                 </div>
@@ -1882,7 +1891,7 @@
                 <input type="text" id="historySearch" oninput="renderHistory()" placeholder="🔍 Filtrar por producto o código..." class="input-text">
                 <div id="historyList" style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;"></div>
                 <div style="display: flex; gap: 8px;">
-                    <button type="button" onclick="exportHistoryCSV()" class="btn-green-action" style="flex: 1; padding: 9px; font-size: 12px;">
+                    <button type="button" data-pro="excel" onclick="exportHistoryCSV()" class="btn-green-action" style="flex: 1; padding: 9px; font-size: 12px;">
                         <i class="fa-solid fa-file-excel"></i> Exportar historial
                     </button>
                     <button type="button" onclick="closeHistoryModal()" class="btn-dark-action" style="flex: 1; padding: 9px; font-size: 12px;">Cerrar</button>
@@ -2015,6 +2024,43 @@
         window.alert = (m) => { uiAlert(m); };
 
         // ==========================================
+        // FUNCIONES DEL PLAN PRO (bloqueadas en GRATIS)
+        // ==========================================
+        const PRO_FEATURES = {
+            excel:   { name: 'Descargar en Excel', icon: '📊' },
+            import:  { name: 'Importar desde Excel', icon: '📥' },
+            labels:  { name: 'Etiquetas de precio', icon: '🏷️' },
+            order:   { name: 'Pedido al proveedor', icon: '📋' },
+            support: { name: 'Soporte por WhatsApp', icon: '💬' }
+        };
+
+        function hasProAccess() {
+            return !!currentUser && (currentUser.isMaster || currentUser.plan === 'pro' || currentUser.plan === 'premium');
+        }
+
+        function requirePro(key) {
+            if (hasProAccess()) return true;
+            const f = PRO_FEATURES[key] || { name: 'Esta función', icon: '🔒' };
+            const t = PLAN_PRICES.COP.pro;
+            const price = t.normal !== t.oferta ? `Hoy con 50% de descuento: ${t.oferta}/mes (antes ${t.normal}).` : `Desde ${t.oferta}/mes.`;
+            uiConfirm(`🔒 ${f.name} es del plan PRO\nCon PRO desbloqueas Excel, importar productos, etiquetas de precio, pedido al proveedor por WhatsApp, soporte y productos ilimitados. ${price}`,
+                { okText: '👑 Ver planes', cancelText: 'Ahora no' }).then(ok => { if (ok) openSubscriptionModal(); });
+            return false;
+        }
+
+        function applyPlanLocks() {
+            document.body.classList.toggle('plan-free', !!currentUser && !hasProAccess());
+        }
+
+        // El soporte por WhatsApp dentro de la app es del plan PRO (en el login sigue disponible)
+        document.addEventListener('click', e => {
+            const a = e.target.closest && e.target.closest('a[href*="wa.me/573218641539"]');
+            if (!a || !document.body.classList.contains('in-app')) return;
+            if (/comprar|c%C3%B3digo|codigo/i.test(a.getAttribute('href'))) return;
+            if (!requirePro('support')) { e.preventDefault(); e.stopPropagation(); }
+        }, true);
+
+        // ==========================================
         // GUÍA INTERACTIVA
         // Para cambiar o agregar pasos, edita GUIDES. Cada paso:
         //   targets: [{ sel: 'selector CSS', menu: 'add' | 'more' }]  → se usa el primero que esté visible
@@ -2074,6 +2120,12 @@
         function guideKey(name) {
             const uid = currentUser && currentUser.uid ? currentUser.uid : 'dispositivo';
             return `guia_${name}_${uid}`;
+        }
+        function guideStepText(step) {
+            let t = step.textFn ? step.textFn() : step.text;
+            const els = guide && guide.res && guide.res.els;
+            if (els && !hasProAccess() && els.some(e => e.closest('[data-pro]'))) t += ' 🔒 Disponible en el plan **PRO**.';
+            return t;
         }
         function guideMd(t) {
             return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -2200,7 +2252,7 @@
             emoji.textContent = step.emoji || '';
             document.getElementById('guideCount').textContent = `Guía · ${g.i + 1} de ${g.steps.length}`;
             document.getElementById('guideTitle').textContent = step.title;
-            document.getElementById('guideText').innerHTML = guideMd(step.textFn ? step.textFn() : step.text);
+            document.getElementById('guideText').innerHTML = guideMd(guideStepText(step));
             const last = g.i === g.steps.length - 1;
             document.getElementById('guidePrev').disabled = g.i === 0;
             document.getElementById('guideNext').textContent = last ? (step.finalLabel || 'Entendido ✓') : 'Siguiente ›';
@@ -2319,7 +2371,7 @@
         }
         function guideSpeechText(step) {
             const div = document.createElement('div');
-            div.innerHTML = guideMd(step.textFn ? step.textFn() : step.text);
+            div.innerHTML = guideMd(guideStepText(step));
             let t = `${step.title}${/[.!?]$/.test(step.title) ? '' : '.'} ${div.textContent}`;
             t = t.replace(/DL STOCK PRO/g, 'DL Stock Pro').replace(/\+ y −/g, 'más y menos').replace(/→/g, ', luego, ').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu, '')
                  .replace(/\bR1\b/g, 'R 1').replace(/\bPRO\b/g, 'Pro').replace(/\bPREMIUM\b/g, 'Premium').replace(/\bGRATIS\b/g, 'Gratis').replace(/\bADMIN\b/g, 'administrador')
@@ -2579,6 +2631,7 @@
         };
 
         function applyPlanPrices(curr) {
+            applyPlanLocks();
             const t = PLAN_PRICES[curr] || PLAN_PRICES.COP;
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
             const short = curr === 'USD' ? ' USD' : '';
@@ -3713,6 +3766,7 @@
                 document.body.classList.remove('in-app');
                 closeMoreMenu();
             }
+            applyPlanLocks();
             scheduleGuides();
         }
 
@@ -4277,6 +4331,7 @@
         }
 
         function openImportModal() {
+            if (!requirePro('import')) return;
             flushAllAdjust();
             importPlan = null;
             document.getElementById('importStep1').classList.remove('hidden');
@@ -4606,6 +4661,7 @@
         }
 
         function exportCountXLSX() {
+            if (!requirePro('excel')) return;
             const { rows } = getCountDiffs();
             if (!rows.length) { uiAlert("No hay productos contados para exportar."); return; }
             const headers = ['Ubicación', 'Producto', 'Código Interno', 'Código de Barras', 'Stock Sistema', 'Contado', 'Diferencia', 'Precio Unitario', 'Valor Diferencia'];
@@ -4719,6 +4775,7 @@
         let labelSelected = new Set();
 
         function openLabelsModal() {
+            if (!requirePro('labels')) return;
             flushAllAdjust();
             const sel = document.getElementById('lblCategory');
             sel.innerHTML = '<option value="">Todas las categorías</option>' +
@@ -6140,7 +6197,7 @@
                 bar.innerHTML = `
                     <span>${label}</span>
                     <div class="qf-actions">
-                        ${quickFilter === 'low' ? `<button type="button" onclick="openOrderModal()" class="btn-gold-action" style="padding: 6px 10px; font-size: 11px;"><i class="fa-solid fa-clipboard-list"></i> Pedido sugerido</button>` : ''}
+                        ${quickFilter === 'low' ? `<button type="button" data-pro="order" onclick="openOrderModal()" class="btn-gold-action" style="padding: 6px 10px; font-size: 11px;"><i class="fa-solid fa-clipboard-list"></i> Pedido sugerido</button>` : ''}
                         <button type="button" onclick="setQuickFilter('all')" class="btn-dark-action" style="padding: 6px 10px; font-size: 11px;"><i class="fa-solid fa-xmark"></i> Ver todos</button>
                     </div>`;
                 bar.classList.remove('hidden');
@@ -6371,6 +6428,7 @@
 
         // ---------- Abrir / cerrar (con botón atrás del celular) ----------
         function openOrderModal() {
+            if (!requirePro('order')) return;
             flushAllAdjust();
             ordCfg = loadOrderConfigLocal();
             let last = null;
@@ -7634,6 +7692,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
         }
 
         function exportCSV() {
+            if (!requirePro('excel')) return;
             flushAllAdjust();
             const items = inventory.filter(Boolean).slice().sort((a, b) =>
                 String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base' }));
@@ -7736,6 +7795,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
         }
 
         function exportHistoryCSV() {
+            if (!requirePro('excel')) return;
             const history = historyView || loadHistory();
             if (history.length === 0) {
                 uiAlert("No hay movimientos para exportar.");

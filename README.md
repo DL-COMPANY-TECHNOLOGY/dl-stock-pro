@@ -76,8 +76,8 @@ DL STOCK PRO es una aplicación web para llevar el inventario de tiendas, minime
 | Plan | Precio (COP) | Precio (USD) | Incluye |
 |------|-------------|-------------|---------|
 | **GRATIS** | $0 | $0 | Hasta 100 productos, almacenamiento en el dispositivo |
-| **PRO** | $19.900 / mes | $5.99 / mes | Productos ilimitados, almacenamiento local, copias de seguridad |
-| **PREMIUM** | $39.900 / mes | $9.99 / mes | Todo lo de PRO + **nube** y **sincronización entre varios dispositivos en tiempo real** + soporte prioritario |
+| **PRO** | ~~$40.000~~ **$20.000** / mes | ~~$9.99~~ **$4.99** / mes | Productos ilimitados, almacenamiento local, copias de seguridad |
+| **PREMIUM** | ~~$80.000~~ **$40.000** / mes | ~~$19.99~~ **$9.99** / mes | Todo lo de PRO + **nube** y **sincronización entre varios dispositivos en tiempo real** + soporte prioritario |
 
 Los planes se activan con un **código de activación**, que se solicita por WhatsApp. Cada código se usa una sola vez y tiene una vigencia (30, 90, 180 o 365 días). La app avisa cuando el plan está por vencer.
 

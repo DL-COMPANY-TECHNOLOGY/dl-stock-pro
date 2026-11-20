@@ -351,6 +351,21 @@
         .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .chip-scroll { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; padding-bottom: 2px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
+        /* Precios con descuento de lanzamiento */
+        .promo-banner { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: linear-gradient(135deg, rgba(239,68,68,.14), rgba(245,158,11,.14)); border: 1.5px solid rgba(245,158,11,.5); }
+        .promo-banner > div > b { display: block; font-size: 13px; color: var(--text-high); }
+        .promo-banner small b { color: var(--text-high); }
+        .promo-banner small { display: block; font-size: 11px; color: var(--text-mid); line-height: 1.4; margin-top: 2px; }
+        .promo-badge { flex-shrink: 0; background: #ef4444; color: #fff; font-weight: 900; font-size: 15px; padding: 8px 9px; border-radius: 12px; transform: rotate(-6deg); box-shadow: 0 4px 12px rgba(239,68,68,.35); }
+        .promo-pill { display: inline-block; background: #ef4444; color: #fff; font-size: 9px; font-weight: 900; padding: 1px 6px; border-radius: 9999px; vertical-align: middle; letter-spacing: 0; }
+        .price-col { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; text-align: right; }
+        .price-col s { font-size: 11px; font-weight: 800; color: var(--text-low); text-decoration-color: #ef4444; text-decoration-thickness: 2px; }
+        .price-col s:empty { display: none; }
+        .price-col small { font-size: 10px; color: var(--text-low); font-weight: 700; }
+        .price-old-mini { display: block; font-size: 8.5px; font-weight: 800; color: var(--text-low); text-decoration-color: #ef4444; text-decoration-thickness: 1.5px; line-height: 1.1; }
+        .plan-current { display: inline-block; font-size: 9px; font-weight: 900; color: #04121c; background: #10b981; padding: 2px 7px; border-radius: 9999px; vertical-align: middle; margin-left: 4px; }
+        .plan-current.hidden { display: none; }
+        .plan-box.is-current { box-shadow: 0 0 0 2px #10b981 inset; }
         /* Guía interactiva */
         #guideLayer { display: none; }
         #guideLayer.open { display: block; }
@@ -758,23 +773,26 @@
                 <!-- SELECCIÓN DE PLANES -->
                 <div style="margin-top: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label style="font-size: 10px; font-weight: 800; color: var(--text-low); text-transform: uppercase;">Membresía / Plan:</label>
+                        <label style="font-size: 10px; font-weight: 800; color: var(--text-low); text-transform: uppercase;">Membresía / Plan: <span class="promo-pill">-50%</span></label>
                         <button type="button" onclick="openSubscriptionModal()" style="background: none; border: none; color: var(--cyan-tech); font-size: 10px; font-weight: 800; cursor: pointer;">Ver detalles →</button>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
                         <button type="button" id="btnPlanGratis" onclick="selectPlan('gratis')" class="plan-card-btn selected">
                             <span style="font-weight: 900; color: #10b981; display: block; font-size: 11px;">GRATIS</span>
+                            <s class="price-old-mini" style="visibility: hidden;">$0</s>
                             <span id="labelPriceGratis" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$0</span>
                             <span style="color: var(--text-low); font-size: 8px; display: block;">Hasta 100 prods</span>
                         </button>
                         <button type="button" id="btnPlanPro" onclick="selectPlan('pro')" class="plan-card-btn">
                             <span style="font-weight: 900; color: #0284c7; display: block; font-size: 11px;">PRO</span>
-                            <span id="labelPricePro" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$19.900</span>
+                            <s id="labelOldPricePro" class="price-old-mini">$40.000</s>
+                            <span id="labelPricePro" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$20.000</span>
                             <span style="color: var(--text-low); font-size: 8px; display: block;">Ilimitado Local</span>
                         </button>
                         <button type="button" id="btnPlanPremium" onclick="selectPlan('premium')" class="plan-card-btn">
                             <span style="font-weight: 900; color: var(--cyan-tech); display: block; font-size: 11px;">PREMIUM</span>
-                            <span id="labelPricePremium" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$39.900</span>
+                            <s id="labelOldPricePremium" class="price-old-mini">$80.000</s>
+                            <span id="labelPricePremium" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$40.000</span>
                             <span style="color: var(--cyan-tech); font-size: 8px; display: block;">Nube & Sync</span>
                         </button>
                     </div>
@@ -1084,10 +1102,30 @@
                     </button>
                 </div>
 
-                <div style="background: var(--bg-input); border: 1.5px solid var(--border-subtle); border-radius: 18px; padding: 14px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <h4 style="font-size: 14px; font-weight: 900; color: #0284c7;">DL STOCK PRO (LOCAL)</h4>
-                        <span id="modalProPriceTag" style="font-size: 13px; font-weight: 900; color: var(--text-high);">$19.900 COP / mes</span>
+                <div class="promo-banner">
+                    <span class="promo-badge">-50%</span>
+                    <div>
+                        <b>🎉 Descuento de lanzamiento</b>
+                        <small>DL STOCK PRO es nueva: todos los planes de pago tienen <b>50% de descuento</b>.</small>
+                    </div>
+                </div>
+
+                <div id="planCardGratis" class="plan-box" style="background: var(--bg-input); border: 1.5px solid var(--border-subtle); border-radius: 18px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px;">
+                        <h4 style="font-size: 14px; font-weight: 900; color: #10b981;">DL STOCK PRO GRATIS <span class="plan-current hidden">Tu plan</span></h4>
+                        <div class="price-col"><span style="font-size: 13px; font-weight: 900; color: var(--text-high);">$0</span><small>Para siempre</small></div>
+                    </div>
+                    <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; line-height: 1.6;">
+                        <li><strong>Hasta 100 productos.</strong></li>
+                        <li>Guardado en este celular (sin nube).</li>
+                        <li>Escáner, alertas de vencimiento y stock bajo, pedido, conteo y etiquetas.</li>
+                    </ul>
+                </div>
+
+                <div id="planCardPro" class="plan-box" style="background: var(--bg-input); border: 1.5px solid var(--border-subtle); border-radius: 18px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px;">
+                        <h4 style="font-size: 14px; font-weight: 900; color: #0284c7;">DL STOCK PRO (LOCAL) <span class="plan-current hidden">Tu plan</span></h4>
+                        <div class="price-col"><s id="modalProOldPrice">$40.000</s><span id="modalProPriceTag" style="font-size: 13px; font-weight: 900; color: var(--text-high);">$20.000 COP / mes</span><span class="promo-pill">-50%</span></div>
                     </div>
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; margin-bottom: 12px; line-height: 1.6;">
                         <li>Productos Ilimitados (sin tope de 100).</li>
@@ -1099,10 +1137,10 @@
                     </button>
                 </div>
 
-                <div style="background: rgba(2, 132, 199, 0.08); border: 1.5px solid var(--cyan-tech); border-radius: 18px; padding: 14px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <h4 style="font-size: 14px; font-weight: 900; color: var(--cyan-tech);">DL STOCK PRO PREMIUM</h4>
-                        <span id="modalPremiumPriceTag" style="font-size: 13px; font-weight: 900; color: var(--text-high);">$39.900 COP / mes</span>
+                <div id="planCardPremium" class="plan-box" style="background: rgba(2, 132, 199, 0.08); border: 1.5px solid var(--cyan-tech); border-radius: 18px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px;">
+                        <h4 style="font-size: 14px; font-weight: 900; color: var(--cyan-tech);">DL STOCK PRO PREMIUM <span class="plan-current hidden">Tu plan</span></h4>
+                        <div class="price-col"><s id="modalPremiumOldPrice">$80.000</s><span id="modalPremiumPriceTag" style="font-size: 13px; font-weight: 900; color: var(--text-high);">$40.000 COP / mes</span><span class="promo-pill">-50%</span></div>
                     </div>
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; margin-bottom: 12px; line-height: 1.6;">
                         <li>Todo lo del plan PRO incluido.</li>
@@ -2533,6 +2571,36 @@
 
         let selectedCurrency = localStorage.getItem('dl_currency_preference') || 'COP';
 
+        // Precios de los planes. Descuento de lanzamiento: 50% (precio normal tachado).
+        // Para quitar el descuento, deja "oferta" igual a "normal".
+        const PLAN_PRICES = {
+            COP: { pro: { normal: '$40.000', oferta: '$20.000' }, premium: { normal: '$80.000', oferta: '$40.000' }, sufijo: ' COP / mes' },
+            USD: { pro: { normal: '$9.99',   oferta: '$4.99' },   premium: { normal: '$19.99', oferta: '$9.99' },  sufijo: ' USD / mes' }
+        };
+
+        function applyPlanPrices(curr) {
+            const t = PLAN_PRICES[curr] || PLAN_PRICES.COP;
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            const short = curr === 'USD' ? ' USD' : '';
+            ['pro', 'premium'].forEach(k => {
+                const P = k === 'pro' ? 'Pro' : 'Premium';
+                const hasDiscount = t[k].normal !== t[k].oferta;
+                set('labelPrice' + P, t[k].oferta + short);
+                set('labelOldPrice' + P, hasDiscount ? t[k].normal + short : '');
+                set('modal' + P + 'PriceTag', t[k].oferta + t.sufijo);
+                set('modal' + P + 'OldPrice', hasDiscount ? t[k].normal : '');
+            });
+            // Marca el plan actual del usuario
+            const cur = currentUser ? (currentUser.isMaster ? null : (currentUser.plan || 'gratis')) : null;
+            [['gratis', 'planCardGratis'], ['pro', 'planCardPro'], ['premium', 'planCardPremium']].forEach(([k, id]) => {
+                const card = document.getElementById(id);
+                if (!card) return;
+                card.classList.toggle('is-current', cur === k);
+                const tag = card.querySelector('.plan-current');
+                if (tag) tag.classList.toggle('hidden', cur !== k);
+            });
+        }
+
         function setCurrency(curr) {
             selectedCurrency = curr;
             localStorage.setItem('dl_currency_preference', curr);
@@ -2548,20 +2616,14 @@
                 if (mBtnCOP) mBtnCOP.classList.add('selected');
                 if (mBtnUSD) mBtnUSD.classList.remove('selected');
 
-                document.getElementById('labelPricePro').textContent = '$19.900';
-                document.getElementById('labelPricePremium').textContent = '$39.900';
-                document.getElementById('modalProPriceTag').textContent = '$19.900 COP / mes';
-                document.getElementById('modalPremiumPriceTag').textContent = '$39.900 COP / mes';
+                applyPlanPrices('COP');
             } else {
                 if (btnUSD) btnUSD.classList.add('selected');
                 if (btnCOP) btnCOP.classList.remove('selected');
                 if (mBtnUSD) mBtnUSD.classList.add('selected');
                 if (mBtnCOP) mBtnCOP.classList.remove('selected');
 
-                document.getElementById('labelPricePro').textContent = '$5.99 USD';
-                document.getElementById('labelPricePremium').textContent = '$9.99 USD';
-                document.getElementById('modalProPriceTag').textContent = '$5.99 USD / mes';
-                document.getElementById('modalPremiumPriceTag').textContent = '$9.99 USD / mes';
+                applyPlanPrices('USD');
             }
         }
 

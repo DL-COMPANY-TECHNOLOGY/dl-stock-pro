@@ -1123,6 +1123,7 @@
                     </div>
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; line-height: 1.6;">
                         <li><strong>Hasta 100 productos.</strong></li>
+                        <li>Hasta <strong>20 productos registrados con escáner</strong> o foto de etiqueta (el resto, a mano).</li>
                         <li>Guardado en este celular (sin nube).</li>
                         <li>Escáner, alertas de vencimiento y stock bajo, conteo e historial.</li>
                         <li style="color: var(--text-low);">🔒 Sin Excel, importar, etiquetas, pedido al proveedor ni soporte.</li>
@@ -1135,7 +1136,7 @@
                         <div class="price-col"><s id="modalProOldPrice">$40.000</s><span id="modalProPriceTag" style="font-size: 13px; font-weight: 900; color: var(--text-high);">$20.000 COP / mes</span><span class="promo-pill">-50%</span></div>
                     </div>
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; margin-bottom: 12px; line-height: 1.6;">
-                        <li>Productos Ilimitados (sin tope de 100).</li>
+                        <li>Productos Ilimitados (sin tope de 100) y escáner sin límite.</li>
                         <li><strong>Excel, importar productos, etiquetas de precio y pedido al proveedor por WhatsApp.</strong></li>
                         <li>Soporte por WhatsApp.</li>
                         <li>Almacenamiento local ultrarrápido sin internet.</li>
@@ -2046,6 +2047,44 @@
             uiConfirm(`🔒 ${f.name} es del plan PRO\nCon PRO desbloqueas Excel, importar productos, etiquetas de precio, pedido al proveedor por WhatsApp, soporte y productos ilimitados. ${price}`,
                 { okText: '👑 Ver planes', cancelText: 'Ahora no' }).then(ok => { if (ok) openSubscriptionModal(); });
             return false;
+        }
+
+        // ---------- Plan GRATIS: máximo 20 productos registrados con escáner o foto de etiqueta (para siempre) ----------
+        const FREE_SCAN_LIMIT = 20;
+        let scanSourcePending = false; // el formulario actual se llenó con escáner o foto
+
+        function scanCountKey() {
+            return getUserStorageKey(currentUser ? currentUser.username : 'anon') + '_scan_ingresos';
+        }
+        function getScanCount() {
+            let local = 0;
+            try { local = parseInt(localStorage.getItem(scanCountKey())) || 0; } catch (e) {}
+            return Math.max(local, currentUser ? (parseInt(currentUser.scanIngresos) || 0) : 0);
+        }
+        function scanLeft() {
+            return Math.max(0, FREE_SCAN_LIMIT - getScanCount());
+        }
+        // true si puede registrar con escáner; si no, muestra el aviso para mejorar el plan
+        function canScanRegister() {
+            if (hasProAccess() || scanLeft() > 0) return true;
+            const t = PLAN_PRICES.COP.pro;
+            const price = t.normal !== t.oferta ? `Hoy con 50% de descuento: ${t.oferta}/mes (antes ${t.normal}).` : `Desde ${t.oferta}/mes.`;
+            uiConfirm(`🔒 Usaste tus ${FREE_SCAN_LIMIT} registros con escáner\nEl plan Gratis permite registrar ${FREE_SCAN_LIMIT} productos con el escáner o la foto de la etiqueta. Puedes seguir registrando a mano, o pasar a PRO para escanear sin límite. ${price}`,
+                { okText: '👑 Ver planes', cancelText: 'Ahora no' }).then(ok => { if (ok) openSubscriptionModal(); });
+            return false;
+        }
+        function countScanRegister() {
+            if (hasProAccess()) return;
+            const n = getScanCount() + 1;
+            try { localStorage.setItem(scanCountKey(), String(n)); } catch (e) {}
+            if (currentUser) {
+                currentUser.scanIngresos = n;
+                saveCurrentUserLocal();
+                if (db && currentUser.uid) db.collection('users').doc(currentUser.uid).set({ scanIngresos: n }, { merge: true }).catch(() => {});
+            }
+            const left = Math.max(0, FREE_SCAN_LIMIT - n);
+            showToast(left > 0 ? `📷 Te quedan ${left} de ${FREE_SCAN_LIMIT} registros con escáner (plan Gratis)` : `📷 Usaste tus ${FREE_SCAN_LIMIT} registros con escáner. Con PRO no hay límite.`,
+                left > 0 ? null : '👑 Ver planes', left > 0 ? null : openSubscriptionModal);
         }
 
         function applyPlanLocks() {
@@ -3496,6 +3535,7 @@
                 expiredPlan: eff.expiredPlan,
                 isMaster: isAdmin,
                 termsVersion: profile.termsVersion || null,
+                scanIngresos: parseInt(profile.scanIngresos) || 0,
                 sessionVersion: SESSION_VERSION
             };
         }
@@ -5210,6 +5250,7 @@
             const file = event.target.files[0];
             event.target.value = ''; // permite volver a elegir la misma foto
             if (!file) return;
+            if (!canScanRegister()) return;
 
             resetModalFields();
 
@@ -5259,6 +5300,7 @@
                 let extractedName = validHeaderLines.length > 0 ? validHeaderLines.slice(0, 2).join(' ').toUpperCase() : "";
 
                 openProductModal();
+                scanSourcePending = true;
                 if (extractedBarcode) {
                     document.getElementById('prodBarcode').value = extractedBarcode.replace(/\s+/g, '');
                     checkDuplicateOnInput('barcode');
@@ -5418,6 +5460,7 @@
         function openProductModal(index = null) {
             flushAllAdjust();
             editingIndex = index;
+            scanSourcePending = false;
             document.getElementById('productForm').reset();
             document.getElementById('nameSuggestionsBox').classList.add('hidden');
             renderCategoryOptions();
@@ -5574,7 +5617,9 @@
                 inventory[editingIndex] = item;
             } else {
                 inventory.unshift(item);
+                if (scanSourcePending) countScanRegister();
             }
+            scanSourcePending = false;
 
             saveUserInventoryToLocal();
 
@@ -7837,6 +7882,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
             downloadBlob(blob, `DL_HISTORIAL_${fileUserTag()}_${localDateStamp()}.xlsx`);
         }
         function openScannerModal(target) {
+            if (target === 'barcode' && editingIndex === null && !canScanRegister()) return;
             scannerTarget = target;
             const titleEl = document.getElementById('scannerModalTitle');
             const hintEl = document.getElementById('scannerHint');
@@ -7934,6 +7980,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
 
             if (scannerTarget === 'barcode') {
                 document.getElementById('prodBarcode').value = cleanCode;
+                if (editingIndex === null) scanSourcePending = true;
                 checkDuplicateOnInput('barcode');
             } else if (scannerTarget === 'quickSearch') {
                 const found = inventory.find(p => {
@@ -7945,9 +7992,11 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
                 if (found) {
                     openProductModal(inventory.indexOf(found));
                 } else {
+                    if (!canScanRegister()) return;
                     if (await uiConfirm(`Producto no encontrado\nEl código "${cleanCode}" no está en el inventario. ¿Deseas registrarlo como producto nuevo?`, { okText: 'Registrar' })) {
                         openProductModal();
                         document.getElementById('prodBarcode').value = cleanCode;
+                        scanSourcePending = true;
                     }
                 }
             }

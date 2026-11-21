@@ -1020,7 +1020,7 @@
                 <a href="legal.html#privacidad" target="_blank" rel="noopener">Política de privacidad</a>
                 <a href="legal.html#reembolsos" target="_blank" rel="noopener">Política de reembolsos</a>
             </div>
-            <p class="dev-copy">DL STOCK PRO v2.1 · Plataforma oficial de inventario © <span class="js-year">2026</span></p>
+            <p class="dev-copy">DL STOCK PRO v2.2 · Plataforma oficial de inventario © <span class="js-year">2026</span></p>
         </footer>
 
         <!-- BARRA DE NAVEGACIÓN INFERIOR (CELULAR) -->
@@ -1256,7 +1256,11 @@
 
                 <!-- SECCIÓN 2: LISTA DE USUARIOS -->
                 <div id="adminSectionUsers" class="hidden">
-                    <p style="font-size: 11px; color: var(--text-low); margin-bottom: 8px;">Listado de clientes registrados en el sistema:</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <p id="adminUsersSummary" style="font-size: 11px; color: var(--text-low); margin: 0;">Registro de clientes:</p>
+                        <button type="button" id="btnUsersExcel" onclick="exportUsersExcel()" class="btn-dark-action" style="padding: 5px 10px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                    </div>
+                    <input type="text" id="adminUsersSearch" oninput="renderAdminUsersRows()" placeholder="Buscar por correo..." style="width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-high); font-size: 12px; margin-bottom: 8px;">
                     <div id="adminUsersList" style="max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px;"></div>
                 </div>
 
@@ -3056,7 +3060,18 @@
 
             users.sort((a, b) => tsToMillis(b.createdAt) - tsToMillis(a.createdAt));
             countLabel.textContent = users.length;
+            adminUsersCache = users;
+            const effs = users.filter(u => u.uid !== ADMIN_UID).map(u => computeEffectivePlan(u, u.uid));
+            document.getElementById('adminUsersSummary').textContent = `${users.length} clientes · Gratis ${effs.filter(e => e.plan === 'gratis').length} · PRO ${effs.filter(e => e.plan === 'pro').length} · PREMIUM ${effs.filter(e => e.plan === 'premium').length} · Vencidos ${effs.filter(e => e.expiredPlan).length}`;
+            renderAdminUsersRows();
+        }
 
+        let adminUsersCache = [];
+        const fechaHoraU = ms => ms ? new Date(ms).toLocaleString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+        function renderAdminUsersRows() {
+            const container = document.getElementById('adminUsersList');
+            const q = ((document.getElementById('adminUsersSearch') || {}).value || '').toLowerCase();
+            const users = adminUsersCache.filter(u => !q || String(u.email || u.uid).toLowerCase().includes(q));
             if (users.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-low); font-size: 11px; text-align: center; padding: 12px;">No hay usuarios registrados aún.</p>';
                 return;
@@ -3075,7 +3090,9 @@
                     <div style="background: var(--bg-card); padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border-subtle); font-size: 11px; display: flex; justify-content: space-between; align-items: center; gap: 6px;">
                         <div style="min-width: 0;">
                             <span style="font-weight: 800; color: var(--text-high); display: block; word-break: break-all;">${esc(u.email || u.uid)}</span>
-                            <span style="color: var(--text-low); font-size: 10px; display: block;">Creado: ${esc(formatDate(tsToMillis(u.createdAt)) || '—')}${detail ? ' • ' + esc(detail) : ''}</span>
+                            <span style="color: var(--text-low); font-size: 10px; display: block;">📅 Cuenta creada: <b>${esc(fechaHoraU(tsToMillis(u.createdAt)))}</b></span>
+                            <span style="color: var(--text-low); font-size: 10px; display: block;">🕑 Último ingreso: ${esc(fechaHoraU(tsToMillis(u.lastLogin)))}</span>
+                            ${u.uid !== ADMIN_UID && eff.plan !== 'gratis' || eff.expiredPlan ? `<span style="color: var(--text-low); font-size: 10px; display: block;">Plan adquirido el <b>${esc(fechaHoraU(tsToMillis(u.planStartedAt)))}</b>${detail ? ' • ' + esc(detail) : ''}${u.redeemedCode ? ' • Código ' + esc(u.redeemedCode) : ''}</span>` : ''}
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
                             <span class="badge ${planLabel === 'PREMIUM' || planLabel === 'ADMIN' ? 'badge-cyan' : (planLabel === 'PRO' ? 'badge-amber' : 'badge-green')}">${esc(planLabel)}</span>
@@ -3084,6 +3101,43 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function exportUsersExcel() {
+            if (!isAdminUser()) return;
+            const users = adminUsersCache;
+            if (!users.length) { uiAlert("No hay clientes para exportar."); return; }
+            const headers = ['Correo', 'Nombre', 'Cuenta creada', 'Último ingreso', 'Plan actual', 'Plan adquirido el', 'Vence', 'Código usado', 'Estado'];
+            const lastCol = colLetter(headers.length - 1), HEADER_ROW = 4;
+            const rows = [];
+            rows.push([{ v: 'DL STOCK PRO — Registro de clientes', s: XS.title }]);
+            rows.push([{ v: `${users.length} clientes • Generado: ${nowLabel()} • DL COMPANY -TECHNOLOGY-`, s: XS.subtitle }]);
+            rows.push([]);
+            rows.push(headers.map(h => ({ v: h, s: XS.header })));
+            users.forEach(u => {
+                const eff = computeEffectivePlan(u, u.uid), adm = u.uid === ADMIN_UID;
+                const pago = !adm && (eff.plan !== 'gratis' || eff.expiredPlan);
+                rows.push([
+                    { v: u.email || u.uid, s: XS.bold },
+                    { v: u.name || '', s: XS.text },
+                    { v: fechaHoraU(tsToMillis(u.createdAt)), s: XS.center },
+                    { v: fechaHoraU(tsToMillis(u.lastLogin)), s: XS.center },
+                    { v: adm ? 'ADMIN' : (eff.expiredPlan ? 'GRATIS' : eff.plan.toUpperCase()), s: XS.center },
+                    { v: pago ? fechaHoraU(tsToMillis(u.planStartedAt)) : '', s: XS.center },
+                    { v: pago && eff.expiresAt ? formatDate(eff.expiresAt) : '', s: XS.center },
+                    { v: pago ? (u.redeemedCode || '') : '', s: XS.code },
+                    { v: adm ? 'Administrador' : eff.expiredPlan ? `${eff.expiredPlan.toUpperCase()} vencido` : eff.plan === 'gratis' ? 'Gratis' : 'Activo', s: eff.expiredPlan ? XS.crit : (eff.plan !== 'gratis' ? XS.ok : XS.center) }
+                ]);
+            });
+            const blob = buildWorkbook('Clientes', rows, {
+                title: 'DL STOCK PRO - Clientes',
+                widths: [32, 22, 20, 20, 12, 20, 12, 22, 16],
+                merges: [`A1:${lastCol}1`, `A2:${lastCol}2`],
+                freezeRow: HEADER_ROW,
+                autoFilter: `A${HEADER_ROW}:${lastCol}${HEADER_ROW + users.length}`,
+                rowHeights: { 0: 26, 3: 30 }
+            });
+            downloadBlob(blob, `DL_STOCK_PRO_Clientes_${localDateStamp()}.xlsx`);
         }
 
         // El administrador puede asignar o quitar un plan directamente
@@ -3666,6 +3720,9 @@
                     console.log("No se pudo crear el perfil:", e);
                 }
             }
+
+            // Registra el último ingreso (para el registro de clientes del administrador)
+            if (fetched) ref.set({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(() => {});
 
             // Corrige la mayúscula del apellido en el perfil del administrador
             if (isAdmin && profile.name === 'Lenin Alexander Benjumea niño') {

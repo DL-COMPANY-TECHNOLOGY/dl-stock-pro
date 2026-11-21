@@ -362,6 +362,12 @@
             font-size: 8.5px; font-weight: 900; padding: 2px 6px; border-radius: 9999px; letter-spacing: .02em; box-shadow: 0 2px 6px rgba(2,132,199,.4); pointer-events: none; line-height: 1.3; }
         body.plan-free .sheet-tile[data-pro]::after { top: 6px; right: 6px; }
         body.plan-free.in-app .btn-floating-whatsapp { display: none; }
+        /* Pago anual */
+        .annual-box{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:0 0 8px;padding:9px 11px;border-radius:12px;border:1px dashed rgba(2,132,199,.55);background:rgba(2,132,199,.07)}
+        .annual-box b{display:block;font-size:12.5px;font-weight:900;color:var(--text-high)}.annual-box small{display:block;font-size:10.5px;color:var(--text-mid);font-weight:700}
+        .annual-box s{display:block;font-size:10.5px;color:var(--text-low);text-decoration-color:#ef4444;text-decoration-thickness:2px}
+        .annual-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 8px}
+        .annual-wa{display:block;text-align:center;padding:8px 6px;border-radius:10px;border:1.5px solid #25d366;color:#25d366;font-size:11.5px;font-weight:800;text-decoration:none}
         /* Precios con descuento de lanzamiento */
         .promo-banner { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: linear-gradient(135deg, rgba(239,68,68,.14), rgba(245,158,11,.14)); border: 1.5px solid rgba(245,158,11,.5); }
         .promo-banner > div > b { display: block; font-size: 13px; color: var(--text-high); }
@@ -1014,7 +1020,7 @@
                 <a href="legal.html#privacidad" target="_blank" rel="noopener">Política de privacidad</a>
                 <a href="legal.html#reembolsos" target="_blank" rel="noopener">Política de reembolsos</a>
             </div>
-            <p class="dev-copy">DL STOCK PRO v2.0 · Plataforma oficial de inventario © <span class="js-year">2026</span></p>
+            <p class="dev-copy">DL STOCK PRO v2.1 · Plataforma oficial de inventario © <span class="js-year">2026</span></p>
         </footer>
 
         <!-- BARRA DE NAVEGACIÓN INFERIOR (CELULAR) -->
@@ -1147,6 +1153,8 @@
                         <li>Almacenamiento local ultrarrápido sin internet.</li>
                         <li>Exportación e importación de copias JSON.</li>
                     </ul>
+                    <div class="annual-box"><div><b>📅 Pago anual</b><small>14 meses: pagas 12 y te regalamos 2</small></div><div style="text-align:right"><s id="annualOldPro"></s><b id="annualPro"></b><small id="annualMesPro"></small></div></div>
+                    <div class="annual-btns"><a id="waMesPro" target="_blank" rel="noopener" class="annual-wa">Pedir mensual</a><a id="waAnualPro" target="_blank" rel="noopener" class="annual-wa">Pedir anual</a></div>
                     <button type="button" onclick="promptCodeActivation('pro')" class="btn-blue-primary" style="width: 100%; padding: 10px; font-size: 12px;">
                         <i class="fa-solid fa-key"></i> Activar con Código de Plan PRO
                     </button>
@@ -1163,6 +1171,8 @@
                         <li><strong>Sincronización multi-dispositivo en tiempo real.</strong></li>
                         <li>Soporte técnico prioritario.</li>
                     </ul>
+                    <div class="annual-box"><div><b>📅 Pago anual</b><small>14 meses: pagas 12 y te regalamos 2</small></div><div style="text-align:right"><s id="annualOldPremium"></s><b id="annualPremium"></b><small id="annualMesPremium"></small></div></div>
+                    <div class="annual-btns"><a id="waMesPremium" target="_blank" rel="noopener" class="annual-wa">Pedir mensual</a><a id="waAnualPremium" target="_blank" rel="noopener" class="annual-wa">Pedir anual</a></div>
                     <button type="button" onclick="promptCodeActivation('premium')" class="btn-green-action" style="width: 100%; padding: 10px; font-size: 12px;">
                         <i class="fa-solid fa-crown"></i> Activar con Código de Plan PREMIUM
                     </button>
@@ -1215,7 +1225,7 @@
                                 <option value="30">30 Días (1 Mes)</option>
                                 <option value="90">3 Meses (90 Días)</option>
                                 <option value="180">6 Meses (180 Días)</option>
-                                <option value="365">1 Año (365 Días)</option>
+                                <option value="426">Anual · 14 Meses (paga 12, 426 Días)</option>
                             </select>
                         </div>
                     </div>
@@ -2807,6 +2817,19 @@
                 set('labelOldPrice' + P, hasDiscount ? t[k].normal + short : '');
                 set('modal' + P + 'PriceTag', t[k].oferta + t.sufijo);
                 set('modal' + P + 'OldPrice', hasDiscount ? t[k].normal : '');
+                // pago anual: 12 meses de precio y 14 meses de servicio
+                const num = x => Number(String(x).replace(/[^0-9.,]/g, '').replace(curr === 'USD' ? /,/g : /\./g, '').replace(',', '.')) || 0;
+                const fmtA = v => curr === 'USD' ? '$' + v.toFixed(2) : '$' + Math.round(v).toLocaleString('es-CO');
+                const an = num(t[k].oferta) * 12;
+                set('annual' + P, fmtA(an) + short);
+                set('annualOld' + P, hasDiscount ? fmtA(num(t[k].normal) * 12) + short : '');
+                set('annualMes' + P, (curr === 'USD' ? fmtA(an / 14) : fmtA(Math.round(an / 14 / 100) * 100)) + short + ' al mes');
+                const nom = k === 'pro' ? 'PRO' : 'PREMIUM';
+                const wa = txt => 'https://wa.me/573218641539?text=' + encodeURIComponent(txt);
+                const em = currentUser && currentUser.email ? `\nCuenta: ${currentUser.email}` : '';
+                const mA = document.getElementById('waMes' + P), aA = document.getElementById('waAnual' + P);
+                if (mA) mA.href = wa(`Hola DL Company 👋 Quiero el plan ${nom} de DL STOCK PRO MENSUAL por ${t[k].oferta}${short} con el descuento de lanzamiento.${em}\n¿Cómo hago el pago para recibir mi código?`);
+                if (aA) aA.href = wa(`Hola DL Company 👋 Quiero el plan ${nom} de DL STOCK PRO ANUAL (14 meses) por ${fmtA(an)}${short} con el descuento de lanzamiento.${em}\n¿Cómo hago el pago para recibir mi código?`);
             });
             // Marca el plan actual del usuario
             const cur = currentUser ? (currentUser.isMaster ? null : (currentUser.plan || 'gratis')) : null;

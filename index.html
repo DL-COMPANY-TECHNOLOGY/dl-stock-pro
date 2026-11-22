@@ -1210,6 +1210,7 @@
                         🌎 USD
                     </button>
                 </div>
+                <p id="fxNoteStock" style="display:none; font-size: 10.5px; color: var(--text-low); text-align: center; margin: 6px 0 0;"></p>
 
                 <div class="promo-banner">
                     <span class="promo-badge">-50%</span>
@@ -3584,12 +3585,40 @@
         // Para quitar el descuento, deja "oferta" igual a "normal".
         const PLAN_PRICES = {
             COP: { pro: { normal: '$40.000', oferta: '$20.000' }, premium: { normal: '$80.000', oferta: '$40.000' }, empresarial: { normal: '$160.000', oferta: '$80.000' }, sufijo: ' COP / mes' },
-            USD: { pro: { normal: '$10',   oferta: '$5' },   premium: { normal: '$20', oferta: '$10' },  empresarial: { normal: '$40', oferta: '$20' }, sufijo: ' USD / mes' }
+            USD: { sufijo: ' USD / mes' }
         };
+        // Precio en dólares: se calcula cada día con el dólar del día (el precio en pesos no cambia)
+        const PLAN_COP = { pro: [40000, 20000], premium: [80000, 40000], empresarial: [160000, 80000] };
+        var FX={rate:3350,fecha:null,live:false};
+        function fxLoad(onChange){
+          var c=null;try{c=JSON.parse(localStorage.getItem('dl_fx_cop')||'null')}catch(e){}
+          if(c&&c.rate){FX.rate=c.rate;FX.fecha=c.fecha;FX.live=true}
+          if(c&&Date.now()-c.ts<12*3600*1000)return;
+          fetch('https://open.er-api.com/v6/latest/USD',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){
+            var v=d&&d.result==='success'&&d.rates&&Number(d.rates.COP);
+            if(!v||v<1000||v>10000)return;
+            FX.rate=v;FX.fecha=(d.time_last_update_utc||'').slice(5,16);FX.live=true;
+            try{localStorage.setItem('dl_fx_cop',JSON.stringify({rate:v,fecha:FX.fecha,ts:Date.now()}))}catch(e){}
+            if(onChange)onChange();
+          }).catch(function(){});
+        }
+        function usdOf(cop){cop=Number(cop)||0;return cop?Math.max(1,Math.round(cop/FX.rate)):0}
+        function usdPlanTable() {
+            const t = { sufijo: ' USD / mes' };
+            Object.keys(PLAN_COP).forEach(k => { t[k] = { normal: '$' + usdOf(PLAN_COP[k][0]), oferta: '$' + usdOf(PLAN_COP[k][1]) }; });
+            return t;
+        }
+        function renderFxNote(curr) {
+            const el = document.getElementById('fxNoteStock');
+            if (!el) return;
+            el.style.display = curr === 'USD' ? '' : 'none';
+            el.innerHTML = `💱 Dólar del día: 1 USD = $${Math.round(FX.rate).toLocaleString('es-CO')} COP${FX.fecha ? ' (' + FX.fecha + ')' : ''} · Tasa: <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">ExchangeRate-API</a>`;
+        }
 
         function applyPlanPrices(curr) {
             applyPlanLocks();
-            const t = PLAN_PRICES[curr] || PLAN_PRICES.COP;
+            const t = curr === 'USD' ? usdPlanTable() : PLAN_PRICES.COP;
+            renderFxNote(curr);
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
             const short = curr === 'USD' ? ' USD' : '';
             ['pro', 'premium', 'empresarial'].forEach(k => {
@@ -3601,7 +3630,7 @@
                 set('modal' + P + 'OldPrice', hasDiscount ? t[k].normal : '');
                 // pago anual: 12 meses de precio y 14 meses de servicio
                 const num = x => Number(String(x).replace(/[^0-9.,]/g, '').replace(curr === 'USD' ? /,/g : /\./g, '').replace(',', '.')) || 0;
-                const fmtA = v => curr === 'USD' ? '$' + v.toFixed(2) : '$' + Math.round(v).toLocaleString('es-CO');
+                const fmtA = v => curr === 'USD' ? '$' + Math.round(v) : '$' + Math.round(v).toLocaleString('es-CO');
                 const an = num(t[k].oferta) * 12;
                 set('annual' + P, fmtA(an) + short);
                 set('annualOld' + P, hasDiscount ? fmtA(num(t[k].normal) * 12) + short : '');
@@ -3652,6 +3681,7 @@
 
         function openSubscriptionModal() {
             setCurrency(selectedCurrency);
+            fxLoad(() => setCurrency(selectedCurrency));
             document.getElementById('subscriptionModal').classList.remove('hidden');
         }
 
@@ -4740,6 +4770,7 @@
         function initApp() {
             loadThemePreference();
             setCurrency(selectedCurrency);
+            fxLoad(() => setCurrency(selectedCurrency));
             loadConfigOptions();
 
             const authScreen = document.getElementById('authScreen');

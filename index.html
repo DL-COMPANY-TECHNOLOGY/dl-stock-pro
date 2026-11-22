@@ -4012,7 +4012,8 @@
             const icon = document.getElementById('themeToggleIcon');
             const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
-            if (savedTheme === 'light') {
+            // Modo claro por defecto; solo queda oscuro si la persona lo eligió
+            if (savedTheme !== 'dark') {
                 document.body.classList.add('light-theme');
                 if (icon) {
                     icon.className = 'fa-solid fa-sun';

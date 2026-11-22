@@ -305,6 +305,12 @@
             transition: transform 0.2s ease;
         }
         .btn-floating-whatsapp:hover { transform: scale(1.08); }
+        body:not(.in-app) .btn-floating-whatsapp { display: none !important; }
+        .buyhelp{display:flex;align-items:center;gap:12px;max-width:420px;margin:14px auto 0;padding:13px 16px;border-radius:18px;border:1.5px solid #25d366;background:rgba(37,211,102,.08);text-decoration:none;text-align:left;font-size:12.5px;line-height:1.35;color:var(--text-low)}
+        .buyhelp b{display:block;color:var(--text-high);font-size:13.5px;margin-bottom:2px}
+        .buyhelp .bh-ic{flex:none;width:40px;height:40px;border-radius:50%;background:#25d366;color:#fff;display:grid;place-items:center}
+        .buyhelp .bh-ic svg{width:24px;height:24px}
+        .buyhelp:active{transform:scale(.98)}
 
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 18px; border: 1px solid var(--border-subtle); background: var(--bg-card); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; white-space: nowrap; }
@@ -900,6 +906,10 @@
                 <button type="button" class="auth-help-btn" style="margin-top: 0;" onclick="toggleCajeroLogin(false)">‹ Soy el dueño (entrar con correo)</button>
             </form>
         </div>
+        <a class="buyhelp" id="btnBuyHelp" href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Tengo%20problemas%20para%20acceder%20a%20un%20plan%20o%20para%20comprarlo." target="_blank" rel="noopener">
+              <span class="bh-ic"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.7c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7Zm5.9-8c-.3-.2-1.9-1-2.2-1.1-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.4.2-.7.1a8.8 8.8 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.6.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.6 5.8 5 2.1.9 3 1 4 .8.7-.1 1.9-.8 2.2-1.6.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.3Z"/></svg></span>
+              <span><b>¿No puedes acceder a un plan o tienes problemas para comprar?</b>Escribe directamente a soporte por WhatsApp</span>
+                </a>
         <!-- FIRMA DEL DESARROLLADOR (pantalla de acceso) -->
         <div class="dev-footer-mini">
             <img src="dl-company.png" alt="DL COMPANY -TECHNOLOGY-" onerror="this.style.display='none'">

@@ -360,6 +360,8 @@
         .owner-only { display: none !important; }
         body.team-owner .owner-only { display: flex !important; }
         body.team-owner .header-btn.owner-only { display: inline-flex !important; }
+        .cajero-only { display: none !important; }
+        body.rol-cajero .cajero-only { display: flex !important; }
         body.rol-cajero .del-btn, body.rol-cajero #morePlansItem, body.rol-cajero #headerPlansBtn,
         body.rol-cajero #moreBackupItem, body.rol-cajero #headerBackupBtn, body.rol-cajero #moreExcelItem,
         body.rol-cajero #moreImportItem, body.rol-cajero #deskExcelBtn, body.rol-cajero #deskImportBtn,
@@ -884,6 +886,7 @@
                     <input type="password" id="cjPass" autocomplete="current-password" placeholder="••••••••" class="auth-input">
                 </div>
                 <button type="submit" id="cjSubmit" class="btn-green-action" style="width: 100%; padding: 12px; font-size: 13px;">Entrar como cajero ›</button>
+                <button type="button" id="cjForgot" onclick="cajeroForgotPass()" style="background: none; border: none; color: var(--cyan-tech); font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit;">¿Olvidaste tu contraseña?</button>
                 <button type="button" class="auth-help-btn" style="margin-top: 0;" onclick="toggleCajeroLogin(false)">‹ Soy el dueño (entrar con correo)</button>
             </form>
         </div>
@@ -1144,6 +1147,7 @@
                     <button type="button" id="moreCategoriesItem" class="sheet-tile" onclick="moreAction(openConfigModal)"><i class="fa-solid fa-sliders" style="color:#a78bfa"></i><span>Categorías</span></button>
                     <button type="button" id="moreThemeItem" class="sheet-tile" onclick="moreAction(toggleTheme)"><i class="fa-solid fa-circle-half-stroke" style="color:#f59e0b"></i><span id="moreThemeLabel">Tema</span></button>
                     <a id="moreSupportItem" data-pro="support" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
+                    <button type="button" id="moreMyPassItem" class="sheet-tile cajero-only" onclick="changeCajeroPass()"><span style="font-size:18px;line-height:1">🔑</span><span>Mi contraseña</span></button>
                     <button type="button" id="moreTeamItem" class="sheet-tile owner-only" onclick="moreAction(openTeamModal)"><span style="font-size:18px;line-height:1">👥</span><span>Equipo</span></button>
                     <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide(isCajero() ? 'cajero' : 'inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
                     <button type="button" id="moreAdminItem" class="sheet-tile hidden" onclick="moreAction(promptAdminAccess)"><i class="fa-solid fa-user-shield" style="color:#38bdf8"></i><span>Admin</span></button>
@@ -1986,7 +1990,7 @@
                     </div>
                     <span class="po-label" style="margin-top: 6px;">Su lineal (categorías que maneja)</span>
                     <div id="tmCats" class="tm-cats-pick"></div>
-                    <p class="po-hint">La app genera una contraseña segura y te la muestra para que se la envíes.</p>
+                    <p class="po-hint">La app genera una <b>clave temporal</b> para que se la envíes. Al entrar la primera vez, el cajero crea <b>su propia contraseña</b>.</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <button type="button" class="btn-dark-action" style="padding: 9px; font-size: 12px;" onclick="cancelCajeroForm()">Cancelar</button>
                         <button type="button" id="tmSaveBtn" class="btn-green-action" style="padding: 9px; font-size: 12px;" onclick="createCajero()">Crear cajero</button>
@@ -2331,7 +2335,7 @@
                     <div class="tm-actions">
                         <button type="button" class="wa" onclick="sendCajeroAccess('${m.slot}')">📲 WhatsApp</button>
                         <button type="button" onclick="editCajeroLineal('${m.slot}')">✏️ Lineal</button>
-                        <button type="button" onclick="regenCajeroPass('${m.slot}')">🔑 Nueva clave</button>
+                        <button type="button" onclick="regenCajeroPass('${m.slot}')">🔑 Clave temporal</button>
                         <button type="button" onclick="toggleCajero('${m.slot}')">${m.activo ? '⏸️ Desactivar' : '▶️ Activar'}</button>
                         <button type="button" class="danger" onclick="deleteCajero('${m.slot}')" aria-label="Eliminar">🗑️</button>
                     </div>
@@ -2376,7 +2380,7 @@
             const saludo = nombre ? `Hola ${String(nombre).split(' ')[0]} 👋` : 'Hola 👋';
             return `${saludo} Este es tu acceso de cajero a DL STOCK PRO para *${name}*:\n\n` +
                 `🏢 Código de empresa: *${currentUser.empresaCodigo}*\n👤 Usuario: *${usuario}*\n` +
-                (pass ? `🔑 Contraseña: *${pass}*\n\n` : `🔑 Contraseña: la que te entregué (si no la tienes, pídeme una nueva)\n\n`) +
+                (pass ? `🔑 Contraseña temporal: *${pass}*\n(al entrar la primera vez, la app te pide crear tu propia contraseña)\n\n` : `🔑 Contraseña: la tuya (si la olvidaste, en el ingreso toca "¿Olvidaste tu contraseña?")\n\n`) +
                 `Abre ${location.origin}${location.pathname} y toca "👥 Entrar como cajero".`;
         }
         function waLink(phone, msg) {
@@ -2388,7 +2392,7 @@
         function shareCredentials(title, usuario, pass, telefono, nombre) {
             const msg = accessMessage(usuario, pass, nombre);
             try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
-            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Contraseña: ${pass}\n\nGuárdala o envíala ahora: por seguridad la contraseña no se vuelve a mostrar. Ya quedó copiada.`,
+            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Clave temporal: ${pass}\n\nEnvíasela ahora (ya quedó copiada). Al entrar la primera vez, el cajero crea su propia contraseña.`,
                 { okText: telefono ? '📲 Enviar a su WhatsApp' : '📲 Enviar por WhatsApp', cancelText: 'Listo' }).then(ok => {
                     if (ok) window.open(waLink(telefono, msg), '_blank');
                 });
@@ -2410,7 +2414,7 @@
             const msg = accessMessage(m.usuario, '', m.nombre);
             try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
             window.open(waLink(tel, msg), '_blank');
-            showToast('📲 Se envía el código y el usuario. Si no tiene la contraseña, usa 🔑 Nueva clave.');
+            showToast('📲 Se envía el código y el usuario. Si olvidó su contraseña, usa 🔑 Clave temporal.');
             renderTeam();
         }
 
@@ -2437,7 +2441,7 @@
                 const uid = await createCajeroAuth(email, pass);
                 const batch = db.batch();
                 batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), {
-                    uid, usuario, nombre, categorias, activo: true, email, ver: 1, telefono, creado: firebase.firestore.FieldValue.serverTimestamp()
+                    uid, usuario, nombre, categorias, activo: true, email, ver: 1, telefono, temporal: true, creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 batch.set(db.collection('miembros').doc(uid), { owner: currentUser.uid, slot });
                 batch.set(accRef, { email, owner: currentUser.uid });
@@ -2491,20 +2495,20 @@
         async function regenCajeroPass(slot) {
             const m = teamCache.find(x => x.slot === slot);
             if (!m) return;
-            if (!(await uiConfirm(`Nueva contraseña\n¿Generar una contraseña nueva para ${m.nombre || m.usuario}? La anterior deja de funcionar.`, { okText: 'Generar' }))) return;
+            if (!(await uiConfirm(`Clave temporal\n¿Generar una clave temporal para ${m.nombre || m.usuario}? Su contraseña actual deja de funcionar. Al entrar con la temporal, la app le pide crear su propia contraseña.`, { okText: 'Generar' }))) return;
             try {
                 const ver = (parseInt(m.ver) || 1) + 1;
                 const pass = genCajeroPass();
                 const email = cajeroEmail(currentUser.empresaCodigo, m.usuario, ver);
                 const uid = await createCajeroAuth(email, pass);
                 const batch = db.batch();
-                batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), { uid, email, ver, activo: true }, { merge: true });
+                batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), { uid, email, ver, activo: true, temporal: true }, { merge: true });
                 batch.set(db.collection('miembros').doc(uid), { owner: currentUser.uid, slot });
                 if (m.uid) batch.delete(db.collection('miembros').doc(m.uid));
                 batch.set(db.collection(`empresas_codigo/${currentUser.empresaCodigo}/accesos`).doc(m.usuario), { email, owner: currentUser.uid });
                 await batch.commit();
                 await loadTeam(); renderTeam();
-                shareCredentials(`🔑 Nueva contraseña para ${m.nombre || m.usuario}`, m.usuario, pass, m.telefono, m.nombre);
+                shareCredentials(`🔑 Clave temporal para ${m.nombre || m.usuario}`, m.usuario, pass, m.telefono, m.nombre);
             } catch (e) {
                 console.log("Nueva clave:", e);
                 uiAlert("❌ No se pudo generar la contraseña\nRevisa tu conexión e intenta de nuevo.");
@@ -2569,6 +2573,7 @@
                 document.getElementById('cjPass').value = '';
                 try { localStorage.setItem('dl_cajero_last', JSON.stringify({ code, usuario })); } catch (e3) {}
                 initApp();
+                setTimeout(ensureOwnCajeroPass, 400);
             } catch (err) {
                 uiAlert(authErrorMessage(err).replace('Correo o contraseña incorrectos.', 'Código de empresa, usuario o contraseña incorrectos.'));
             } finally {
@@ -2611,6 +2616,7 @@
                     empresaNombre,
                     slot: String(slot),
                     categorias: s.categorias || [],
+                    temporal: s.temporal === true,
                     plan: 'empresarial',
                     planExpiresAt: eff.expiresAt,
                     expiredPlan: null,
@@ -2626,6 +2632,83 @@
                 if (currentUser && currentUser.uid === fbUser.uid) return currentUser;
                 throw e;
             }
+        }
+
+        // ---------- Contraseña propia del cajero ----------
+        async function askNewCajeroPass(title) {
+            while (true) {
+                const p1 = await uiPrompt(`${title}\nEscribe tu nueva contraseña (mínimo 6 caracteres). Úsala desde ahora para entrar.`, '', { inputType: 'password', placeholder: 'Nueva contraseña', okText: 'Continuar' });
+                if (p1 === null) return null;
+                if (String(p1).length < 6) { await uiAlert("⚠️ Muy corta\nLa contraseña debe tener al menos 6 caracteres."); continue; }
+                const p2 = await uiPrompt("Confirma tu contraseña\nEscríbela otra vez.", '', { inputType: 'password', placeholder: 'Repite la contraseña', okText: 'Guardar' });
+                if (p2 === null) return null;
+                if (p1 !== p2) { await uiAlert("⚠️ No coinciden\nLas dos contraseñas deben ser iguales. Intenta de nuevo."); continue; }
+                return String(p1);
+            }
+        }
+
+        async function saveCajeroPass(newPass) {
+            const user = auth.currentUser;
+            await user.updatePassword(newPass);
+            currentUser.temporal = false;
+            saveCurrentUserLocal();
+            // Marca que ya no usa la clave temporal (si las reglas aún no lo permiten, no pasa nada)
+            db.collection(`users/${currentUser.empresaUid}/equipo`).doc(String(currentUser.slot)).set({ temporal: false }, { merge: true }).catch(() => {});
+        }
+
+        // Primera entrada con clave temporal: debe crear su propia contraseña
+        let cajeroPassPrompting = false;
+        async function ensureOwnCajeroPass() {
+            if (!isCajero() || !currentUser.temporal || cajeroPassPrompting) return;
+            cajeroPassPrompting = true;
+            try { await ensureOwnCajeroPassInner(); } finally { cajeroPassPrompting = false; }
+        }
+        async function ensureOwnCajeroPassInner() {
+            const np = await askNewCajeroPass(`🔐 Crea tu contraseña\nHola ${String(currentUser.name || '').split(' ')[0]}, entraste con una clave temporal.`);
+            if (np === null) {
+                await uiAlert("Debes crear tu contraseña\nPara usar la app necesitas crear tu propia contraseña. Vuelve a entrar con la clave temporal cuando quieras.");
+                try { await auth.signOut(); } catch (e) {}
+                return;
+            }
+            try {
+                await saveCajeroPass(np);
+                uiAlert("✅ Contraseña creada\nDesde ahora entra con tu usuario y tu nueva contraseña.");
+            } catch (e) {
+                console.log("Crear contraseña:", e);
+                uiAlert("❌ No se pudo guardar la contraseña\nRevisa tu conexión. Te la pediremos de nuevo la próxima vez que entres.");
+            }
+        }
+
+        // Más → 🔑 Mi contraseña (el cajero la cambia cuando quiera)
+        async function changeCajeroPass() {
+            closeMoreMenu();
+            if (!isCajero()) return;
+            const cur = await uiPrompt("Cambiar contraseña\nEscribe tu contraseña actual.", '', { inputType: 'password', placeholder: 'Contraseña actual', okText: 'Continuar' });
+            if (cur === null) return;
+            try {
+                const cred = firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, cur);
+                await auth.currentUser.reauthenticateWithCredential(cred);
+            } catch (e) {
+                uiAlert("❌ Contraseña actual incorrecta\nSi no la recuerdas, pídele al dueño una clave temporal.");
+                return;
+            }
+            const np = await askNewCajeroPass("🔐 Nueva contraseña");
+            if (np === null) return;
+            try { await saveCajeroPass(np); showToast('✅ Contraseña cambiada'); }
+            catch (e) { uiAlert("❌ No se pudo cambiar la contraseña\nRevisa tu conexión e intenta de nuevo."); }
+        }
+
+        // ¿Olvidaste tu contraseña? (cajero): el dueño le genera una clave temporal
+        function cajeroForgotPass() {
+            const code = String(document.getElementById('cjCode').value || '').trim().toUpperCase();
+            const usuario = cleanUsuario(document.getElementById('cjUser').value);
+            const msg = `Hola 👋 Olvidé mi contraseña de cajero en DL STOCK PRO.` +
+                (usuario ? `\n👤 Usuario: ${usuario}` : '') + (code ? `\n🏢 Empresa: ${code}` : '') +
+                `\n¿Me generas una clave temporal? (Más → 👥 Equipo → 🔑 Clave temporal)`;
+            uiConfirm("¿Olvidaste tu contraseña?\nPídele al dueño de tu empresa una clave temporal: él la genera en segundos desde su app. Al entrar con ella, creas una contraseña nueva.",
+                { okText: '📲 Pedírsela por WhatsApp', cancelText: 'Cerrar' }).then(ok => {
+                    if (ok) window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+                });
         }
 
         // Si el dueño desactiva al cajero o vence el plan, se cierra su sesión
@@ -4634,6 +4717,7 @@
             }
             applyPlanLocks();
             document.body.classList.toggle('rol-cajero', isCajero());
+            if (isCajero() && currentUser.temporal && !authFlowInProgress) setTimeout(ensureOwnCajeroPass, 900);
             document.body.classList.toggle('team-owner', isEmpresarialOwner());
             scheduleGuides();
         }

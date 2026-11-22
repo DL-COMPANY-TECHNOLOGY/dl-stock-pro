@@ -127,6 +127,10 @@ service cloud.firestore {
         allow read: if (isOwner(uid) && hasEmpresarial(uid))
           || (signedIn() && resource.data.uid == request.auth.uid);
         allow write: if isOwner(uid) && hasEmpresarial(uid) && slot.matches('^[1-5]$');
+        // El cajero solo puede marcar que ya creó su propia contraseña
+        allow update: if signedIn() && resource.data.uid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['temporal'])
+          && request.resource.data.temporal == false;
       }
     }
 

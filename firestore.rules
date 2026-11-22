@@ -122,6 +122,15 @@ service cloud.firestore {
           && request.resource.data == resource.data;
       }
 
+      // Diferencias de conteo: cualquiera del equipo las envía; solo el dueño las ve y las revisa
+      match /conteos/{repId} {
+        allow read, update, delete: if isOwner(uid) && hasActivePremium(uid);
+        allow create: if ((isOwner(uid) && hasActivePremium(uid)) || isMember(uid))
+          && request.resource.data.id == repId
+          && request.resource.data.porUid == request.auth.uid
+          && request.resource.data.items.size() <= 400;
+      }
+
       // Equipo de cajeros (plan EMPRESARIAL): máximo 5 puestos
       match /equipo/{slot} {
         allow read: if (isOwner(uid) && hasEmpresarial(uid))

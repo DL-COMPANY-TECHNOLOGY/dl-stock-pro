@@ -356,6 +356,10 @@
         .lookup-status.is-hit { border-color: rgba(16,185,129,.5); background: rgba(16,185,129,.1); color: var(--text-high); }
         .lookup-status.is-miss { border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.1); }
         .lookup-status.hidden { display: none; }
+        .phone-row { display: flex; gap: 6px; }
+        .phone-row input { flex: 1; min-width: 0; }
+        .contact-pick { display: none; flex: 0 0 auto; width: 44px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); font-size: 18px; cursor: pointer; }
+        body.can-pick-contacts .contact-pick { display: block; }
         /* Plan Empresarial: equipo y cajeros */
         .owner-only { display: none !important; }
         body.team-owner .owner-only { display: flex !important; }
@@ -1986,7 +1990,7 @@
                     <div class="po-grid">
                         <label class="po-full">Nombre<input id="tmName" type="text" maxlength="40" placeholder="Ej: Andrés Gómez" oninput="suggestUsuario()"></label>
                         <label class="po-full">Usuario (para entrar)<input id="tmUser" type="text" maxlength="20" autocapitalize="none" placeholder="Ej: andres" oninput="this.dataset.touched=1; this.value=cleanUsuario(this.value)"></label>
-                        <label class="po-full">WhatsApp del cajero (opcional)<input id="tmPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej: 3001234567"></label>
+                        <label class="po-full">WhatsApp del cajero (opcional)<span class="phone-row"><input id="tmPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej: 3001234567"><button type="button" class="contact-pick" onclick="pickContactInto('tmPhone', 'tmName')" aria-label="Elegir de mis contactos">📇</button></span></label>
                     </div>
                     <span class="po-label" style="margin-top: 6px;">Su lineal (categorías que maneja)</span>
                     <div id="tmCats" class="tm-cats-pick"></div>
@@ -2024,7 +2028,7 @@
                     <span id="pvFormTitle" class="po-label">Nuevo proveedor</span>
                     <div class="po-grid">
                         <label class="po-full">Nombre<input id="pvName" type="text" placeholder="Ej: Distribuidora Andina"></label>
-                        <label class="po-full">WhatsApp<input id="pvPhone" type="tel" inputmode="tel" placeholder="Ej: 3001234567"></label>
+                        <label class="po-full">WhatsApp<span class="phone-row"><input id="pvPhone" type="tel" inputmode="tel" placeholder="Ej: 3001234567"><button type="button" class="contact-pick" onclick="pickContactInto('pvPhone', 'pvName')" aria-label="Elegir de mis contactos">📇</button></span></label>
                         <label class="po-full">¿Qué me vende?<input id="pvNote" type="text" placeholder="Ej: Aseo y desechables"></label>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
@@ -2403,6 +2407,14 @@
             const m = teamCache.find(x => x.slot === slot);
             if (!m) return;
             let tel = m.telefono || '';
+            if (!tel && canPickContacts()) {
+                // Abre los contactos del celular para elegir el WhatsApp del cajero
+                const c = await pickContact();
+                if (c) {
+                    tel = c.tel;
+                    try { await db.collection(`users/${currentUser.uid}/equipo`).doc(slot).set({ telefono: tel }, { merge: true }); m.telefono = tel; } catch (e) {}
+                }
+            }
             if (!tel) {
                 const val = await uiPrompt(`WhatsApp de ${m.nombre || m.usuario}\nEscribe su número para enviarle el acceso (queda guardado). Déjalo vacío para elegir el chat en WhatsApp.`, '', { placeholder: 'Ej: 3001234567', inputType: 'tel', okText: 'Continuar' });
                 if (val === null) return;
@@ -2533,6 +2545,48 @@
         function copyCompanyCode() {
             try { navigator.clipboard.writeText(currentUser.empresaCodigo); showToast('📋 Código copiado'); } catch (e) {}
         }
+
+        // ---------- Elegir un número de los contactos del celular (Android + Chrome) ----------
+        function canPickContacts() {
+            return 'contacts' in navigator && 'ContactsManager' in window && typeof navigator.contacts.select === 'function';
+        }
+        // Deja el número en 10 dígitos para Colombia (quita +57) o como venga si es de otro país
+        function cleanPickedPhone(tel) {
+            let d = String(tel || '').replace(/\D/g, '');
+            if (d.length === 12 && d.startsWith('57')) d = d.slice(2);
+            return d;
+        }
+        async function pickContact() {
+            if (!canPickContacts()) return null;
+            try {
+                const res = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+                const c = res && res[0];
+                if (!c) return null;
+                const tels = (c.tel || []).map(cleanPickedPhone).filter(t => t.length >= 7);
+                if (!tels.length) { uiAlert("⚠️ Sin número\nEse contacto no tiene número de teléfono."); return null; }
+                // Si tiene varios números, se prefiere un celular colombiano (empieza por 3 y tiene 10 dígitos)
+                const tel = tels.find(t => t.length === 10 && t.startsWith('3')) || tels[0];
+                return { tel, name: (c.name && c.name[0]) || '' };
+            } catch (e) {
+                console.log("Contactos:", e);
+                return null;
+            }
+        }
+        async function pickContactInto(phoneId, nameId) {
+            const c = await pickContact();
+            if (!c) return;
+            document.getElementById(phoneId).value = c.tel;
+            const nameEl = nameId && document.getElementById(nameId);
+            if (nameEl && !nameEl.value.trim() && c.name) {
+                nameEl.value = c.name;
+                nameEl.dispatchEvent(new Event('input'));
+            }
+            showToast(`📇 ${c.name ? c.name + ': ' : ''}${c.tel}`);
+        }
+        function applyContactPickers() {
+            document.body.classList.toggle('can-pick-contacts', canPickContacts());
+        }
+        document.addEventListener('DOMContentLoaded', applyContactPickers);
 
         // ---------- Ingreso del cajero ----------
         function toggleCajeroLogin(show) {
@@ -4717,6 +4771,7 @@
             }
             applyPlanLocks();
             document.body.classList.toggle('rol-cajero', isCajero());
+            applyContactPickers();
             if (isCajero() && currentUser.temporal && !authFlowInProgress) setTimeout(ensureOwnCajeroPass, 900);
             document.body.classList.toggle('team-owner', isEmpresarialOwner());
             scheduleGuides();

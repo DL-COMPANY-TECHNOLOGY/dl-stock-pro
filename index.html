@@ -7584,9 +7584,30 @@
             return getUserStorageKey(currentUser ? currentUser.username : 'anon') + '_pedidos_cfg';
         }
 
+        // Nombre de la empresa para el pedido: el del plan Empresarial o el de las etiquetas
+        function companyNameGuess() {
+            if (currentUser && currentUser.empresaNombre) return currentUser.empresaNombre;
+            try { return (JSON.parse(localStorage.getItem('dl_label_prefs') || '{}').store) || ''; } catch (e) { return ''; }
+        }
+        async function loadCompanyNameForOrder() {
+            if (!currentUser || currentUser.empresaNombre || !currentUser.empresaCodigo || !db) return;
+            try {
+                const snap = await db.collection('empresas_codigo').doc(currentUser.empresaCodigo).get();
+                if (snap.exists && snap.data().nombre) {
+                    currentUser.empresaNombre = snap.data().nombre;
+                    saveCurrentUserLocal();
+                    if (ordCfg && !ordCfg.negocio) {
+                        ordCfg.negocio = currentUser.empresaNombre;
+                        const el = document.getElementById('poNegocio');
+                        if (el && !el.value) el.value = ordCfg.negocio;
+                        renderOrderPreview();
+                    }
+                }
+            } catch (e) { console.log('Nombre de la empresa:', e); }
+        }
+
         function defaultOrderConfig() {
-            let store = '';
-            try { store = (JSON.parse(localStorage.getItem('dl_label_prefs') || '{}').store) || ''; } catch (e) {}
+            const store = companyNameGuess();
             return {
                 proveedores: [], presentaciones: [], aNombreDe: currentUser ? (currentUser.name || '') : '',
                 negocio: store, sedes: [{ nombre: 'Principal', direccion: '' }], sedeActual: 'Principal', updatedTs: 0
@@ -7769,6 +7790,7 @@
                 try { history.pushState({ dlModal: 'order' }, ''); ordHistoryPushed = true; } catch (e) {}
             }
             syncOrderConfigFromCloud();
+            loadCompanyNameForOrder();
         }
 
         function closeOrderModal(fromPopstate) {
@@ -8220,6 +8242,7 @@
             dIn.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             dIn.classList.toggle('active', !!ordDate.date);
             document.getElementById('poDateLabel').textContent = sel.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+            if (!ordCfg.negocio) ordCfg.negocio = companyNameGuess();
             document.getElementById('poNegocio').value = ordCfg.negocio || '';
             document.getElementById('poSede').innerHTML = ordCfg.sedes.map(s => `<option value="${esc(s.nombre)}"${s.nombre === ordCfg.sedeActual ? ' selected' : ''}>${esc(s.nombre)}</option>`).join('') + '<option value="__new">＋ Nueva sede…</option>';
             document.getElementById('poDireccion').value = currentSede().direccion || '';

@@ -1,0 +1,200 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.uid == 'bGreSTxcOabW1D6TvemeZPoVfLl1';
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function planVigente(u) {
+      return u.planStartedAt != null
+        && request.time < u.planStartedAt + duration.value(u.planDays, 'd');
+    }
+
+    // Plan con nube vigente: PREMIUM o EMPRESARIAL
+    function hasActivePremium(uid) {
+      let u = userDoc(uid);
+      return u.plan in ['premium', 'empresarial'] && planVigente(u);
+    }
+
+    // Plan EMPRESARIAL vigente (equipo de cajeros)
+    function hasEmpresarial(uid) {
+      let u = userDoc(uid);
+      return u.plan == 'empresarial' && planVigente(u);
+    }
+
+    // Puesto del cajero que hace la petición dentro de la empresa "owner"
+    function miembroPath() {
+      return /databases/$(database)/documents/miembros/$(request.auth.uid);
+    }
+    function puesto(owner) {
+      return get(/databases/$(database)/documents/users/$(owner)/equipo/$(get(miembroPath()).data.slot)).data;
+    }
+
+    // Cajero activo de la empresa, con el plan EMPRESARIAL de la empresa vigente
+    function isMember(owner) {
+      return signedIn()
+        && exists(miembroPath())
+        && get(miembroPath()).data.owner == owner
+        && puesto(owner).uid == request.auth.uid
+        && puesto(owner).activo == true
+        && hasEmpresarial(owner);
+    }
+
+    // La categoría del producto está en el lineal del cajero
+    function enSuLineal(owner, data) {
+      return data.category in puesto(owner).categorias;
+    }
+
+    // Canje de código válido (se hace junto con la marca del código)
+    function isValidRedeem(uid) {
+      let code = request.resource.data.redeemedCode;
+      let before = get(/databases/$(database)/documents/codes/$(code)).data;
+      let after = getAfter(/databases/$(database)/documents/codes/$(code)).data;
+      return before.used == false
+        && after.used == true
+        && after.usedBy == uid
+        && request.resource.data.plan == before.plan
+        && request.resource.data.planDays == before.days
+        && request.resource.data.planStartedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['plan', 'planDays', 'planStartedAt', 'redeemedCode']);
+    }
+
+    // El administrador puede ver y modificar todo
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Perfil de cada usuario (sus cajeros pueden leerlo para saber si el plan está vigente)
+    match /users/{uid} {
+      allow get: if isOwner(uid) || isMember(uid);
+
+      allow create: if isOwner(uid)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.plan == 'gratis'
+        && request.resource.data.planDays == 0
+        && request.resource.data.planStartedAt == null;
+
+      allow update: if isOwner(uid) && (
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['email', 'plan', 'planDays', 'planStartedAt', 'redeemedCode'])
+        || isValidRedeem(uid)
+      );
+
+      // Inventario en la nube: el dueño con PREMIUM/EMPRESARIAL vigente.
+      // Los cajeros lo ven todo, pero solo crean y editan productos de su lineal, y nunca borran.
+      match /inventory/{docId} {
+        allow read: if (isOwner(uid) && hasActivePremium(uid)) || isMember(uid);
+        allow create: if (isOwner(uid) && hasActivePremium(uid))
+          || (isMember(uid) && enSuLineal(uid, request.resource.data));
+        allow update: if (isOwner(uid) && hasActivePremium(uid))
+          || (isMember(uid) && enSuLineal(uid, resource.data) && enSuLineal(uid, request.resource.data));
+        allow delete: if isOwner(uid) && hasActivePremium(uid);
+      }
+
+      // Configuración de pedidos (proveedores, presentaciones, entrega): solo su dueño
+      match /config/{docId} {
+        allow read, delete: if isOwner(uid) && hasActivePremium(uid);
+        allow write: if isOwner(uid) && hasActivePremium(uid) && docId == 'pedidos'
+          && request.resource.size() < 200000;
+      }
+
+      // Historial: solo se puede agregar, nunca modificar ni borrar
+      match /movements/{moveId} {
+        allow read: if (isOwner(uid) && hasActivePremium(uid)) || isMember(uid);
+        allow create: if ((isOwner(uid) && hasActivePremium(uid)) || isMember(uid))
+          && request.resource.data.id == moveId;
+        allow update: if ((isOwner(uid) && hasActivePremium(uid)) || isMember(uid))
+          && request.resource.data == resource.data;
+      }
+
+      // Equipo de cajeros (plan EMPRESARIAL): máximo 5 puestos
+      match /equipo/{slot} {
+        allow read: if (isOwner(uid) && hasEmpresarial(uid))
+          || (signedIn() && resource.data.uid == request.auth.uid);
+        allow write: if isOwner(uid) && hasEmpresarial(uid) && slot.matches('^[1-5]$');
+      }
+    }
+
+    // A qué empresa pertenece cada cajero
+    match /miembros/{memberUid} {
+      allow get: if signedIn() && (request.auth.uid == memberUid || resource.data.owner == request.auth.uid);
+      allow create: if signedIn() && hasEmpresarial(request.auth.uid)
+        && request.resource.data.keys().hasOnly(['owner', 'slot'])
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.slot is string;
+      allow update: if signedIn() && hasEmpresarial(request.auth.uid)
+        && resource.data.owner == request.auth.uid
+        && request.resource.data.keys().hasOnly(['owner', 'slot'])
+        && request.resource.data.owner == request.auth.uid;
+      allow delete: if signedIn() && resource.data.owner == request.auth.uid;
+    }
+
+    // Código de empresa (lo usan los cajeros para entrar)
+    match /empresas_codigo/{code} {
+      allow get: if signedIn();
+      allow create: if signedIn() && hasEmpresarial(request.auth.uid)
+        && code.matches('^[A-Z0-9]{6}$')
+        && request.resource.data.keys().hasOnly(['owner', 'nombre'])
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 60;
+      allow update: if signedIn()
+        && resource.data.owner == request.auth.uid
+        && request.resource.data.keys().hasOnly(['owner', 'nombre'])
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 60;
+
+      // Acceso de cada cajero: solo guarda su correo interno (la contraseña la guarda Firebase Auth)
+      match /accesos/{usuario} {
+        allow get: if true;
+        allow create, update: if signedIn()
+          && get(/databases/$(database)/documents/empresas_codigo/$(code)).data.owner == request.auth.uid
+          && usuario.matches('^[a-z0-9.]{3,20}$')
+          && request.resource.data.keys().hasOnly(['email', 'owner'])
+          && request.resource.data.owner == request.auth.uid;
+        allow delete: if signedIn()
+          && get(/databases/$(database)/documents/empresas_codigo/$(code)).data.owner == request.auth.uid;
+      }
+    }
+
+    // Catálogo común de productos por código de barras (sin precios ni stock)
+    match /catalogo/{code} {
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && code.matches('^[0-9]{8,14}$')
+        && request.resource.data.keys().hasOnly(['name', 'category', 'createdBy', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 2 && request.resource.data.name.size() <= 120
+        && (!('category' in request.resource.data) || (request.resource.data.category is string && request.resource.data.category.size() <= 60))
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+    }
+
+    // Códigos de activación
+    match /codes/{code} {
+      allow get: if signedIn();
+      allow update: if signedIn()
+        && resource.data.used == false
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['used', 'usedBy', 'usedByEmail', 'usedAt'])
+        && request.resource.data.used == true
+        && request.resource.data.usedBy == request.auth.uid
+        && request.resource.data.usedAt == request.time
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.redeemedCode == code;
+    }
+  }
+}

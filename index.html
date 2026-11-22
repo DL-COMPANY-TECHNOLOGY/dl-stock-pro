@@ -356,6 +356,41 @@
         .lookup-status.is-hit { border-color: rgba(16,185,129,.5); background: rgba(16,185,129,.1); color: var(--text-high); }
         .lookup-status.is-miss { border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.1); }
         .lookup-status.hidden { display: none; }
+        /* Plan Empresarial: equipo y cajeros */
+        .owner-only { display: none !important; }
+        body.team-owner .owner-only { display: flex !important; }
+        body.team-owner .header-btn.owner-only { display: inline-flex !important; }
+        body.rol-cajero .del-btn, body.rol-cajero #morePlansItem, body.rol-cajero #headerPlansBtn,
+        body.rol-cajero #moreBackupItem, body.rol-cajero #headerBackupBtn, body.rol-cajero #moreExcelItem,
+        body.rol-cajero #moreImportItem, body.rol-cajero #deskExcelBtn, body.rol-cajero #deskImportBtn,
+        body.rol-cajero #moreSupportItem, body.rol-cajero .btn-floating-whatsapp, body.rol-cajero #moreCategoriesItem, body.rol-cajero #headerConfigBtn { display: none !important; }
+        .inv-card.not-mine .qs-bar { opacity: .4; }
+        .inv-card.not-mine .inv-card-actions { opacity: .45; }
+        .auth-cajero-btn { background: rgba(168, 85, 247, .12); border: 1px solid rgba(168, 85, 247, .45); color: #a855f7; border-radius: 12px; padding: 10px; width: 100%; font-size: 12.5px; font-weight: 900; cursor: pointer; font-family: inherit; margin-top: 12px; }
+        .cj-label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-low); margin-bottom: 4px; }
+        .tm-company { background: rgba(168, 85, 247, .08); border: 1px solid rgba(168, 85, 247, .35); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+        .tm-company small { font-size: 10.5px; color: var(--text-low); font-weight: 700; }
+        .tm-code-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .tm-code-row b { font-size: 24px; letter-spacing: .22em; font-weight: 900; color: var(--text-high); font-family: ui-monospace, monospace; }
+        .tm-code-row button, .tm-actions button { border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-high); border-radius: 10px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
+        .tm-company label { display: flex; flex-direction: column; gap: 3px; font-size: 10.5px; font-weight: 800; color: var(--text-low); }
+        .tm-company input { height: 36px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-high); padding: 0 10px; font-size: 14px; font-family: inherit; }
+        .tm-usage { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 900; color: var(--text-high); }
+        .tm-bar { height: 6px; border-radius: 9999px; background: var(--bg-input); overflow: hidden; }
+        .tm-bar i { display: block; height: 100%; background: #a855f7; border-radius: 9999px; transition: width .3s; }
+        .tm-card { background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+        .tm-card.off { opacity: .6; }
+        .tm-card b { display: block; font-size: 13.5px; }
+        .tm-card small { display: block; font-size: 10.5px; color: var(--text-low); margin-top: 2px; }
+        .tm-card code { font-weight: 900; color: var(--text-high); }
+        .tm-cats { display: flex; flex-wrap: wrap; gap: 4px; }
+        .tm-cats span { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 9999px; background: rgba(168, 85, 247, .15); color: #a855f7; }
+        .tm-cats em { font-size: 11px; color: #f59e0b; }
+        .tm-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tm-actions .danger { color: #ef4444; margin-left: auto; }
+        .tm-cats-pick { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tm-cat { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 9999px; border: 1px solid var(--border-subtle); background: var(--bg-input); cursor: pointer; }
+        .tm-cat input { accent-color: #a855f7; }
         /* Funciones bloqueadas en plan GRATIS */
         body.plan-free [data-pro] { position: relative; opacity: .62; }
         body.plan-free [data-pro]::after { content: '🔒 PRO'; position: absolute; top: -7px; right: -5px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff;
@@ -757,6 +792,7 @@
                 </button>
             </div>
 
+            <div id="authOwnerArea">
             <!-- Pestañas Iniciar Sesión / Registrarse -->
             <div style="display: flex; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle);">
                 <button type="button" id="tabLogin" onclick="switchAuthTab('login')" class="auth-tab-btn active">Iniciar Sesión</button>
@@ -793,7 +829,7 @@
                         <label style="font-size: 10px; font-weight: 800; color: var(--text-low); text-transform: uppercase;">Membresía / Plan: <span class="promo-pill">-50%</span></label>
                         <button type="button" onclick="openSubscriptionModal()" style="background: none; border: none; color: var(--cyan-tech); font-size: 10px; font-weight: 800; cursor: pointer;">Ver detalles →</button>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                         <button type="button" id="btnPlanGratis" onclick="selectPlan('gratis')" class="plan-card-btn selected">
                             <span style="font-weight: 900; color: #10b981; display: block; font-size: 11px;">GRATIS</span>
                             <s class="price-old-mini" style="visibility: hidden;">$0</s>
@@ -812,6 +848,12 @@
                             <span id="labelPricePremium" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$40.000</span>
                             <span style="color: var(--cyan-tech); font-size: 8px; display: block;">Nube & Sync</span>
                         </button>
+                        <button type="button" id="btnPlanEmpresarial" onclick="selectPlan('empresarial')" class="plan-card-btn">
+                            <span style="font-weight: 900; color: #a855f7; display: block; font-size: 11px;">EMPRESARIAL</span>
+                            <s id="labelOldPriceEmpresarial" class="price-old-mini">$160.000</s>
+                            <span id="labelPriceEmpresarial" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$80.000</span>
+                            <span style="color: #a855f7; font-size: 8px; display: block;">Nube + 5 cajeros</span>
+                        </button>
                     </div>
                 </div>
 
@@ -819,7 +861,30 @@
                     Ingresar a DL STOCK PRO &gt;
                 </button>
             </form>
+            <button type="button" id="cajeroLoginBtn" class="auth-cajero-btn" onclick="toggleCajeroLogin(true)">👥 Entrar como cajero</button>
             <button type="button" class="auth-help-btn" onclick="showLoginGuide()">❔ ¿Cómo empiezo?</button>
+            </div>
+            <form id="cajeroLogin" class="hidden" onsubmit="handleCajeroLogin(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="text-align:center;">
+                    <div style="font-size: 34px; line-height: 1;">👥</div>
+                    <h3 style="margin: 6px 0 2px; font-size: 16px;">Acceso de cajero</h3>
+                    <p style="font-size: 11.5px; color: var(--text-low); margin: 0;">Pide estos datos al dueño de tu empresa (plan Empresarial).</p>
+                </div>
+                <div>
+                    <label class="cj-label">Código de empresa</label>
+                    <input type="text" id="cjCode" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="Ej: K7M2QX" class="auth-input" style="text-transform: uppercase; letter-spacing: .2em; font-weight: 900;">
+                </div>
+                <div>
+                    <label class="cj-label">Usuario</label>
+                    <input type="text" id="cjUser" autocomplete="username" autocapitalize="none" placeholder="Ej: andres" class="auth-input">
+                </div>
+                <div>
+                    <label class="cj-label">Contraseña</label>
+                    <input type="password" id="cjPass" autocomplete="current-password" placeholder="••••••••" class="auth-input">
+                </div>
+                <button type="submit" id="cjSubmit" class="btn-green-action" style="width: 100%; padding: 12px; font-size: 13px;">Entrar como cajero ›</button>
+                <button type="button" class="auth-help-btn" style="margin-top: 0;" onclick="toggleCajeroLogin(false)">‹ Soy el dueño (entrar con correo)</button>
+            </form>
         </div>
         <!-- FIRMA DEL DESARROLLADOR (pantalla de acceso) -->
         <div class="dev-footer-mini">
@@ -878,7 +943,8 @@
                         <i class="fa-solid fa-bell"></i>
                         <span id="badgeCriticos" class="hidden" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">0</span>
                     </button>
-                    <button type="button" id="headerGuideBtn" onclick="startGuide('inicio', true)" class="header-btn" title="Guía de la app" style="font-size:15px;">🧭</button>
+                    <button type="button" id="headerTeamBtn" onclick="openTeamModal()" class="header-btn owner-only" title="Mi equipo (Empresarial)" style="font-size:15px;">👥</button>
+                    <button type="button" id="headerGuideBtn" onclick="startGuide(isCajero() ? 'cajero' : 'inicio', true)" class="header-btn" title="Guía de la app" style="font-size:15px;">🧭</button>
                     <button type="button" onclick="handleLogout()" class="header-btn" style="color: #ef4444;" title="Cerrar Sesión">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
@@ -1077,7 +1143,8 @@
                     <button type="button" id="moreCategoriesItem" class="sheet-tile" onclick="moreAction(openConfigModal)"><i class="fa-solid fa-sliders" style="color:#a78bfa"></i><span>Categorías</span></button>
                     <button type="button" id="moreThemeItem" class="sheet-tile" onclick="moreAction(toggleTheme)"><i class="fa-solid fa-circle-half-stroke" style="color:#f59e0b"></i><span id="moreThemeLabel">Tema</span></button>
                     <a id="moreSupportItem" data-pro="support" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
-                    <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide('inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
+                    <button type="button" id="moreTeamItem" class="sheet-tile owner-only" onclick="moreAction(openTeamModal)"><span style="font-size:18px;line-height:1">👥</span><span>Equipo</span></button>
+                    <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide(isCajero() ? 'cajero' : 'inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
                     <button type="button" id="moreAdminItem" class="sheet-tile hidden" onclick="moreAction(promptAdminAccess)"><i class="fa-solid fa-user-shield" style="color:#38bdf8"></i><span>Admin</span></button>
                 </div>
                 <a class="sheet-legal" href="legal.html" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-solid fa-scale-balanced"></i> Términos, privacidad y reembolsos</a>
@@ -1178,6 +1245,24 @@
                     </button>
                 </div>
 
+                <div id="planCardEmpresarial" class="plan-box" style="background: rgba(168, 85, 247, 0.08); border: 1.5px solid #a855f7; border-radius: 18px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px;">
+                        <h4 style="font-size: 14px; font-weight: 900; color: #a855f7;">DL STOCK PRO EMPRESARIAL <span class="plan-current hidden">Tu plan</span></h4>
+                        <div class="price-col"><s id="modalEmpresarialOldPrice">$160.000</s><span id="modalEmpresarialPriceTag" style="font-size: 13px; font-weight: 900; color: var(--text-high);">$80.000 COP / mes</span><span class="promo-pill">-50%</span></div>
+                    </div>
+                    <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; margin-bottom: 12px; line-height: 1.6;">
+                        <li>Todo lo del plan PREMIUM incluido.</li>
+                        <li><strong>Hasta 5 cajeros</strong> que entran con su usuario y contraseña.</li>
+                        <li><strong>Cada cajero con su lineal</strong>: ve todo el inventario, pero agrega y edita solo sus categorías.</li>
+                        <li>Tú controlas: borrar productos, valor del inventario, Excel, importar y copias.</li>
+                    </ul>
+                    <div class="annual-box"><div><b>📅 Pago anual</b><small>14 meses: pagas 12 y te regalamos 2</small></div><div style="text-align:right"><s id="annualOldEmpresarial"></s><b id="annualEmpresarial"></b><small id="annualMesEmpresarial"></small></div></div>
+                    <div class="annual-btns"><a id="waMesEmpresarial" target="_blank" rel="noopener" class="annual-wa">Pedir mensual</a><a id="waAnualEmpresarial" target="_blank" rel="noopener" class="annual-wa">Pedir anual</a></div>
+                    <button type="button" onclick="promptCodeActivation('empresarial')" class="btn-green-action" style="width: 100%; padding: 10px; font-size: 12px; background: #a855f7;">
+                        <i class="fa-solid fa-building"></i> Activar con Código de Plan EMPRESARIAL
+                    </button>
+                </div>
+
                 <div style="text-align: center; margin-top: 8px;">
                     <a href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Quiero%20comprar%20un%20c%C3%B3digo%20de%20activaci%C3%B3n%20para%20DL%20STOCK%20PRO" target="_blank" style="color: #25d366; font-size: 12px; font-weight: 800; text-decoration: none;">
                         <i class="fa-brands fa-whatsapp"></i> ¿No tienes código? Pídelo aquí por WhatsApp
@@ -1217,6 +1302,7 @@
                             <select id="adminGenPlan" class="input-text">
                                 <option value="pro">Plan PRO</option>
                                 <option value="premium" selected>Plan PREMIUM</option>
+                                <option value="empresarial">Plan EMPRESARIAL</option>
                             </select>
                         </div>
                         <div>
@@ -1870,6 +1956,52 @@
         </div>
     </div>
 
+    <!-- MODAL EQUIPO (PLAN EMPRESARIAL) -->
+    <div id="teamModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>👥 Mi equipo <small style="font-size: 10px; color: #a855f7; font-weight: 900;">EMPRESARIAL</small></span>
+                <button type="button" onclick="closeTeamModal()" style="background: none; border: none; color: var(--text-low); font-size: 18px; cursor: pointer;" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="gap: 10px;">
+                <div class="tm-company">
+                    <small>Código de empresa (tus cajeros lo usan para entrar)</small>
+                    <div class="tm-code-row"><b id="teamCode">—</b><button type="button" onclick="copyCompanyCode()">📋 Copiar</button></div>
+                    <label>Nombre de la empresa<input id="teamCompanyName" type="text" maxlength="60" placeholder="Ej: Supermercado La 10" onchange="saveCompanyName(this.value)"></label>
+                </div>
+                <div class="tm-usage"><span id="teamUsage">0 de 5 cajeros</span><div class="tm-bar"><i id="teamUsageBar"></i></div></div>
+                <p class="po-hint" style="margin: 0;">Cada cajero <b>ve todo el inventario</b>, pero solo <b>agrega y edita</b> productos de su lineal. No puede borrar productos, ver el valor del inventario, ni usar Excel, importar o copias.</p>
+                <div id="teamList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                <button type="button" id="teamAddBtn" class="btn-gold-action" style="width: 100%; padding: 10px; font-size: 12px;" onclick="newCajeroForm()">＋ Agregar cajero</button>
+                <p id="teamFull" class="po-hint hidden" style="text-align: center;">Llegaste al máximo de 5 cajeros de tu plan.</p>
+                <div id="teamForm" class="po-sec hidden">
+                    <span class="po-label">Nuevo cajero</span>
+                    <div class="po-grid">
+                        <label class="po-full">Nombre<input id="tmName" type="text" maxlength="40" placeholder="Ej: Andrés Gómez" oninput="suggestUsuario()"></label>
+                        <label class="po-full">Usuario (para entrar)<input id="tmUser" type="text" maxlength="20" autocapitalize="none" placeholder="Ej: andres" oninput="this.dataset.touched=1; this.value=cleanUsuario(this.value)"></label>
+                    </div>
+                    <span class="po-label" style="margin-top: 6px;">Su lineal (categorías que maneja)</span>
+                    <div id="tmCats" class="tm-cats-pick"></div>
+                    <p class="po-hint">La app genera una contraseña segura y te la muestra para que se la envíes.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" class="btn-dark-action" style="padding: 9px; font-size: 12px;" onclick="cancelCajeroForm()">Cancelar</button>
+                        <button type="button" id="tmSaveBtn" class="btn-green-action" style="padding: 9px; font-size: 12px;" onclick="createCajero()">Crear cajero</button>
+                    </div>
+                </div>
+                <div id="teamEdit" class="po-sec hidden">
+                    <span id="teamEditTitle" class="po-label">Lineal</span>
+                    <div id="teamEditCats" class="tm-cats-pick"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" class="btn-dark-action" style="padding: 9px; font-size: 12px;" onclick="document.getElementById('teamEdit').classList.add('hidden')">Cancelar</button>
+                        <button type="button" class="btn-green-action" style="padding: 9px; font-size: 12px;" onclick="saveCajeroLineal()">Guardar lineal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PROVEEDORES -->
     <div id="providersModal" class="modal-overlay hidden" style="z-index: 1001;">
         <div class="modal-box">
@@ -2045,6 +2177,425 @@
         window.alert = (m) => { uiAlert(m); };
 
         // ==========================================
+        // PLAN EMPRESARIAL: EQUIPO DE CAJEROS
+        // Cada cajero es un usuario de Firebase con un correo interno (nadie lo ve) y una
+        // contraseña generada por la app. Ve todo el inventario de la empresa, pero solo
+        // agrega y edita productos de las categorías de su lineal.
+        //   empresas_codigo/{CODIGO}                 → { owner, nombre }
+        //   empresas_codigo/{CODIGO}/accesos/{usuario} → { email, owner }   (para el ingreso)
+        //   users/{dueño}/equipo/{1..5}               → { uid, usuario, nombre, categorias, activo, email, ver }
+        //   miembros/{uidCajero}                      → { owner, slot }
+        // ==========================================
+        const CAJERO_DOMAIN = 'cajeros.dlstockpro.app';
+        const TEAM_MAX = 5;
+        let teamCache = [];
+
+        function isCajeroEmail(email) {
+            return String(email || '').toLowerCase().endsWith('.' + CAJERO_DOMAIN);
+        }
+        function isEmpresarialOwner() {
+            return !!currentUser && !isCajero() && (currentUser.plan === 'empresarial' || currentUser.isMaster);
+        }
+        // El cajero puede editar un producto solo si es de una categoría de su lineal
+        function canEditItem(item) {
+            if (!isCajero()) return true;
+            // Igual que en las reglas de Firebase: la categoría debe coincidir exactamente
+            const cats = (currentUser.categorias || []).map(c => String(c).trim());
+            return !!item && cats.includes(String(item.category || '').trim());
+        }
+        function lineLabel() {
+            return (currentUser && currentUser.categorias && currentUser.categorias.length) ? currentUser.categorias.join(', ') : 'sin categorías asignadas';
+        }
+        function denyNotMine() {
+            uiAlert(`🔒 Fuera de tu lineal\nPuedes ver este producto, pero solo puedes agregar y editar productos de tu lineal: ${lineLabel()}.`);
+        }
+        function requireOwner(what) {
+            if (!isCajero()) return true;
+            uiAlert(`🔒 Solo el dueño\n${what} solo lo puede hacer el dueño de la empresa.`);
+            return false;
+        }
+
+        function randomFrom(chars, n) {
+            const a = new Uint32Array(n);
+            crypto.getRandomValues(a);
+            return Array.from(a, x => chars[x % chars.length]).join('');
+        }
+        function genCompanyCode() { return randomFrom('ABCDEFGHJKMNPQRSTUVWXYZ23456789', 6); }
+        function genCajeroPass() { return randomFrom('ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789', 8); }
+        function cleanUsuario(u) {
+            return String(u || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9.]/g, '');
+        }
+        function cajeroEmail(code, usuario, ver) {
+            return `${usuario}.${ver}@${String(code).toLowerCase()}.${CAJERO_DOMAIN}`;
+        }
+
+        // Segunda conexión de Firebase: crea al cajero sin cerrar la sesión del dueño
+        function secondaryAuth() {
+            let app = (firebase.apps || []).find(a => a && a.name === 'dl-cajeros');
+            if (!app) app = firebase.initializeApp(firebaseConfig, 'dl-cajeros');
+            return app.auth();
+        }
+        async function createCajeroAuth(email, pass) {
+            const a = secondaryAuth();
+            try { await a.setPersistence(firebase.auth.Auth.Persistence.NONE); } catch (e) {}
+            const cred = await a.createUserWithEmailAndPassword(email, pass);
+            const uid = cred.user.uid;
+            try { await a.signOut(); } catch (e) {}
+            return uid;
+        }
+
+        async function ensureCompanyCode() {
+            if (currentUser.empresaCodigo) return currentUser.empresaCodigo;
+            let nombre = '';
+            try { nombre = (JSON.parse(localStorage.getItem('dl_label_prefs') || '{}').store) || ''; } catch (e) {}
+            nombre = nombre || currentUser.name || 'Mi empresa';
+            for (let i = 0; i < 6; i++) {
+                const code = genCompanyCode();
+                const ref = db.collection('empresas_codigo').doc(code);
+                const snap = await ref.get();
+                if (snap.exists) continue;
+                await ref.set({ owner: currentUser.uid, nombre: nombre.slice(0, 60) });
+                await db.collection('users').doc(currentUser.uid).set({ empresaCodigo: code }, { merge: true });
+                currentUser.empresaCodigo = code;
+                currentUser.empresaNombre = nombre;
+                saveCurrentUserLocal();
+                return code;
+            }
+            throw new Error('No se pudo crear el código de la empresa');
+        }
+
+        async function loadTeam() {
+            const snap = await db.collection(`users/${currentUser.uid}/equipo`).get();
+            const list = [];
+            snap.forEach(d => list.push(Object.assign({ slot: d.id }, d.data())));
+            list.sort((a, b) => Number(a.slot) - Number(b.slot));
+            teamCache = list;
+            return list;
+        }
+
+        async function openTeamModal() {
+            closeMoreMenu();
+            if (isCajero()) return;
+            if (!isEmpresarialOwner()) {
+                const t = PLAN_PRICES.COP.empresarial;
+                if (await uiConfirm(`🏢 Plan EMPRESARIAL\nAgrega hasta ${TEAM_MAX} cajeros con su propio usuario y contraseña. Cada uno maneja su lineal (sus categorías) y tú controlas todo. Hoy con 50% de descuento: ${t.oferta}/mes (antes ${t.normal}).`, { okText: '👑 Ver planes', cancelText: 'Ahora no' })) openSubscriptionModal();
+                return;
+            }
+            if (!firebaseReady()) { uiAlert("⚠️ Sin conexión\nEl equipo se administra con internet. Conéctate e intenta de nuevo."); return; }
+            document.getElementById('teamModal').classList.remove('hidden');
+            document.getElementById('teamList').innerHTML = '<p class="po-empty">Cargando tu equipo…</p>';
+            try {
+                await ensureCompanyCode();
+                await loadTeam();
+                const snap = await db.collection('empresas_codigo').doc(currentUser.empresaCodigo).get();
+                if (snap.exists && snap.data().nombre) currentUser.empresaNombre = snap.data().nombre;
+            } catch (e) {
+                console.log("Equipo:", e);
+                document.getElementById('teamList').innerHTML = '<p class="po-empty">No se pudo cargar el equipo. Revisa tu conexión y que las reglas de Firebase estén actualizadas.</p>';
+                return;
+            }
+            renderTeam();
+        }
+
+        function closeTeamModal() {
+            document.getElementById('teamModal').classList.add('hidden');
+            document.getElementById('teamForm').classList.add('hidden');
+        }
+
+        function catCheckboxes(selected, name) {
+            const sel = (selected || []).map(normCat);
+            const cats = getAllCategories();
+            if (!cats.length) return '<p class="po-hint">Primero crea categorías en tu inventario.</p>';
+            return cats.map(c => `<label class="tm-cat"><input type="checkbox" name="${name}" value="${esc(c)}"${sel.includes(normCat(c)) ? ' checked' : ''}><span>${esc(c)}</span></label>`).join('');
+        }
+
+        function renderTeam() {
+            document.getElementById('teamCode').textContent = currentUser.empresaCodigo || '—';
+            document.getElementById('teamCompanyName').value = currentUser.empresaNombre || '';
+            const active = teamCache.length;
+            document.getElementById('teamUsage').textContent = `${active} de ${TEAM_MAX} cajeros`;
+            document.getElementById('teamUsageBar').style.width = Math.min(100, active / TEAM_MAX * 100) + '%';
+            document.getElementById('teamAddBtn').classList.toggle('hidden', active >= TEAM_MAX);
+            document.getElementById('teamFull').classList.toggle('hidden', active < TEAM_MAX);
+            document.getElementById('teamList').innerHTML = teamCache.length ? teamCache.map(m => `
+                <div class="tm-card${m.activo ? '' : ' off'}">
+                    <div class="tm-head">
+                        <div style="min-width:0;">
+                            <b>${esc(m.nombre || m.usuario)}</b>
+                            <small>Usuario: <code>${esc(m.usuario)}</code> · ${m.activo ? '🟢 Activo' : '⏸️ Desactivado'}</small>
+                        </div>
+                    </div>
+                    <div class="tm-cats">${(m.categorias || []).length ? m.categorias.map(c => `<span>${esc(c)}</span>`).join('') : '<em>Sin lineal asignado</em>'}</div>
+                    <div class="tm-actions">
+                        <button type="button" onclick="editCajeroLineal('${m.slot}')">✏️ Lineal</button>
+                        <button type="button" onclick="regenCajeroPass('${m.slot}')">🔑 Nueva clave</button>
+                        <button type="button" onclick="toggleCajero('${m.slot}')">${m.activo ? '⏸️ Desactivar' : '▶️ Activar'}</button>
+                        <button type="button" class="danger" onclick="deleteCajero('${m.slot}')" aria-label="Eliminar">🗑️</button>
+                    </div>
+                </div>`).join('') : '<p class="po-empty">Aún no tienes cajeros. Agrega el primero.</p>';
+        }
+
+        function newCajeroForm() {
+            const f = document.getElementById('teamForm');
+            f.classList.remove('hidden');
+            document.getElementById('tmName').value = '';
+            document.getElementById('tmUser').value = '';
+            document.getElementById('tmCats').innerHTML = catCheckboxes([], 'tmcat');
+            document.getElementById('teamAddBtn').classList.add('hidden');
+            setTimeout(() => document.getElementById('tmName').focus(), 80);
+        }
+        function cancelCajeroForm() {
+            document.getElementById('teamForm').classList.add('hidden');
+            renderTeam();
+        }
+        function suggestUsuario() {
+            const u = document.getElementById('tmUser');
+            if (u.dataset.touched) return;
+            u.value = cleanUsuario(document.getElementById('tmName').value.split(' ')[0]).slice(0, 20);
+        }
+
+        async function saveCompanyName(val) {
+            const nombre = String(val || '').trim().slice(0, 60);
+            if (!nombre || !currentUser.empresaCodigo) return;
+            try {
+                await db.collection('empresas_codigo').doc(currentUser.empresaCodigo).set({ owner: currentUser.uid, nombre }, { merge: true });
+                currentUser.empresaNombre = nombre;
+                saveCurrentUserLocal();
+                showToast('✅ Nombre de la empresa guardado');
+            } catch (e) { showToast('No se pudo guardar el nombre'); }
+        }
+
+        function shareCredentials(title, usuario, pass) {
+            const name = currentUser.empresaNombre || 'mi empresa';
+            const msg = `Hola 👋 Este es tu acceso de cajero a DL STOCK PRO para *${name}*:\n\n` +
+                `🏢 Código de empresa: *${currentUser.empresaCodigo}*\n👤 Usuario: *${usuario}*\n🔑 Contraseña: *${pass}*\n\n` +
+                `Abre ${location.origin}${location.pathname} y toca "👥 Entrar como cajero".`;
+            try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Contraseña: ${pass}\n\nGuárdala o envíala ahora: por seguridad no se vuelve a mostrar. Ya quedó copiada.`,
+                { okText: '📲 Enviar por WhatsApp', cancelText: 'Listo' }).then(ok => {
+                    if (ok) window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+                });
+        }
+
+        async function createCajero() {
+            const nombre = document.getElementById('tmName').value.trim().slice(0, 40);
+            const usuario = cleanUsuario(document.getElementById('tmUser').value).slice(0, 20);
+            const categorias = [...document.querySelectorAll('input[name="tmcat"]:checked')].map(x => x.value);
+            if (!nombre) { uiAlert("⚠️ Falta el nombre\nEscribe el nombre del cajero."); return; }
+            if (usuario.length < 3) { uiAlert("⚠️ Usuario no válido\nEl usuario debe tener al menos 3 letras o números (sin espacios)."); return; }
+            if (!categorias.length) { uiAlert("⚠️ Asigna su lineal\nMarca al menos una categoría que maneja este cajero."); return; }
+            const used = new Set(teamCache.map(m => m.slot));
+            const slot = ['1', '2', '3', '4', '5'].find(x => !used.has(x));
+            if (!slot) { uiAlert(`Tu plan permite hasta ${TEAM_MAX} cajeros.`); return; }
+            const code = currentUser.empresaCodigo;
+            const btn = document.getElementById('tmSaveBtn');
+            btn.disabled = true; btn.textContent = 'Creando…';
+            try {
+                const accRef = db.collection(`empresas_codigo/${code}/accesos`).doc(usuario);
+                if ((await accRef.get()).exists) { uiAlert("⚠️ Ese usuario ya existe\nElige otro nombre de usuario."); return; }
+                const pass = genCajeroPass();
+                const email = cajeroEmail(code, usuario, 1);
+                const uid = await createCajeroAuth(email, pass);
+                const batch = db.batch();
+                batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), {
+                    uid, usuario, nombre, categorias, activo: true, email, ver: 1, creado: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                batch.set(db.collection('miembros').doc(uid), { owner: currentUser.uid, slot });
+                batch.set(accRef, { email, owner: currentUser.uid });
+                await batch.commit();
+                document.getElementById('teamForm').classList.add('hidden');
+                await loadTeam();
+                renderTeam();
+                shareCredentials(`✅ Cajero creado: ${nombre}`, usuario, pass);
+            } catch (e) {
+                console.log("Crear cajero:", e);
+                uiAlert(e && e.code === 'auth/email-already-in-use' ? "⚠️ Ese usuario ya existe\nElige otro nombre de usuario." : "❌ No se pudo crear el cajero\nRevisa tu conexión y que las reglas de Firebase estén actualizadas.");
+            } finally {
+                btn.disabled = false; btn.textContent = 'Crear cajero';
+            }
+        }
+
+        async function editCajeroLineal(slot) {
+            const m = teamCache.find(x => x.slot === slot);
+            if (!m) return;
+            const box = document.getElementById('teamEditCats');
+            box.innerHTML = catCheckboxes(m.categorias, 'tmedit');
+            document.getElementById('teamEditTitle').textContent = `Lineal de ${m.nombre || m.usuario}`;
+            document.getElementById('teamEdit').dataset.slot = slot;
+            document.getElementById('teamEdit').classList.remove('hidden');
+        }
+        async function saveCajeroLineal() {
+            const ed = document.getElementById('teamEdit');
+            const slot = ed.dataset.slot;
+            const categorias = [...document.querySelectorAll('input[name="tmedit"]:checked')].map(x => x.value);
+            if (!categorias.length) { uiAlert("⚠️ Marca al menos una categoría."); return; }
+            try {
+                await db.collection(`users/${currentUser.uid}/equipo`).doc(slot).set({ categorias }, { merge: true });
+                ed.classList.add('hidden');
+                await loadTeam(); renderTeam();
+                showToast('✅ Lineal actualizado');
+            } catch (e) { uiAlert("❌ No se pudo guardar el lineal."); }
+        }
+
+        async function toggleCajero(slot) {
+            const m = teamCache.find(x => x.slot === slot);
+            if (!m) return;
+            try {
+                await db.collection(`users/${currentUser.uid}/equipo`).doc(slot).set({ activo: !m.activo }, { merge: true });
+                await loadTeam(); renderTeam();
+                showToast(m.activo ? `⏸️ ${m.nombre || m.usuario} ya no puede entrar` : `▶️ ${m.nombre || m.usuario} puede entrar de nuevo`);
+            } catch (e) { uiAlert("❌ No se pudo cambiar el estado."); }
+        }
+
+        // No se puede cambiar la clave de otro usuario desde el celular: se crea un acceso nuevo
+        // y el anterior queda sin permisos.
+        async function regenCajeroPass(slot) {
+            const m = teamCache.find(x => x.slot === slot);
+            if (!m) return;
+            if (!(await uiConfirm(`Nueva contraseña\n¿Generar una contraseña nueva para ${m.nombre || m.usuario}? La anterior deja de funcionar.`, { okText: 'Generar' }))) return;
+            try {
+                const ver = (parseInt(m.ver) || 1) + 1;
+                const pass = genCajeroPass();
+                const email = cajeroEmail(currentUser.empresaCodigo, m.usuario, ver);
+                const uid = await createCajeroAuth(email, pass);
+                const batch = db.batch();
+                batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), { uid, email, ver, activo: true }, { merge: true });
+                batch.set(db.collection('miembros').doc(uid), { owner: currentUser.uid, slot });
+                if (m.uid) batch.delete(db.collection('miembros').doc(m.uid));
+                batch.set(db.collection(`empresas_codigo/${currentUser.empresaCodigo}/accesos`).doc(m.usuario), { email, owner: currentUser.uid });
+                await batch.commit();
+                await loadTeam(); renderTeam();
+                shareCredentials(`🔑 Nueva contraseña para ${m.nombre || m.usuario}`, m.usuario, pass);
+            } catch (e) {
+                console.log("Nueva clave:", e);
+                uiAlert("❌ No se pudo generar la contraseña\nRevisa tu conexión e intenta de nuevo.");
+            }
+        }
+
+        async function deleteCajero(slot) {
+            const m = teamCache.find(x => x.slot === slot);
+            if (!m) return;
+            if (!(await uiConfirm(`Eliminar cajero\n¿Eliminar a ${m.nombre || m.usuario}? Ya no podrá entrar. Los productos y movimientos que registró se conservan.`, { danger: true, okText: 'Eliminar' }))) return;
+            try {
+                const batch = db.batch();
+                batch.delete(db.collection(`users/${currentUser.uid}/equipo`).doc(slot));
+                if (m.uid) batch.delete(db.collection('miembros').doc(m.uid));
+                batch.delete(db.collection(`empresas_codigo/${currentUser.empresaCodigo}/accesos`).doc(m.usuario));
+                await batch.commit();
+                await loadTeam(); renderTeam();
+                showToast(`🗑️ ${m.nombre || m.usuario} eliminado`);
+            } catch (e) { uiAlert("❌ No se pudo eliminar."); }
+        }
+
+        function copyCompanyCode() {
+            try { navigator.clipboard.writeText(currentUser.empresaCodigo); showToast('📋 Código copiado'); } catch (e) {}
+        }
+
+        // ---------- Ingreso del cajero ----------
+        function toggleCajeroLogin(show) {
+            document.getElementById('cajeroLogin').classList.toggle('hidden', !show);
+            document.getElementById('authOwnerArea').classList.toggle('hidden', show);
+            if (show) {
+                try {
+                    const last = JSON.parse(localStorage.getItem('dl_cajero_last') || 'null');
+                    if (last && !document.getElementById('cjCode').value) { document.getElementById('cjCode').value = last.code || ''; document.getElementById('cjUser').value = last.usuario || ''; }
+                } catch (e) {}
+                setTimeout(() => document.getElementById(document.getElementById('cjCode').value ? 'cjPass' : 'cjCode').focus(), 50);
+            }
+        }
+
+        async function handleCajeroLogin(e) {
+            if (e) e.preventDefault();
+            const code = String(document.getElementById('cjCode').value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const usuario = cleanUsuario(document.getElementById('cjUser').value);
+            const pass = document.getElementById('cjPass').value;
+            if (code.length !== 6 || !usuario || !pass) { uiAlert("⚠️ Completa los datos\nEscribe el código de empresa (6 caracteres), tu usuario y tu contraseña."); return; }
+            if (!firebaseReady()) { uiAlert("⚠️ Sin conexión\nNecesitas internet para entrar."); return; }
+            const btn = document.getElementById('cjSubmit');
+            btn.disabled = true; btn.textContent = 'Entrando…';
+            authFlowInProgress = true;
+            try {
+                const acc = await db.collection(`empresas_codigo/${code}/accesos`).doc(usuario).get();
+                if (!acc.exists) throw { code: 'auth/invalid-credential' };
+                const cred = await auth.signInWithEmailAndPassword(acc.data().email, pass);
+                try {
+                    currentUser = await loadProfile(cred.user);
+                } catch (err) {
+                    try { await auth.signOut(); } catch (e2) {}
+                    currentUser = null;
+                    throw err;
+                }
+                profileLoadedThisSession = true;
+                saveCurrentUserLocal();
+                document.getElementById('cjPass').value = '';
+                try { localStorage.setItem('dl_cajero_last', JSON.stringify({ code, usuario })); } catch (e3) {}
+                initApp();
+            } catch (err) {
+                uiAlert(authErrorMessage(err).replace('Correo o contraseña incorrectos.', 'Código de empresa, usuario o contraseña incorrectos.'));
+            } finally {
+                authFlowInProgress = false;
+                btn.disabled = false; btn.textContent = 'Entrar como cajero ›';
+            }
+        }
+
+        // Perfil del cajero: su empresa, su lineal y el plan de la empresa
+        async function loadCajeroProfile(fbUser) {
+            try {
+                const mem = await db.collection('miembros').doc(fbUser.uid).get();
+                if (!mem.exists) throw { code: 'dl/cajero-inactivo' };
+                const { owner, slot } = mem.data();
+                const seat = await db.collection(`users/${owner}/equipo`).doc(String(slot)).get();
+                if (!seat.exists || seat.data().uid !== fbUser.uid || !seat.data().activo) throw { code: 'dl/cajero-inactivo' };
+                let ownerSnap;
+                try { ownerSnap = await db.collection('users').doc(owner).get(); }
+                catch (e) { if (e && e.code === 'permission-denied') throw { code: 'dl/empresa-sin-plan' }; throw e; }
+                const ownerProfile = ownerSnap.exists ? ownerSnap.data() : {};
+                const eff = computeEffectivePlan(ownerProfile, owner);
+                if (eff.plan !== 'empresarial') throw { code: 'dl/empresa-sin-plan' };
+                let empresaNombre = '';
+                if (ownerProfile.empresaCodigo) {
+                    try {
+                        const c = await db.collection('empresas_codigo').doc(ownerProfile.empresaCodigo).get();
+                        if (c.exists) empresaNombre = c.data().nombre || '';
+                    } catch (e) {}
+                }
+                const s = seat.data();
+                return {
+                    uid: fbUser.uid,
+                    username: `${s.usuario}@${ownerProfile.empresaCodigo || owner}`,
+                    name: s.nombre || s.usuario,
+                    zone: 'Cajero',
+                    rol: 'cajero',
+                    usuario: s.usuario,
+                    empresaUid: owner,
+                    empresaCodigo: ownerProfile.empresaCodigo || '',
+                    empresaNombre,
+                    slot: String(slot),
+                    categorias: s.categorias || [],
+                    plan: 'empresarial',
+                    planExpiresAt: eff.expiresAt,
+                    expiredPlan: null,
+                    isMaster: false,
+                    termsVersion: TERMS_VERSION,
+                    scanIngresos: 0,
+                    sessionVersion: SESSION_VERSION
+                };
+            } catch (e) {
+                if (e && e.code && String(e.code).startsWith('dl/')) throw e;
+                if (e && e.code === 'permission-denied') throw { code: 'dl/cajero-inactivo' };
+                // Sin internet: se usa la última copia guardada en el celular
+                if (currentUser && currentUser.uid === fbUser.uid) return currentUser;
+                throw e;
+            }
+        }
+
+        // Si el dueño desactiva al cajero o vence el plan, se cierra su sesión
+        async function cajeroAccessLost(msg) {
+            uiAlert(msg || "🔒 Acceso cerrado\nTu usuario de cajero fue desactivado o el plan de la empresa venció. Habla con el dueño.");
+            try { await auth.signOut(); } catch (e) {}
+        }
+
+        // ==========================================
         // FUNCIONES DEL PLAN PRO (bloqueadas en GRATIS)
         // ==========================================
         const PRO_FEATURES = {
@@ -2056,10 +2607,11 @@
         };
 
         function hasProAccess() {
-            return !!currentUser && (currentUser.isMaster || currentUser.plan === 'pro' || currentUser.plan === 'premium');
+            return !!currentUser && (currentUser.isMaster || ['pro', 'premium', 'empresarial'].includes(currentUser.plan));
         }
 
         function requirePro(key) {
+            if (isCajero() && (key === 'excel' || key === 'import')) return requireOwner(key === 'excel' ? 'Descargar en Excel' : 'Importar productos');
             if (hasProAccess()) return true;
             const f = PRO_FEATURES[key] || { name: 'Esta función', icon: '🔒' };
             const t = PLAN_PRICES.COP.pro;
@@ -2279,13 +2831,29 @@
                 { emoji: '♾️', title: 'Productos ilimitados', text: 'Ya no tienes el límite de 100: registra **todos los productos** que necesites.' },
                 { targets: [{ sel: '#headerBackupBtn' }, { sel: '#moreBackupItem', menu: 'more' }], title: 'Copias de seguridad', text: 'Descarga una **copia de seguridad** de tu inventario y restáurala en cualquier celular.' }
             ],
+            empresarial: [
+                { emoji: '🏢', title: '¡Ahora tienes el plan EMPRESARIAL!', text: 'Tu inventario queda **en la nube** y ahora puedes trabajar **con tu equipo**.' },
+                { targets: [{ sel: '#headerTeamBtn' }, { sel: '#moreTeamItem', menu: 'more' }], title: 'Tu equipo', text: 'Aquí creas **hasta 5 cajeros** con su usuario y contraseña, y le asignas a cada uno **su lineal** (sus categorías).' },
+                { emoji: '🔑', title: 'Cómo entran tus cajeros', text: 'En la pantalla de ingreso tocan **👥 Entrar como cajero** y escriben el **código de empresa**, su **usuario** y su **contraseña**.' },
+                { targets: [{ sel: '#syncStatusBadge' }], title: 'Todo sincronizado', text: 'Lo que hagan tus cajeros se ve **en tiempo real** en tu celular. Tú sigues controlando el valor del inventario, Excel y las copias.' }
+            ],
+            cajero: [
+                { emoji: '👋', title: '¡Hola! Eres cajero', textFn: () => `Trabajas en **${currentUser.empresaNombre || 'tu empresa'}**. Tu lineal: **${lineLabel()}**. Ves todo el inventario, pero solo editas lo de tu lineal.` },
+                { targets: [{ sel: '#searchInput' }], title: 'Buscar', text: 'Busca por **nombre, ubicación o código**. No importan las tildes.' },
+                { targets: [{ sel: '#navScanBtn' }, { sel: '#deskScanBtn' }], title: 'Escanear', text: 'Busca un producto con la **cámara**. Si es nuevo y de tu lineal, lo registras.' },
+                { targets: [{ sel: '#inventoryCards .inv-card:not(.not-mine)' }, { sel: '#inventoryTableBody tr[data-idx]:first-child' }], title: 'Sumar y restar', text: 'En los productos de tu lineal usa **+ y −** para sumar o restar unidades. Los que tienen 🔒 son de otro lineal: solo los ves.' },
+                { targets: [{ sel: '#navAddBtn' }, { sel: '#deskAddActions, #deskAddActions + .quick-actions' }], title: 'Agregar productos', text: 'Agrega productos **nuevos de tu lineal** con foto, escáner o a mano.' },
+                { targets: [{ sel: '#navAlertsBtn' }, { sel: '#headerAlertsBtn' }], title: 'Alertas', text: 'Aquí ves los productos que **se vencen**.' },
+                { targets: [{ sel: '.sheet-logout', menu: 'more' }], title: 'Cerrar sesión', text: 'Al terminar tu turno, **cierra sesión** para que nadie use tu usuario.' },
+                { emoji: '✅', title: '¡Listo!', text: 'Puedes repetir esta guía desde **Más → 🧭 Guía**.' }
+            ],
             premium: [
                 { emoji: '🎉', title: '¡Ahora tienes el plan PREMIUM!', text: 'Te muestro **lo nuevo** que tienes.' },
                 { targets: [{ sel: '#syncStatusBadge' }], title: 'Nube y tiempo real', text: 'Tu inventario queda **en la nube** y se **sincroniza en tiempo real** entre varios celulares. Aquí ves el estado.' },
                 { targets: [{ sel: '#moreSupportItem', menu: 'more' }], title: 'Soporte prioritario', text: 'Tienes **soporte prioritario por WhatsApp**. Escríbenos desde aquí cuando lo necesites.' }
             ]
         };
-        const PLAN_RANK = { gratis: 0, pro: 1, premium: 2 };
+        const PLAN_RANK = { gratis: 0, pro: 1, premium: 2, empresarial: 3 };
 
         let guide = null; // { name, steps, i, menu, histPushed, onDone }
 
@@ -2632,6 +3200,7 @@
                 return localStorage.getItem('guia_login_dispositivo') ? null : 'login';
             }
             if (!currentUser) return null;
+            if (isCajero()) return localStorage.getItem(guideKey('cajero')) ? null : 'cajero';
             const plan = guidePlan();
             const planKey = guideKey('plan');
             const lastPlan = localStorage.getItem(planKey);
@@ -2805,8 +3374,8 @@
         // Precios de los planes. Descuento de lanzamiento: 50% (precio normal tachado).
         // Para quitar el descuento, deja "oferta" igual a "normal".
         const PLAN_PRICES = {
-            COP: { pro: { normal: '$40.000', oferta: '$20.000' }, premium: { normal: '$80.000', oferta: '$40.000' }, sufijo: ' COP / mes' },
-            USD: { pro: { normal: '$9.99',   oferta: '$4.99' },   premium: { normal: '$19.99', oferta: '$9.99' },  sufijo: ' USD / mes' }
+            COP: { pro: { normal: '$40.000', oferta: '$20.000' }, premium: { normal: '$80.000', oferta: '$40.000' }, empresarial: { normal: '$160.000', oferta: '$80.000' }, sufijo: ' COP / mes' },
+            USD: { pro: { normal: '$9.99',   oferta: '$4.99' },   premium: { normal: '$19.99', oferta: '$9.99' },  empresarial: { normal: '$39.99', oferta: '$19.99' }, sufijo: ' USD / mes' }
         };
 
         function applyPlanPrices(curr) {
@@ -2814,8 +3383,8 @@
             const t = PLAN_PRICES[curr] || PLAN_PRICES.COP;
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
             const short = curr === 'USD' ? ' USD' : '';
-            ['pro', 'premium'].forEach(k => {
-                const P = k === 'pro' ? 'Pro' : 'Premium';
+            ['pro', 'premium', 'empresarial'].forEach(k => {
+                const P = k.charAt(0).toUpperCase() + k.slice(1);
                 const hasDiscount = t[k].normal !== t[k].oferta;
                 set('labelPrice' + P, t[k].oferta + short);
                 set('labelOldPrice' + P, hasDiscount ? t[k].normal + short : '');
@@ -2828,7 +3397,7 @@
                 set('annual' + P, fmtA(an) + short);
                 set('annualOld' + P, hasDiscount ? fmtA(num(t[k].normal) * 12) + short : '');
                 set('annualMes' + P, (curr === 'USD' ? fmtA(an / 14) : fmtA(Math.round(an / 14 / 100) * 100)) + short + ' al mes');
-                const nom = k === 'pro' ? 'PRO' : 'PREMIUM';
+                const nom = k.toUpperCase();
                 const wa = txt => 'https://wa.me/573218641539?text=' + encodeURIComponent(txt);
                 const em = currentUser && currentUser.email ? `\nCuenta: ${currentUser.email}` : '';
                 const mA = document.getElementById('waMes' + P), aA = document.getElementById('waAnual' + P);
@@ -2837,7 +3406,7 @@
             });
             // Marca el plan actual del usuario
             const cur = currentUser ? (currentUser.isMaster ? null : (currentUser.plan || 'gratis')) : null;
-            [['gratis', 'planCardGratis'], ['pro', 'planCardPro'], ['premium', 'planCardPremium']].forEach(([k, id]) => {
+            [['gratis', 'planCardGratis'], ['pro', 'planCardPro'], ['premium', 'planCardPremium'], ['empresarial', 'planCardEmpresarial']].forEach(([k, id]) => {
                 const card = document.getElementById(id);
                 if (!card) return;
                 card.classList.toggle('is-current', cur === k);
@@ -2943,7 +3512,8 @@
 
         async function generateActivationCodes() {
             if (!isAdminUser() || !firebaseReady()) return;
-            const plan = document.getElementById('adminGenPlan').value === 'pro' ? 'pro' : 'premium';
+            const planSel = document.getElementById('adminGenPlan').value;
+            const plan = ['pro', 'premium', 'empresarial'].includes(planSel) ? planSel : 'premium';
             const days = parseInt(document.getElementById('adminGenDuration').value) || 30;
             const prefix = (document.getElementById('adminGenPrefix').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') || 'DL');
             const qty = Math.min(Math.max(parseInt(document.getElementById('adminGenQty').value) || 1, 1), 50);
@@ -3143,11 +3713,11 @@
         // El administrador puede asignar o quitar un plan directamente
         async function adminGrantPlan(uid) {
             if (!isAdminUser() || !firebaseReady()) return;
-            const planIn = await uiPrompt("Cambiar plan\nEscribe el plan a asignar: gratis, pro o premium", "premium");
+            const planIn = await uiPrompt("Cambiar plan\nEscribe el plan a asignar: gratis, pro, premium o empresarial", "premium");
             if (planIn === null) return;
             const plan = String(planIn).trim().toLowerCase();
-            if (!['gratis', 'pro', 'premium'].includes(plan)) {
-                uiAlert("Plan no válido. Escribe gratis, pro o premium.");
+            if (!['gratis', 'pro', 'premium', 'empresarial'].includes(plan)) {
+                uiAlert("Plan no válido. Escribe gratis, pro, premium o empresarial.");
                 return;
             }
             let data;
@@ -3371,7 +3941,8 @@
             const allCats = getAllCategories();
             const optionsHtml = allCats.map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('');
             filterSel.innerHTML += optionsHtml;
-            formSel.innerHTML = optionsHtml;
+            // El cajero solo puede guardar productos en las categorías de su lineal
+            formSel.innerHTML = isCajero() ? (currentUser.categorias || []).map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('') : optionsHtml;
 
             if (currentFilterVal) selectCategoryValue(filterSel, currentFilterVal);
             if (currentFormVal) selectCategoryValue(formSel, currentFormVal);
@@ -3542,9 +4113,10 @@
             const btnGratis = document.getElementById('btnPlanGratis');
             const btnPro = document.getElementById('btnPlanPro');
             const btnPremium = document.getElementById('btnPlanPremium');
+            const btnEmp = document.getElementById('btnPlanEmpresarial');
             const badge = document.getElementById('planBadgeDisplay');
 
-            [btnGratis, btnPro, btnPremium].forEach(btn => btn && btn.classList.remove('selected'));
+            [btnGratis, btnPro, btnPremium, btnEmp].forEach(btn => btn && btn.classList.remove('selected'));
 
             if (plan === 'gratis') {
                 if (btnGratis) btnGratis.classList.add('selected');
@@ -3554,6 +4126,10 @@
                 if (btnPro) btnPro.classList.add('selected');
                 badge.className = 'badge badge-cyan';
                 badge.textContent = 'PRO (ILIMITADO LOCAL)';
+            } else if (plan === 'empresarial') {
+                if (btnEmp) btnEmp.classList.add('selected');
+                badge.className = 'badge badge-cyan';
+                badge.textContent = 'EMPRESARIAL (NUBE + CAJEROS)';
             } else {
                 if (btnPremium) btnPremium.classList.add('selected');
                 badge.className = 'badge badge-cyan';
@@ -3668,7 +4244,9 @@
                 'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
                 'auth/too-many-requests': 'Demasiados intentos. Espera unos minutos e intenta de nuevo.',
                 'auth/network-request-failed': 'Sin conexión a internet. Revisa tu red e intenta de nuevo.',
-                'auth/operation-not-allowed': 'El acceso con correo no está activado en Firebase.'
+                'auth/operation-not-allowed': 'El acceso con correo no está activado en Firebase.',
+                'dl/cajero-inactivo': 'Tu usuario de cajero está desactivado o ya no existe. Habla con el dueño de la empresa.',
+                'dl/empresa-sin-plan': 'El plan EMPRESARIAL de tu empresa no está activo. Pídele al dueño que lo renueve.'
             };
             return '❌ ' + (map[code] || ('No se pudo completar la operación. ' + (err && err.message ? err.message : '')));
         }
@@ -3686,6 +4264,7 @@
 
         // Lee (o crea) el perfil del usuario en Firestore: users/{uid}
         async function loadProfile(fbUser) {
+            if (isCajeroEmail(fbUser.email)) return loadCajeroProfile(fbUser);
             const isAdmin = fbUser.uid === ADMIN_UID;
             const email = fbUser.email || '';
             const ref = db.collection('users').doc(fbUser.uid);
@@ -3742,6 +4321,7 @@
                 isMaster: isAdmin,
                 termsVersion: profile.termsVersion || null,
                 scanIngresos: parseInt(profile.scanIngresos) || 0,
+                empresaCodigo: profile.empresaCodigo || null,
                 sessionVersion: SESSION_VERSION
             };
         }
@@ -3864,7 +4444,7 @@
                 }
 
                 // Si eligió un plan de pago, se pide el código
-                if ((selectedPlan === 'pro' || selectedPlan === 'premium') && !isAdminUser() && currentUser.plan !== selectedPlan) {
+                if (['pro', 'premium', 'empresarial'].includes(selectedPlan) && !isAdminUser() && currentUser.plan !== selectedPlan) {
                     const code = await uiPrompt(`Activar Plan ${selectedPlan.toUpperCase()}\nIngresa tu código de activación. Si aún no lo tienes, toca Cancelar y seguirás con tu plan actual (puedes pedirlo por WhatsApp).`, '', { placeholder: 'Ej: DL-30D-ABCD1234', okText: 'Activar' });
                     if (code) {
                         const res = await redeemCode(code, selectedPlan);
@@ -3926,7 +4506,7 @@
 
         // Usuarios que ya tenían cuenta: aceptan una sola vez
         async function ensureTermsAccepted() {
-            if (!currentUser || currentUser.isMaster || termsPromptOpen) return;
+            if (!currentUser || currentUser.isMaster || isCajero() || termsPromptOpen) return;
             if (currentUser.termsVersion === TERMS_VERSION) return;
             if (termsAcceptedLocally()) {
                 // ya aceptó en este dispositivo: sincroniza la constancia si falta en la nube
@@ -3979,7 +4559,8 @@
                 document.body.classList.add('in-app');
 
                 let planText = currentUser.isMaster ? 'ADMIN' : currentUser.plan.toUpperCase();
-                if (!currentUser.isMaster && currentUser.plan !== 'gratis' && currentUser.planExpiresAt) {
+                if (isCajero()) planText = 'CAJERO' + (currentUser.empresaNombre ? ' · ' + currentUser.empresaNombre : '');
+                else if (!currentUser.isMaster && currentUser.plan !== 'gratis' && currentUser.planExpiresAt) {
                     planText += ' (vence ' + formatDate(currentUser.planExpiresAt) + ')';
                 }
                 document.getElementById('headerUserName').textContent = currentUser.name || "";
@@ -3989,14 +4570,14 @@
                 loadUserInventory();
                 renderCategoryOptions();
                 renderTable();
-                if (currentUser.plan !== 'premium') applyDefaultMinStock();
+                if (!isCloudPlan(currentUser.plan)) applyDefaultMinStock();
                 checkExpirationsAndAlert(!alertSoundPlayed);
                 alertSoundPlayed = true;
 
                 showPlanNotices();
                 setTimeout(ensureTermsAccepted, 600);
 
-                if (currentUser.plan === 'premium') {
+                if (isCloudPlan(currentUser.plan)) {
                     initFirebaseSync();
                 } else {
                     stopFirebaseSync();
@@ -4013,12 +4594,14 @@
                 closeMoreMenu();
             }
             applyPlanLocks();
+            document.body.classList.toggle('rol-cajero', isCajero());
+            document.body.classList.toggle('team-owner', isEmpresarialOwner());
             scheduleGuides();
         }
 
         // Avisos de plan vencido o por vencer (una vez por día)
         function showPlanNotices() {
-            if (!currentUser || currentUser.isMaster) return;
+            if (!currentUser || currentUser.isMaster || isCajero()) return;
             const today = localDateStamp();
             const key = 'dl_plan_notice_' + (currentUser.uid || '');
             if (localStorage.getItem(key) === today) return;
@@ -4068,7 +4651,17 @@
                     return;
                 }
                 if (profileLoadedThisSession && currentUser && currentUser.uid === fbUser.uid) return;
-                currentUser = await loadProfile(fbUser);
+                try {
+                    currentUser = await loadProfile(fbUser);
+                } catch (err) {
+                    // Cajero desactivado o empresa sin plan: se cierra la sesión
+                    currentUser = null;
+                    localStorage.removeItem('canasto_current_user');
+                    try { await auth.signOut(); } catch (e) {}
+                    initApp();
+                    uiAlert(authErrorMessage(err));
+                    return;
+                }
                 profileLoadedThisSession = true;
                 saveCurrentUserLocal();
                 initApp();
@@ -4086,7 +4679,7 @@
 
         // Inventario en la nube de cada usuario: users/{uid}/inventory
         function getCollectionName() {
-            return `users/${currentUser.uid}/inventory`;
+            return `users/${companyUid()}/inventory`;
         }
 
         // ID del documento en la nube: código de barras, o código interno si no hay
@@ -4112,7 +4705,7 @@
         }
 
         function initFirebaseSync() {
-            if (!db || !currentUser || currentUser.plan !== 'premium') return;
+            if (!db || !currentUser || !isCloudPlan(currentUser.plan)) return;
             stopFirebaseSync(); // evita escuchas duplicadas
             syncPendingHistory();
 
@@ -4146,7 +4739,11 @@
                         badge.className = "badge badge-cyan";
                         badge.innerHTML = '<i class="fa-solid fa-cloud"></i> Nube OK';
                     }
-                    if (inventory.length > 0) {
+                    if (isCajero()) {
+                        inventory = [];
+                        saveUserInventoryToLocal();
+                        renderTable();
+                    } else if (inventory.length > 0) {
                         uploadInventory(collectionName, inventory).catch(e => console.log("Error subiendo inventario:", e));
                     } else if (isAdminUser() && !localStorage.getItem('dl_legacy_migrated_' + currentUser.uid)) {
                         // Primera vez del administrador: trae el inventario de la colección antigua
@@ -4161,6 +4758,7 @@
                 }
             }, err => {
                 console.log("Modo local activo:", err);
+                if (isCajero() && err && err.code === 'permission-denied') { cajeroAccessLost(); return; }
                 if (badge) {
                     badge.className = "badge badge-amber";
                     badge.innerHTML = '<i class="fa-solid fa-database"></i> Local';
@@ -4565,7 +5163,7 @@
             });
 
             saveUserInventoryToLocal();
-            if (db && currentUser && currentUser.uid && plan === 'premium' && changed.length) {
+            if (db && currentUser && currentUser.uid && isCloudPlan(plan) && changed.length) {
                 uploadInventory(getCollectionName(), changed).catch(() =>
                     uiAlert("⚠️ Importado en este dispositivo\nNo se pudo subir a la nube ahora. Se sincronizará al reconectar."));
             }
@@ -4856,14 +5454,14 @@
                 <div><strong style="color:#38bdf8">${sobrantes.length}</strong><small>sobrantes</small></div>
                 <div><strong style="color:#ef4444">${faltantes.length}</strong><small>faltantes</small></div>`;
             document.getElementById('countValue').innerHTML = diffs.length
-                ? (hasPremiumAccess()
+                ? (canSeeValue()
                     ? `Diferencia en valor: <b style="color:${valueNet >= 0 ? '#10b981' : '#ef4444'}">${valueNet >= 0 ? '+' : '−'}${money(Math.abs(valueNet))}</b>`
                     : `Diferencia en valor: <a onclick="openSubscriptionModal()" style="color:#f59e0b;font-weight:900;cursor:pointer;">👑 Disponible en PREMIUM</a>`)
                 : '✅ Todo lo contado coincide con el sistema.';
             document.getElementById('countPendingNote').textContent = pending
                 ? `${pending} producto(s) no se contaron.`
                 : 'Contaste todos los productos.';
-            if (hasPremiumAccess()) diffs.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+            if (canSeeValue()) diffs.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
             else diffs.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
             document.getElementById('countDiffList').innerHTML = diffs.length ? diffs.slice(0, 150).map(r => `
                 <div class="order-item">
@@ -4873,7 +5471,7 @@
                     </div>
                     <div class="order-qty">
                         <strong style="color:${r.diff > 0 ? '#38bdf8' : '#ef4444'}">${r.diff > 0 ? '+' : ''}${r.diff}</strong>
-                        ${hasPremiumAccess() ? `<span style="font-size:10px;color:var(--text-low);">${r.value >= 0 ? '+' : '−'}${money(Math.abs(r.value))}</span>` : ''}
+                        ${canSeeValue() ? `<span style="font-size:10px;color:var(--text-low);">${r.value >= 0 ? '+' : '−'}${money(Math.abs(r.value))}</span>` : ''}
                     </div>
                 </div>`).join('') : '';
             document.getElementById('countApplyBtn').disabled = diffs.length === 0;
@@ -4882,8 +5480,14 @@
 
         async function applyCount() {
             const { rows } = getCountDiffs();
-            const diffs = rows.filter(r => r.diff !== 0);
+            let diffs = rows.filter(r => r.diff !== 0);
             if (!diffs.length) return;
+            if (isCajero()) {
+                const outside = diffs.filter(r => !canEditItem(r.item)).length;
+                diffs = diffs.filter(r => canEditItem(r.item));
+                if (outside) await uiAlert(`🔒 Solo tu lineal\n${outside} producto(s) contados son de otro lineal: no se ajustan. Se aplican solo los de tu lineal (${lineLabel()}).`);
+                if (!diffs.length) return;
+            }
             if (!(await uiConfirm(`Aplicar conteo\nSe ajustará el stock de ${diffs.length} producto(s) a lo contado. Cada ajuste quedará en el historial como CONTEO.`, { okText: 'Aplicar ajustes' }))) return;
             const stamp = nowStamp();
             diffs.forEach(r => {
@@ -4894,7 +5498,7 @@
                 logMovement('CONTEO', r.item, r.sys, r.counted);
             });
             saveUserInventoryToLocal();
-            if (db && currentUser && currentUser.uid && currentUser.plan === 'premium') {
+            if (db && currentUser && currentUser.uid && isCloudPlan(currentUser.plan)) {
                 uploadInventory(getCollectionName(), diffs.map(r => r.item)).catch(() =>
                     uiAlert("⚠️ Ajustado en este dispositivo\nNo se pudo subir a la nube ahora; se sincronizará al reconectar."));
             }
@@ -4935,7 +5539,7 @@
             });
             let cWidths = [22, 38, 14, 17, 12, 11, 11, 14, 16];
             let cLast = lastCol;
-            if (!hasPremiumAccess()) {
+            if (!canSeeValue()) {
                 // Columna "Valor Diferencia": exclusivo PREMIUM
                 for (let r = 3; r < out.length; r++) out[r].splice(8, 1);
                 cWidths.splice(8, 1);
@@ -5192,6 +5796,7 @@
         // ==========================================
         function openBackupModal() {
             flushAllAdjust();
+            if (!requireOwner('Las copias de seguridad')) return;
             document.getElementById('backupInfo').textContent =
                 `${inventory.filter(Boolean).length} productos • ${customCategories.length} categorías • ${customZones.length} zonas • ${loadHistory().length} movimientos`;
             document.getElementById('restoreModeMerge').checked = true;
@@ -5327,7 +5932,7 @@
             }
 
             // Nube (PREMIUM)
-            if (db && currentUser && currentUser.uid && plan === 'premium') {
+            if (db && currentUser && currentUser.uid && isCloudPlan(plan)) {
                 const col = getCollectionName();
                 try {
                     await uploadInventory(col, result);
@@ -5666,6 +6271,8 @@
 
         function openProductModal(index = null) {
             flushAllAdjust();
+            if (index !== null && isCajero() && !canEditItem(inventory[index])) { denyNotMine(); return; }
+            if (index === null && isCajero() && !(currentUser.categorias || []).length) { uiAlert("🔒 Sin lineal\nEl dueño aún no te asignó categorías. Pídele que te asigne tu lineal."); return; }
             editingIndex = index;
             scanSourcePending = false;
             lookupSeq++;
@@ -5843,7 +6450,7 @@
             }
 
             const currentPlan = (currentUser && currentUser.plan) ? currentUser.plan : "gratis";
-            if (db && currentPlan === "premium") {
+            if (db && isCloudPlan(currentPlan)) {
                 const collectionName = getCollectionName();
                 const docId = getDocId(item) || ('prod_' + Date.now());
                 db.collection(collectionName).doc(docId).set(item).catch(err => {
@@ -5864,6 +6471,7 @@
 
         async function deleteProduct(index) {
             flushAllAdjust();
+            if (!requireOwner('Borrar productos')) return;
             const item = inventory[index];
             if (await uiConfirm(`Eliminar producto\n¿Eliminar "${item.name}" del inventario? Esta acción no se puede deshacer.`, { danger: true, okText: 'Eliminar' })) {
                 const docId = getDocId(item);
@@ -5873,7 +6481,7 @@
                 logMovement('ELIMINADO', item, parseInt(item.units) || 0, 0);
 
                 const currentPlan = (currentUser && currentUser.plan) ? currentUser.plan : "gratis";
-                if (db && docId && currentPlan === "premium") {
+                if (db && docId && isCloudPlan(currentPlan)) {
                     const collectionName = getCollectionName();
                     db.collection(collectionName).doc(docId).delete().catch(err => {
                         console.log("Error borrando en nube:", err);
@@ -5998,7 +6606,7 @@
         }
 
         function saveItemToCloud(item) {
-            if (db && currentUser && currentUser.uid && currentUser.plan === 'premium') {
+            if (db && currentUser && currentUser.uid && isCloudPlan(currentUser.plan)) {
                 const id = getDocId(item);
                 if (id) db.collection(getCollectionName()).doc(id).set(item).catch(e => console.log("Error sincronizando ajuste:", e));
             }
@@ -6059,6 +6667,7 @@
         function quickStep(index, delta) {
             const item = inventory[index];
             if (!item) return;
+            if (!canEditItem(item)) { denyNotMine(); return; }
             if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
             applyStockDelta(item, delta);
         }
@@ -6089,6 +6698,7 @@
         function openQuickAdjust(index, mode) {
             const item = inventory[index];
             if (!item) return;
+            if (!canEditItem(item)) { denyNotMine(); return; }
             flushAllAdjust();
             quickAdjustIndex = index;
             quickAdjustMode = mode || 'in';
@@ -6277,7 +6887,7 @@
             saveUserInventoryToLocal();
 
             // En la nube solo se actualiza el campo del mínimo (no se pisan otros datos)
-            if (db && currentUser.uid && currentUser.plan === 'premium') {
+            if (db && currentUser.uid && isCloudPlan(currentUser.plan) && !isCajero()) {
                 const col = getCollectionName();
                 for (let k = 0; k < changed.length; k += 400) {
                     const batch = db.batch();
@@ -6317,14 +6927,23 @@
 
         // Funciones de valor del inventario: solo PREMIUM (y el administrador)
         function hasPremiumAccess() {
-            return !!(currentUser && (currentUser.isMaster || currentUser.plan === 'premium'));
+            return !!(currentUser && (currentUser.isMaster || isCloudPlan(currentUser.plan)));
         }
+
+        // Planes con inventario en la nube
+        function isCloudPlan(p) { return p === 'premium' || p === 'empresarial'; }
+        // Cajero del plan Empresarial (entra con usuario y contraseña de la empresa)
+        function isCajero() { return !!(currentUser && currentUser.rol === 'cajero'); }
+        // Dueño del inventario en la nube: el mismo usuario o, si es cajero, su empresa
+        function companyUid() { return currentUser ? (currentUser.empresaUid || currentUser.uid) : null; }
+        // El valor del inventario lo ve el dueño (PREMIUM/EMPRESARIAL), nunca el cajero
+        function canSeeValue() { return hasPremiumAccess() && !isCajero(); }
 
         // ---------- Orden de la lista ----------
         let sortMode = (() => { try { return localStorage.getItem('dl_sort_mode') || 'name'; } catch (e) { return 'name'; } })();
 
         function setSortMode(mode) {
-            if (mode === 'value' && !hasPremiumAccess()) {
+            if (mode === 'value' && !canSeeValue()) {
                 document.getElementById('sortSelect').value = sortMode;
                 uiAlert("👑 Exclusivo PREMIUM\nOrdenar por valor en stock está disponible en el plan PREMIUM.");
                 return;
@@ -6359,7 +6978,7 @@
                     return (da - db2) || byName;
                 }
                 case 'updated': return (updatedMillis(b) - updatedMillis(a)) || byName;
-                case 'value': if (!hasPremiumAccess()) return byName; return (((parseInt(b.units) || 0) * (Number(b.price) || 0)) - ((parseInt(a.units) || 0) * (Number(a.price) || 0))) || byName;
+                case 'value': if (!canSeeValue()) return byName; return (((parseInt(b.units) || 0) * (Number(b.price) || 0)) - ((parseInt(a.units) || 0) * (Number(a.price) || 0))) || byName;
                 default: return byName;
             }
         }
@@ -6370,10 +6989,10 @@
             if (sel) {
                 const valOpt = sel.querySelector('option[value="value"]');
                 if (valOpt) {
-                    valOpt.disabled = !hasPremiumAccess();
-                    valOpt.textContent = hasPremiumAccess() ? 'Mayor valor en stock' : 'Mayor valor en stock 👑 Premium';
+                    valOpt.disabled = !canSeeValue();
+                    valOpt.textContent = canSeeValue() ? 'Mayor valor en stock' : 'Mayor valor en stock 👑 Premium';
                 }
-                if (sortMode === 'value' && !hasPremiumAccess()) sortMode = 'name';
+                if (sortMode === 'value' && !canSeeValue()) sortMode = 'name';
                 if (sel.value !== sortMode) sel.value = sortMode;
             }
         }
@@ -6410,7 +7029,7 @@
                     click: quickFilter !== 'all' ? "setQuickFilter('all')" : '', active: false
                 }),
                 // Valor del inventario: exclusivo del plan PREMIUM
-                hasPremiumAccess()
+                canSeeValue()
                     ? card({
                         label: 'Valor inventario', icon: 'fa-sack-dollar', color: '#10b981', money: true,
                         value: money(totalValue),
@@ -6419,8 +7038,8 @@
                     : card({
                         label: 'Valor inventario', icon: 'fa-crown', color: '#f59e0b', money: true, locked: true,
                         value: '<span class="kpi-blur">$000.000.000</span>',
-                        sub: '<b>👑 Exclusivo PREMIUM</b> • Toca para desbloquear',
-                        click: 'openSubscriptionModal()'
+                        sub: isCajero() ? '<b>🔒 Solo el dueño</b> lo ve' : '<b>👑 Exclusivo PREMIUM</b> • Toca para desbloquear',
+                        click: isCajero() ? '' : 'openSubscriptionModal()'
                     }),
                 card({
                     label: 'Stock bajo', icon: 'fa-triangle-exclamation', color: '#f59e0b',
@@ -6531,7 +7150,7 @@
         }
 
         function orderConfigRef() {
-            try { return (db && currentUser && currentUser.uid && hasPremiumAccess()) ? db.collection(`users/${currentUser.uid}/config`).doc('pedidos') : null; } catch (e) { return null; }
+            try { return (db && currentUser && currentUser.uid && hasPremiumAccess() && !isCajero()) ? db.collection(`users/${currentUser.uid}/config`).doc('pedidos') : null; } catch (e) { return null; }
         }
 
         async function syncOrderConfigFromCloud() {
@@ -6911,7 +7530,7 @@
             });
             if (changed.length) {
                 saveUserInventoryToLocal();
-                if (db && currentUser && currentUser.uid && hasPremiumAccess()) {
+                if (db && currentUser && currentUser.uid && hasPremiumAccess() && !isCajero()) {
                     const col = getCollectionName();
                     for (let k = 0; k < changed.length; k += 400) {
                         const batch = db.batch();
@@ -6994,7 +7613,7 @@
             });
             if (!changed.length) return;
             saveUserInventoryToLocal();
-            if (db && currentUser && currentUser.uid && hasPremiumAccess()) {
+            if (db && currentUser && currentUser.uid && hasPremiumAccess() && !isCajero()) {
                 const col = getCollectionName();
                 const batch = db.batch();
                 changed.slice(0, 450).forEach(it => {
@@ -7339,7 +7958,7 @@
                         <button type="button" onclick="openProductModal(${realIndex})" style="background: none; border: none; color: var(--cyan-tech); cursor: pointer; padding: 4px; font-size: 14px;" title="Editar">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button type="button" onclick="deleteProduct(${realIndex})" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 14px;" title="Eliminar">
+                        <button type="button" class="del-btn" onclick="deleteProduct(${realIndex})" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 14px;" title="Eliminar">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -7347,7 +7966,7 @@
             `);
 
             const card = (`
-                <div class="inv-card" data-idx="${realIndex}">
+                <div class="inv-card${canEditItem(item) ? '' : ' not-mine'}" data-idx="${realIndex}">
                     <div class="inv-card-top">
                         <div>
                             <div class="inv-card-name">${esc(item.name)}</div>
@@ -7355,7 +7974,7 @@
                         </div>
                         <div class="inv-card-actions">
                             <button type="button" onclick="openProductModal(${realIndex})" style="color: var(--cyan-tech);" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button type="button" onclick="deleteProduct(${realIndex})" style="color: #ef4444;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="del-btn" onclick="deleteProduct(${realIndex})" style="color: #ef4444;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                     <div class="inv-card-tags">
@@ -7492,11 +8111,11 @@
         }
 
         function canUseCloudHistory() {
-            return !!(db && currentUser && currentUser.uid && currentUser.plan === 'premium');
+            return !!(db && currentUser && currentUser.uid && isCloudPlan(currentUser.plan));
         }
 
         function getMovementsCollection() {
-            return db.collection(`users/${currentUser.uid}/movements`);
+            return db.collection(`users/${companyUid()}/movements`);
         }
 
         // Lo que se guarda en la nube (sin marcas internas)
@@ -8025,7 +8644,7 @@ ${opts.autoFilter ? `<autoFilter ref="${opts.autoFilter}"/>` : ''}${merges ? `<m
 
             let widths = [13, 17, 38, 22, 22, 12, 11, 11, 10, 10, 14, 13, 14, 14, 16, 13, 16, 22, 11, 14];
             let xlLastCol = lastCol;
-            if (!hasPremiumAccess()) {
+            if (!canSeeValue()) {
                 // Columna O (Valor del Stock) y su total: exclusivo PREMIUM
                 for (let r = HEADER_ROW - 1; r < rows.length; r++) rows[r].splice(14, 1);
                 rows[rows.length - 1][13] = { v: '', s: XS.totalLabel };

@@ -8260,39 +8260,53 @@
 
         function exportOrderXLSX() {
             if (!ordItems.length) { uiAlert("No hay productos en el pedido."); return; }
-            const headers = ['Categoría', 'Producto', 'Código Interno', 'Código de Barras', 'Stock Actual', 'Stock Mínimo', 'Cantidad', 'Presentación', 'Und. por presentación', 'Total Und'];
-            const lastCol = colLetter(headers.length - 1);
-            const rows = [
-                [{ v: `Pedido${ordProv ? ' a ' + ordProv : ''} — ${ordCfg.negocio || (currentUser ? currentUser.name : '')}`, s: XS.title }],
-                [{ v: `Para el ${ordDateValue().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} • ${ordItems.length} productos • Generado: ${nowLabel()}`, s: XS.subtitle }],
-                [],
-                headers.map(h => ({ v: h, s: XS.header }))
+            // Igual que el mensaje de WhatsApp: datos de entrega y la lista de productos con su cantidad
+            const negocio = ordCfg.negocio || (currentUser ? currentUser.name : '') || 'Mi negocio';
+            const sede = currentSede();
+            const showSede = sede && sede.nombre && !(ordCfg.sedes.length === 1 && normCat(sede.nombre) === 'principal');
+            const nombre = (ordCfg.aNombreDe || '').trim();
+            const fecha = ordDateValue().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const info = [
+                ['Proveedor', ordProv || '—'],
+                ['Negocio', negocio + (showSede ? ' · ' + sede.nombre : '')],
+                ['Dirección de entrega', (sede && sede.direccion) || '—'],
+                ['A nombre de', nombre || '—'],
+                ['Para el', fecha.charAt(0).toUpperCase() + fecha.slice(1)]
             ];
-            ordItems.forEach((l, idx) => {
+            const rows = [
+                [{ v: `Pedido${ordProv ? ' para ' + ordProv : ''}`, s: XS.title }],
+                [{ v: `${negocio} • Generado: ${nowLabel()}`, s: XS.subtitle }],
+                []
+            ];
+            info.forEach(([k, v]) => rows.push([{ v: k, s: XS.bold }, { v: v, s: XS.text }]));
+            rows.push([]);
+            const headRow = rows.length;
+            rows.push(['N°', 'Producto', 'Cantidad', 'Presentación'].map(h => ({ v: h, s: XS.header })));
+            let n = 0;
+            ordItems.forEach(l => {
                 const it = ordItemByKey(l.key);
                 if (!it) return;
                 const p = presOf(l.pres);
-                const rn = 5 + idx;
+                n++;
                 rows.push([
-                    { v: it.category || 'General', s: XS.text },
+                    { v: n, t: 'n', s: XS.numCenter },
                     { v: String(it.name || '').toUpperCase(), s: XS.bold },
-                    { v: String(it.sap || ''), s: XS.code },
-                    { v: String(it.barcode || ''), s: XS.center },
-                    { v: parseInt(it.units) || 0, t: 'n', s: XS.und },
-                    (parseInt(it.minStock) || 0) ? { v: parseInt(it.minStock), t: 'n', s: XS.numCenter } : { v: '—', s: XS.na },
                     { v: l.qty, t: 'n', s: XS.cx },
-                    { v: l.qty === 1 ? p.singular : p.plural, s: XS.center },
-                    { v: l.cont, t: 'n', s: XS.numCenter },
-                    { f: `G${rn}*I${rn}`, v: l.qty * l.cont, s: XS.r1 }
+                    { v: (l.qty === 1 ? p.singular : p.plural) + (p.noCont ? '' : ` x${l.cont} und`), s: XS.text }
                 ]);
             });
+            rows.push([]);
+            rows.push([{ v: 'Total', s: XS.bold }, { v: `${n} ${n === 1 ? 'producto' : 'productos'}`, s: XS.bold }]);
+            if (ordNote.trim()) rows.push([{ v: 'Nota', s: XS.bold }, { v: ordNote.trim(), s: XS.text }]);
+            const merges = ['A1:D1', 'A2:D2'];
+            for (let r = 4; r < 4 + info.length; r++) merges.push(`B${r}:D${r}`);
+            if (ordNote.trim()) merges.push(`B${rows.length}:D${rows.length}`);
             const blob = buildWorkbook('Pedido', rows, {
                 title: 'DL STOCK PRO - Pedido',
-                widths: [24, 40, 14, 17, 12, 12, 10, 14, 14, 11],
-                merges: [`A1:${lastCol}1`, `A2:${lastCol}2`],
-                freezeRow: 4,
-                autoFilter: `A4:${lastCol}${4 + ordItems.length}`,
-                rowHeights: { 0: 26, 3: 30 }
+                widths: [20, 52, 11, 20],
+                merges,
+                freezeRow: headRow + 1,
+                rowHeights: { 0: 26, [headRow]: 24 }
             });
             downloadBlob(blob, `DL_PEDIDO_${(ordProv || 'proveedor').replace(/[^a-zA-Z0-9]+/g, '_')}_${localDateStamp()}.xlsx`);
         }

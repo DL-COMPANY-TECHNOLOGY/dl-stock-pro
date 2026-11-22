@@ -567,6 +567,10 @@
         .count-info { min-width: 0; flex: 1; }
         .count-info b { display: block; font-size: 12px; font-weight: 800; color: var(--text-high); line-height: 1.3; }
         .count-info small { display: block; font-size: 10px; color: var(--text-low); margin-top: 2px; }
+        .count-exp { display: flex; align-items: center; gap: 5px; white-space: nowrap; margin-top: 5px; font-size: 10px; font-weight: 800; color: var(--text-low); }
+        .count-exp input { background: var(--bg-card); color: var(--text-high); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 3px 6px; font-size: 11px; font-family: inherit; max-width: 135px; }
+        .count-exp.changed { color: #f59e0b; }
+        .count-exp.changed input { border-color: #f59e0b; }
         .count-ctrl { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
         .count-ctrl .qs-btn { width: 36px; height: 38px; font-size: 20px; }
         .count-input { width: 58px; height: 38px; text-align: center; font-size: 16px; font-weight: 900; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-high); outline: none; font-family: inherit; -moz-appearance: textfield; appearance: textfield; }
@@ -2084,7 +2088,7 @@
     <div id="alertsModal" class="modal-overlay hidden">
         <div class="modal-box">
             <div class="modal-header" style="background: #b91c1c; color: white;">
-                <span>Productos Próximos a Vencer</span>
+                <span>Alertas</span>
                 <button type="button" onclick="closeAlertsModal()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -5570,6 +5574,7 @@
                         <div class="count-info">
                             <b>${esc(i.name)}</b>
                             <small><i class="fa-solid fa-location-dot"></i> ${esc(i.location || 'Sin ubicación')} • ${esc(i.sap || i.barcode)}${countSession.showSystem ? ` • Sistema: <strong>${parseInt(i.units) || 0}</strong>` : ''}</small>
+                            ${countExpiryField(i, key)}
                         </div>
                         <div class="count-ctrl">
                             <button type="button" class="qs-btn qs-minus" onclick="countStep(this.parentNode.querySelector('.count-input').dataset.key, -1)" aria-label="Restar">−</button>
@@ -5582,6 +5587,33 @@
                 }).join('') + (items.length > shown.length ? `<p style="text-align:center;color:var(--text-low);font-size:11px;padding:6px;">Mostrando 80 de ${items.length}. Usa la búsqueda o el escáner para encontrar el resto.</p>` : '');
             }
             updateCountProgress();
+        }
+
+        // Fecha de vencimiento durante el conteo
+        function isDateStr(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')); }
+        function countExpiryField(i, key) {
+            const exp = countSession.expiry || {};
+            const changed = exp[key] !== undefined && exp[key] !== (i.expiry || '');
+            const val = exp[key] !== undefined ? exp[key] : (isDateStr(i.expiry) ? i.expiry : '');
+            return `<label class="count-exp${changed ? ' changed' : ''}">📅 Vence
+                <input type="date" value="${esc(val)}" data-key="${esc(key)}" onchange="setCountExpiry(this.dataset.key, this.value, this)">${changed ? ' <span>nueva</span>' : ''}</label>`;
+        }
+        function setCountExpiry(key, value, el) {
+            if (!countSession) return;
+            if (!countSession.expiry) countSession.expiry = {};
+            const item = countScopeItems().find(i => countKey(i) === key);
+            const cur = item ? (item.expiry || '') : '';
+            if (!value || value === cur) delete countSession.expiry[key];
+            else countSession.expiry[key] = value;
+            saveCountSession();
+            const lab = el && el.closest('.count-exp');
+            if (lab) lab.outerHTML = countExpiryField(item, key);
+        }
+        function getCountExpiryChanges() {
+            const exp = (countSession && countSession.expiry) || {};
+            return countScopeItems()
+                .filter(i => exp[countKey(i)] !== undefined && exp[countKey(i)] !== (i.expiry || ''))
+                .map(i => ({ item: i, before: i.expiry || 'No aplica', after: exp[countKey(i)] }));
         }
 
         // Escanear durante el conteo
@@ -5670,22 +5702,36 @@
                         ${canSeeValue() ? `<span style="font-size:10px;color:var(--text-low);">${r.value >= 0 ? '+' : '−'}${money(Math.abs(r.value))}</span>` : ''}
                     </div>
                 </div>`).join('') : '';
-            document.getElementById('countApplyBtn').disabled = diffs.length === 0;
-            document.getElementById('countApplyBtn').style.opacity = diffs.length ? '1' : '0.5';
+            const expCh = getCountExpiryChanges();
+            if (expCh.length) document.getElementById('countPendingNote').textContent += ` 📅 ${expCh.length} fecha(s) de vencimiento por actualizar.`;
+            const canApply = diffs.length > 0 || expCh.length > 0;
+            document.getElementById('countApplyBtn').disabled = !canApply;
+            document.getElementById('countApplyBtn').style.opacity = canApply ? '1' : '0.5';
         }
 
         async function applyCount() {
             const { rows } = getCountDiffs();
             let diffs = rows.filter(r => r.diff !== 0);
-            if (!diffs.length) return;
+            let expCh = getCountExpiryChanges();
+            if (!diffs.length && !expCh.length) return;
             if (isCajero()) {
-                const outside = diffs.filter(r => !canEditItem(r.item)).length;
+                const outside = diffs.filter(r => !canEditItem(r.item)).length + expCh.filter(c => !canEditItem(c.item)).length;
                 diffs = diffs.filter(r => canEditItem(r.item));
-                if (outside) await uiAlert(`🔒 Solo tu lineal\n${outside} producto(s) contados son de otro lineal: no se ajustan. Se aplican solo los de tu lineal (${lineLabel()}).`);
-                if (!diffs.length) return;
+                expCh = expCh.filter(c => canEditItem(c.item));
+                if (outside) await uiAlert(`🔒 Solo tu lineal\n${outside} cambio(s) son de productos de otro lineal: no se aplican. Se aplican solo los de tu lineal (${lineLabel()}).`);
+                if (!diffs.length && !expCh.length) return;
             }
-            if (!(await uiConfirm(`Aplicar conteo\nSe ajustará el stock de ${diffs.length} producto(s) a lo contado. Cada ajuste quedará en el historial como CONTEO.`, { okText: 'Aplicar ajustes' }))) return;
+            const parts = [];
+            if (diffs.length) parts.push(`Se ajustará el stock de ${diffs.length} producto(s) a lo contado.`);
+            if (expCh.length) parts.push(`Se actualizará la fecha de vencimiento de ${expCh.length} producto(s).`);
+            if (!(await uiConfirm(`Aplicar conteo\n${parts.join(' ')} Cada cambio quedará en el historial.`, { okText: 'Aplicar ajustes' }))) return;
             const stamp = nowStamp();
+            expCh.forEach(c => {
+                c.item.expiry = c.after;
+                c.item.updatedAt = stamp;
+                c.item.updatedTs = Date.now();
+                logMovement('VENCE', c.item, c.item.units, c.item.units, `Vence: ${fmtExpiry(c.before)} → ${fmtExpiry(c.after)}`);
+            });
             diffs.forEach(r => {
                 r.item.units = r.counted;
                 syncPackFields(r.item);
@@ -5694,18 +5740,22 @@
                 logMovement('CONTEO', r.item, r.sys, r.counted);
             });
             saveUserInventoryToLocal();
+            const changedItems = [...new Set([...diffs.map(r => r.item), ...expCh.map(c => c.item)])];
             if (db && currentUser && currentUser.uid && isCloudPlan(currentUser.plan)) {
-                uploadInventory(getCollectionName(), diffs.map(r => r.item)).catch(() =>
+                uploadInventory(getCollectionName(), changedItems).catch(() =>
                     uiAlert("⚠️ Ajustado en este dispositivo\nNo se pudo subir a la nube ahora; se sincronizará al reconectar."));
             }
             const scope = countSession.scope || '';
             countSession = null;
             saveCountSession();
             renderTable();
-            const sent = await saveCountReport(diffs, scope);
+            const sent = diffs.length ? await saveCountReport(diffs, scope) : true;
             checkExpirationsAndAlert();
             closeCountModal();
-            uiAlert(`✅ Conteo aplicado\nSe ajustó el stock de ${diffs.length} producto(s) a lo contado.` + (isCajero()
+            const done = [];
+            if (diffs.length) done.push(`Se ajustó el stock de ${diffs.length} producto(s) a lo contado.`);
+            if (expCh.length) done.push(`📅 Se actualizó la fecha de vencimiento de ${expCh.length} producto(s).`);
+            uiAlert(`✅ Conteo aplicado\n${done.join('\n')}` + (!diffs.length ? '' : isCajero()
                 ? (sent ? `\n\n📋 Las diferencias se enviaron al dueño para que las revise.` : `\n\n⚠️ No se pudo enviar el reporte de diferencias al dueño. Revisa tu conexión.`)
                 : `\n\n📋 Las diferencias quedaron en Alertas → "Diferencias de conteo" para que verifiques en el historial si fueron ventas o mercancía sin ingresar.`));
         }
@@ -6922,12 +6972,46 @@
                                 <span style="font-weight: 800; color: var(--text-high); display: block;">${esc(item.name)}</span>
                                 <span style="font-size: 11px; color: var(--text-low);">Ref: ${esc(item.sap)} • ${esc(item.location || 'Sin ubicación')} • Stock: ${esc(item.units)} und</span>
                             </div>
-                            <span class="badge ${isVencido ? 'badge-red' : 'badge-amber'}">${isVencido ? 'VENCIDO' : days + ' días rest.'}</span>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex:none;">
+                                <span class="badge ${isVencido ? 'badge-red' : 'badge-amber'}">${isVencido ? 'VENCIDO' : days + ' días rest.'}</span>
+                                ${!isCajero() || canEditItem(item) ? `<button type="button" onclick="changeExpiryFromAlert('${esc(String(inventory.indexOf(item)))}')" style="background:none; border:1px solid var(--border-subtle); color:var(--text-high); border-radius:10px; padding:4px 8px; font-size:10px; font-weight:800; cursor:pointer;">📅 Cambiar fecha</button>` : ''}
+                            </div>
                         </div>
                     `;
                 });
             }
             document.getElementById('alertsModal').classList.remove('hidden');
+        }
+
+        function fmtExpiry(v) {
+            if (!isDateStr(v)) return 'No aplica';
+            const [y, m, d] = v.split('-'); return `${d}/${m}/${y}`;
+        }
+
+        async function changeExpiryFromAlert(idx) {
+            const item = inventory[parseInt(idx)];
+            if (!item) return;
+            if (isCajero() && !canEditItem(item)) { uiAlert(`🔒 Solo tu lineal\nEste producto es de otro lineal.`); return; }
+            const val = await uiPrompt(`📅 Nueva fecha de vencimiento\n${item.name}\nActual: ${fmtExpiry(item.expiry)}. Si llegó mercancía con otra fecha, pon la del lote que se vence primero.`,
+                isDateStr(item.expiry) ? item.expiry : '', { inputType: 'date', okText: 'Guardar' });
+            if (val === null || val === undefined) return;
+            const nv = String(val).trim();
+            if (!isDateStr(nv)) { uiAlert('⚠️ Fecha no válida\nElige una fecha en el calendario.'); return; }
+            if (nv === item.expiry) return;
+            const before = item.expiry || 'No aplica';
+            item.expiry = nv;
+            item.updatedAt = nowStamp();
+            item.updatedTs = Date.now();
+            logMovement('VENCE', item, item.units, item.units, `Vence: ${fmtExpiry(before)} → ${fmtExpiry(nv)}`);
+            saveUserInventoryToLocal();
+            if (db && currentUser && currentUser.uid && isCloudPlan(currentUser.plan)) {
+                uploadInventory(getCollectionName(), [item]).catch(() =>
+                    uiAlert("⚠️ Guardado en este dispositivo\nNo se pudo subir a la nube ahora; se sincronizará al reconectar."));
+            }
+            renderTable();
+            checkExpirationsAndAlert();
+            openAlertsModal();
+            if (typeof showToast === 'function') showToast(`📅 Fecha actualizada: ${fmtExpiry(nv)}`);
         }
 
         function closeAlertsModal() {
@@ -8493,7 +8577,8 @@
             return {
                 id: m.id, ts: m.ts, date: m.date, type: m.type,
                 name: m.name, sap: m.sap, barcode: m.barcode,
-                before: m.before, after: m.after, diff: m.diff, user: m.user
+                before: m.before, after: m.after, diff: m.diff, user: m.user,
+                ...(m.note ? { note: m.note } : {})
             };
         }
 
@@ -8505,7 +8590,7 @@
             saveHistory(history);
         }
 
-        function logMovement(type, item, before, after) {
+        function logMovement(type, item, before, after, note) {
             const entry = {
                 id: newMoveId(),
                 ts: Date.now(),
@@ -8519,6 +8604,7 @@
                 diff: (parseInt(after) || 0) - (parseInt(before) || 0),
                 user: currentUser ? (currentUser.username || currentUser.name || '') : ''
             };
+            if (note) entry.note = String(note).slice(0, 120);
 
             const history = loadHistory();
             history.unshift(entry);
@@ -8621,12 +8707,13 @@
                 'EDICIÓN': 'badge-gray',
                 'ELIMINADO': 'badge-red',
                 'IMPORTACIÓN': 'badge-purple',
-                'CONTEO': 'badge-cyan'
+                'CONTEO': 'badge-cyan',
+                'VENCE': 'badge-amber'
             };
 
             list.innerHTML = history.slice(0, 200).map(h => {
                 const diff = Number(h.diff) || 0;
-                const diffText = h.type === 'EDICIÓN' ? 'Sin cambio de stock' :
+                const diffText = h.note ? esc(h.note) : h.type === 'EDICIÓN' ? 'Sin cambio de stock' :
                     `${esc(h.before)} → ${esc(h.after)} und <strong style="color: ${diff >= 0 ? '#10b981' : '#ef4444'};">(${diff >= 0 ? '+' : ''}${esc(diff)})</strong>`;
                 return `
                     <div class="history-item">

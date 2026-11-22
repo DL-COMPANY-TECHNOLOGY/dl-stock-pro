@@ -718,7 +718,7 @@
 <body>
 
     <!-- BOTÓN FLOTANTE PERMANENTE DE SOPORTE WHATSAPP -->
-    <a href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" class="btn-floating-whatsapp" title="Soporte WhatsApp DL Company">
+    <a href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" class="btn-floating-whatsapp" title="Soporte WhatsApp DL Company">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
@@ -1012,7 +1012,7 @@
                 alertas automáticas, reportes en Excel y sincronización en la nube.
             </p>
             <div class="dev-links">
-                <a href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener">Soporte por WhatsApp</a>
+                <a href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener">Soporte por WhatsApp</a>
                 <a onclick="openSubscriptionModal()">Planes y precios</a>
             </div>
             <div class="dev-links legal-links">
@@ -1076,7 +1076,7 @@
                     <button type="button" id="moreBackupItem" class="sheet-tile" onclick="moreAction(openBackupModal)"><i class="fa-solid fa-shield-halved" style="color:#38bdf8"></i><span>Copia</span></button>
                     <button type="button" id="moreCategoriesItem" class="sheet-tile" onclick="moreAction(openConfigModal)"><i class="fa-solid fa-sliders" style="color:#a78bfa"></i><span>Categorías</span></button>
                     <button type="button" id="moreThemeItem" class="sheet-tile" onclick="moreAction(toggleTheme)"><i class="fa-solid fa-circle-half-stroke" style="color:#f59e0b"></i><span id="moreThemeLabel">Tema</span></button>
-                    <a id="moreSupportItem" data-pro="support" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
+                    <a id="moreSupportItem" data-pro="support" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
                     <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide('inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
                     <button type="button" id="moreAdminItem" class="sheet-tile hidden" onclick="moreAction(promptAdminAccess)"><i class="fa-solid fa-user-shield" style="color:#38bdf8"></i><span>Admin</span></button>
                 </div>
@@ -1179,7 +1179,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 8px;">
-                    <a href="https://wa.me/573218641539?text=Hola%20DL%20Company,%20quiero%20comprar%20un%20c%C3%B3digo%20de%20activaci%C3%B3n%20para%20DL%20STOCK%20PRO" target="_blank" style="color: #25d366; font-size: 12px; font-weight: 800; text-decoration: none;">
+                    <a href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Quiero%20comprar%20un%20c%C3%B3digo%20de%20activaci%C3%B3n%20para%20DL%20STOCK%20PRO" target="_blank" style="color: #25d366; font-size: 12px; font-weight: 800; text-decoration: none;">
                         <i class="fa-brands fa-whatsapp"></i> ¿No tienes código? Pídelo aquí por WhatsApp
                     </a>
                 </div>
@@ -2832,8 +2832,8 @@
                 const wa = txt => 'https://wa.me/573218641539?text=' + encodeURIComponent(txt);
                 const em = currentUser && currentUser.email ? `\nCuenta: ${currentUser.email}` : '';
                 const mA = document.getElementById('waMes' + P), aA = document.getElementById('waAnual' + P);
-                if (mA) mA.href = wa(`Hola DL Company 👋 Quiero el plan ${nom} de DL STOCK PRO MENSUAL por ${t[k].oferta}${short} con el descuento de lanzamiento.${em}\n¿Cómo hago el pago para recibir mi código?`);
-                if (aA) aA.href = wa(`Hola DL Company 👋 Quiero el plan ${nom} de DL STOCK PRO ANUAL (14 meses) por ${fmtA(an)}${short} con el descuento de lanzamiento.${em}\n¿Cómo hago el pago para recibir mi código?`);
+                if (mA) mA.href = wa(`Hola DL Company 👋 Vengo de la app DL STOCK PRO. Quiero el plan ${nom} de DL STOCK PRO MENSUAL por ${t[k].oferta}${short} con el descuento de lanzamiento.${em}\n¿Cómo hago el pago para recibir mi código?`);
+                if (aA) aA.href = wa(`Hola DL Company 👋 Vengo de la app DL STOCK PRO. Quiero el plan ${nom} de DL STOCK PRO ANUAL (14 meses) por ${fmtA(an)}${short} con el descuento de lanzamiento.${em}\n¿Cómo hago el pago para recibir mi código?`);
             });
             // Marca el plan actual del usuario
             const cur = currentUser ? (currentUser.isMaster ? null : (currentUser.plan || 'gratis')) : null;

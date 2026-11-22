@@ -1,7 +1,7 @@
 // DL STOCK PRO - Service Worker
 // Permite instalar la app y abrirla sin internet.
 // Cambia la versión cada vez que publiques cambios grandes para limpiar la caché vieja.
-const VERSION = 'dlstock-v17';
+const VERSION = 'dlstock-v18';
 const APP_CACHE = VERSION + '-app';
 const CDN_CACHE = VERSION + '-cdn';
 

@@ -388,6 +388,7 @@
         .tm-cats em { font-size: 11px; color: #f59e0b; }
         .tm-actions { display: flex; flex-wrap: wrap; gap: 6px; }
         .tm-actions .danger { color: #ef4444; margin-left: auto; }
+        .tm-actions .wa { background: #25d366; border-color: #25d366; color: #fff; }
         .tm-cats-pick { display: flex; flex-wrap: wrap; gap: 6px; }
         .tm-cat { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 9999px; border: 1px solid var(--border-subtle); background: var(--bg-input); cursor: pointer; }
         .tm-cat input { accent-color: #a855f7; }
@@ -1981,6 +1982,7 @@
                     <div class="po-grid">
                         <label class="po-full">Nombre<input id="tmName" type="text" maxlength="40" placeholder="Ej: Andrés Gómez" oninput="suggestUsuario()"></label>
                         <label class="po-full">Usuario (para entrar)<input id="tmUser" type="text" maxlength="20" autocapitalize="none" placeholder="Ej: andres" oninput="this.dataset.touched=1; this.value=cleanUsuario(this.value)"></label>
+                        <label class="po-full">WhatsApp del cajero (opcional)<input id="tmPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej: 3001234567"></label>
                     </div>
                     <span class="po-label" style="margin-top: 6px;">Su lineal (categorías que maneja)</span>
                     <div id="tmCats" class="tm-cats-pick"></div>
@@ -2322,11 +2324,12 @@
                     <div class="tm-head">
                         <div style="min-width:0;">
                             <b>${esc(m.nombre || m.usuario)}</b>
-                            <small>Usuario: <code>${esc(m.usuario)}</code> · ${m.activo ? '🟢 Activo' : '⏸️ Desactivado'}</small>
+                            <small>Usuario: <code>${esc(m.usuario)}</code> · ${m.activo ? '🟢 Activo' : '⏸️ Desactivado'}${m.telefono ? ' · 📱 ' + esc(m.telefono) : ''}</small>
                         </div>
                     </div>
                     <div class="tm-cats">${(m.categorias || []).length ? m.categorias.map(c => `<span>${esc(c)}</span>`).join('') : '<em>Sin lineal asignado</em>'}</div>
                     <div class="tm-actions">
+                        <button type="button" class="wa" onclick="sendCajeroAccess('${m.slot}')">📲 WhatsApp</button>
                         <button type="button" onclick="editCajeroLineal('${m.slot}')">✏️ Lineal</button>
                         <button type="button" onclick="regenCajeroPass('${m.slot}')">🔑 Nueva clave</button>
                         <button type="button" onclick="toggleCajero('${m.slot}')">${m.activo ? '⏸️ Desactivar' : '▶️ Activar'}</button>
@@ -2340,6 +2343,8 @@
             f.classList.remove('hidden');
             document.getElementById('tmName').value = '';
             document.getElementById('tmUser').value = '';
+            document.getElementById('tmUser').dataset.touched = '';
+            document.getElementById('tmPhone').value = '';
             document.getElementById('tmCats').innerHTML = catCheckboxes([], 'tmcat');
             document.getElementById('teamAddBtn').classList.add('hidden');
             setTimeout(() => document.getElementById('tmName').focus(), 80);
@@ -2365,22 +2370,56 @@
             } catch (e) { showToast('No se pudo guardar el nombre'); }
         }
 
-        function shareCredentials(title, usuario, pass) {
+        // Mensaje de acceso para el cajero (con o sin contraseña)
+        function accessMessage(usuario, pass, nombre) {
             const name = currentUser.empresaNombre || 'mi empresa';
-            const msg = `Hola 👋 Este es tu acceso de cajero a DL STOCK PRO para *${name}*:\n\n` +
-                `🏢 Código de empresa: *${currentUser.empresaCodigo}*\n👤 Usuario: *${usuario}*\n🔑 Contraseña: *${pass}*\n\n` +
+            const saludo = nombre ? `Hola ${String(nombre).split(' ')[0]} 👋` : 'Hola 👋';
+            return `${saludo} Este es tu acceso de cajero a DL STOCK PRO para *${name}*:\n\n` +
+                `🏢 Código de empresa: *${currentUser.empresaCodigo}*\n👤 Usuario: *${usuario}*\n` +
+                (pass ? `🔑 Contraseña: *${pass}*\n\n` : `🔑 Contraseña: la que te entregué (si no la tienes, pídeme una nueva)\n\n`) +
                 `Abre ${location.origin}${location.pathname} y toca "👥 Entrar como cajero".`;
+        }
+        function waLink(phone, msg) {
+            let d = String(phone || '').replace(/\D/g, '');
+            if (d.length === 10) d = '57' + d;
+            return `https://wa.me/${d}?text=${encodeURIComponent(msg)}`;
+        }
+
+        function shareCredentials(title, usuario, pass, telefono, nombre) {
+            const msg = accessMessage(usuario, pass, nombre);
             try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
-            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Contraseña: ${pass}\n\nGuárdala o envíala ahora: por seguridad no se vuelve a mostrar. Ya quedó copiada.`,
-                { okText: '📲 Enviar por WhatsApp', cancelText: 'Listo' }).then(ok => {
-                    if (ok) window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Contraseña: ${pass}\n\nGuárdala o envíala ahora: por seguridad la contraseña no se vuelve a mostrar. Ya quedó copiada.`,
+                { okText: telefono ? '📲 Enviar a su WhatsApp' : '📲 Enviar por WhatsApp', cancelText: 'Listo' }).then(ok => {
+                    if (ok) window.open(waLink(telefono, msg), '_blank');
                 });
+        }
+
+        // Botón 📲 de cada cajero: reenvía código y usuario (la contraseña no se guarda)
+        async function sendCajeroAccess(slot) {
+            const m = teamCache.find(x => x.slot === slot);
+            if (!m) return;
+            let tel = m.telefono || '';
+            if (!tel) {
+                const val = await uiPrompt(`WhatsApp de ${m.nombre || m.usuario}\nEscribe su número para enviarle el acceso (queda guardado). Déjalo vacío para elegir el chat en WhatsApp.`, '', { placeholder: 'Ej: 3001234567', inputType: 'tel', okText: 'Continuar' });
+                if (val === null) return;
+                tel = String(val || '').replace(/\D/g, '').slice(0, 15);
+                if (tel && tel.length >= 7) {
+                    try { await db.collection(`users/${currentUser.uid}/equipo`).doc(slot).set({ telefono: tel }, { merge: true }); m.telefono = tel; } catch (e) {}
+                } else tel = '';
+            }
+            const msg = accessMessage(m.usuario, '', m.nombre);
+            try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
+            window.open(waLink(tel, msg), '_blank');
+            showToast('📲 Se envía el código y el usuario. Si no tiene la contraseña, usa 🔑 Nueva clave.');
+            renderTeam();
         }
 
         async function createCajero() {
             const nombre = document.getElementById('tmName').value.trim().slice(0, 40);
             const usuario = cleanUsuario(document.getElementById('tmUser').value).slice(0, 20);
             const categorias = [...document.querySelectorAll('input[name="tmcat"]:checked')].map(x => x.value);
+            const telefono = String(document.getElementById('tmPhone').value || '').replace(/\D/g, '').slice(0, 15);
+            if (telefono && telefono.length < 7) { uiAlert("⚠️ WhatsApp no válido\nEscribe el número con 10 dígitos (ej: 3001234567) o déjalo vacío."); return; }
             if (!nombre) { uiAlert("⚠️ Falta el nombre\nEscribe el nombre del cajero."); return; }
             if (usuario.length < 3) { uiAlert("⚠️ Usuario no válido\nEl usuario debe tener al menos 3 letras o números (sin espacios)."); return; }
             if (!categorias.length) { uiAlert("⚠️ Asigna su lineal\nMarca al menos una categoría que maneja este cajero."); return; }
@@ -2398,7 +2437,7 @@
                 const uid = await createCajeroAuth(email, pass);
                 const batch = db.batch();
                 batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), {
-                    uid, usuario, nombre, categorias, activo: true, email, ver: 1, creado: firebase.firestore.FieldValue.serverTimestamp()
+                    uid, usuario, nombre, categorias, activo: true, email, ver: 1, telefono, creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 batch.set(db.collection('miembros').doc(uid), { owner: currentUser.uid, slot });
                 batch.set(accRef, { email, owner: currentUser.uid });
@@ -2406,7 +2445,7 @@
                 document.getElementById('teamForm').classList.add('hidden');
                 await loadTeam();
                 renderTeam();
-                shareCredentials(`✅ Cajero creado: ${nombre}`, usuario, pass);
+                shareCredentials(`✅ Cajero creado: ${nombre}`, usuario, pass, telefono, nombre);
             } catch (e) {
                 console.log("Crear cajero:", e);
                 uiAlert(e && e.code === 'auth/email-already-in-use' ? "⚠️ Ese usuario ya existe\nElige otro nombre de usuario." : "❌ No se pudo crear el cajero\nRevisa tu conexión y que las reglas de Firebase estén actualizadas.");
@@ -2465,7 +2504,7 @@
                 batch.set(db.collection(`empresas_codigo/${currentUser.empresaCodigo}/accesos`).doc(m.usuario), { email, owner: currentUser.uid });
                 await batch.commit();
                 await loadTeam(); renderTeam();
-                shareCredentials(`🔑 Nueva contraseña para ${m.nombre || m.usuario}`, m.usuario, pass);
+                shareCredentials(`🔑 Nueva contraseña para ${m.nombre || m.usuario}`, m.usuario, pass, m.telefono, m.nombre);
             } catch (e) {
                 console.log("Nueva clave:", e);
                 uiAlert("❌ No se pudo generar la contraseña\nRevisa tu conexión e intenta de nuevo.");

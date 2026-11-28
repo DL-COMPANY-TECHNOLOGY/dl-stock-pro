@@ -25,15 +25,18 @@ service cloud.firestore {
     }
 
     // Plan con nube vigente: PREMIUM o EMPRESARIAL
+    // La cuenta del administrador siempre tiene todo activo (sin vencimiento)
+    function isAdminUid(uid) {
+      return uid == 'bGreSTxcOabW1D6TvemeZPoVfLl1';
+    }
+
     function hasActivePremium(uid) {
-      let u = userDoc(uid);
-      return u.plan in ['premium', 'empresarial'] && planVigente(u);
+      return isAdminUid(uid) || (userDoc(uid).plan in ['premium', 'empresarial'] && planVigente(userDoc(uid)));
     }
 
     // Plan EMPRESARIAL vigente (equipo de cajeros)
     function hasEmpresarial(uid) {
-      let u = userDoc(uid);
-      return u.plan == 'empresarial' && planVigente(u);
+      return isAdminUid(uid) || (userDoc(uid).plan == 'empresarial' && planVigente(userDoc(uid)));
     }
 
     // Puesto del cajero que hace la petición dentro de la empresa "owner"

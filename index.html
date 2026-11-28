@@ -2745,7 +2745,8 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 catch (e) { if (e && e.code === 'permission-denied') throw { code: 'dl/empresa-sin-plan' }; throw e; }
                 const ownerProfile = ownerSnap.exists ? ownerSnap.data() : {};
                 const eff = computeEffectivePlan(ownerProfile, owner);
-                if (eff.plan !== 'empresarial') throw { code: 'dl/empresa-sin-plan' };
+                // La cuenta del administrador (DL COMPANY) siempre tiene el equipo activo
+                if (eff.plan !== 'empresarial' && owner !== ADMIN_UID) throw { code: 'dl/empresa-sin-plan' };
                 let empresaNombre = '';
                 if (ownerProfile.empresaCodigo) {
                     try {

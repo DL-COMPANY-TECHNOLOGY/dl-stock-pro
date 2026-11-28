@@ -366,12 +366,16 @@
         .phone-row input { flex: 1; min-width: 0; }
         .contact-pick { display: none; flex: 0 0 auto; width: 44px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); font-size: 18px; cursor: pointer; }
         body.can-pick-contacts .contact-pick { display: block; }
-        /* Plan Empresarial: equipo y cajeros */
+        /* Plan Empresarial: equipo y operarios */
         .owner-only { display: none !important; }
         body.team-owner .owner-only { display: flex !important; }
         body.team-owner .header-btn.owner-only { display: inline-flex !important; }
         .cajero-only { display: none !important; }
-        body.rol-cajero .cajero-only { display: flex !important; }
+        body.rol-miembro .cajero-only { display: flex !important; }
+        /* Supervisor: todo el inventario como el dueño, pero sin planes, soporte ni equipo */
+        body.rol-supervisor #morePlansItem, body.rol-supervisor #headerPlansBtn,
+        body.rol-supervisor #moreSupportItem, body.rol-supervisor .btn-floating-whatsapp { display: none !important; }
+        .tm-section { font-size: 12px; font-weight: 900; color: var(--text-high); margin-top: 6px; }
         body.rol-cajero .del-btn, body.rol-cajero #morePlansItem, body.rol-cajero #headerPlansBtn,
         body.rol-cajero #moreBackupItem, body.rol-cajero #headerBackupBtn, body.rol-cajero #moreExcelItem,
         body.rol-cajero #moreImportItem, body.rol-cajero #deskExcelBtn, body.rol-cajero #deskImportBtn,
@@ -900,7 +904,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                             <span style="font-weight: 900; color: #a855f7; display: block; font-size: 11px;">EMPRESARIAL</span>
                             <s id="labelOldPriceEmpresarial" class="price-old-mini">$160.000</s>
                             <span id="labelPriceEmpresarial" style="font-size: 10px; font-weight: 800; color: var(--text-high); display: block;">$80.000</span>
-                            <span style="color: #a855f7; font-size: 8px; display: block;">Nube + 5 cajeros</span>
+                            <span style="color: #a855f7; font-size: 8px; display: block;">Nube + 5 operarios + 3 supervisores</span>
                         </button>
                     </div>
                 </div>
@@ -909,13 +913,13 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     Ingresar a DL STOCK PRO &gt;
                 </button>
             </form>
-            <button type="button" id="cajeroLoginBtn" class="auth-cajero-btn" onclick="toggleCajeroLogin(true)">👥 Entrar como cajero</button>
+            <button type="button" id="cajeroLoginBtn" class="auth-cajero-btn" onclick="toggleCajeroLogin(true)">👥 Entrar como operario o supervisor</button>
             <button type="button" class="auth-help-btn" onclick="showLoginGuide()">❔ ¿Cómo empiezo?</button>
             </div>
             <form id="cajeroLogin" class="hidden" onsubmit="handleCajeroLogin(event)" style="display: flex; flex-direction: column; gap: 12px;">
                 <div style="text-align:center;">
                     <div style="font-size: 34px; line-height: 1;">👥</div>
-                    <h3 style="margin: 6px 0 2px; font-size: 16px;">Acceso de cajero</h3>
+                    <h3 style="margin: 6px 0 2px; font-size: 16px;">Acceso de operario o supervisor</h3>
                     <p style="font-size: 11.5px; color: var(--text-low); margin: 0;">Pide estos datos al dueño de tu empresa (plan Empresarial).</p>
                 </div>
                 <div>
@@ -930,7 +934,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     <label class="cj-label">Contraseña</label>
                     <input type="password" id="cjPass" autocomplete="current-password" placeholder="••••••••" class="auth-input">
                 </div>
-                <button type="submit" id="cjSubmit" class="btn-green-action" style="width: 100%; padding: 12px; font-size: 13px;">Entrar como cajero ›</button>
+                <button type="submit" id="cjSubmit" class="btn-green-action" style="width: 100%; padding: 12px; font-size: 13px;">Entrar ›</button>
                 <button type="button" id="cjForgot" onclick="cajeroForgotPass()" style="background: none; border: none; color: var(--cyan-tech); font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit;">¿Olvidaste tu contraseña?</button>
                 <button type="button" class="auth-help-btn" style="margin-top: 0;" onclick="toggleCajeroLogin(false)">‹ Soy el dueño (entrar con correo)</button>
             </form>
@@ -997,7 +1001,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                         <span id="badgeCriticos" class="hidden" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">0</span>
                     </button>
                     <button type="button" id="headerTeamBtn" onclick="openTeamModal()" class="header-btn owner-only" title="Mi equipo (Empresarial)" style="font-size:15px;">👥</button>
-                    <button type="button" id="headerGuideBtn" onclick="startGuide(isCajero() ? 'cajero' : 'inicio', true)" class="header-btn" title="Guía de la app" style="font-size:15px;">🧭</button>
+                    <button type="button" id="headerGuideBtn" onclick="startGuide(isMiembro() ? memberGuide() : 'inicio', true)" class="header-btn" title="Guía de la app" style="font-size:15px;">🧭</button>
                     <button type="button" onclick="handleLogout()" class="header-btn" style="color: #ef4444;" title="Cerrar Sesión">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
@@ -1190,7 +1194,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     <a id="moreSupportItem" data-pro="support" class="sheet-tile" href="https://wa.me/573218641539?text=Hola%20DL%20Company%20%F0%9F%91%8B%20Vengo%20de%20la%20app%20DL%20STOCK%20PRO.%20Necesito%20ayuda%20con%20DL%20STOCK%20PRO" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i><span>Soporte</span></a>
                     <button type="button" id="moreMyPassItem" class="sheet-tile cajero-only" onclick="changeCajeroPass()"><span style="font-size:18px;line-height:1">🔑</span><span>Mi contraseña</span></button>
                     <button type="button" id="moreTeamItem" class="sheet-tile owner-only" onclick="moreAction(openTeamModal)"><span style="font-size:18px;line-height:1">👥</span><span>Equipo</span></button>
-                    <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide(isCajero() ? 'cajero' : 'inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
+                    <button type="button" id="moreGuideItem" class="sheet-tile" onclick="moreAction(() => startGuide(isMiembro() ? memberGuide() : 'inicio', true))"><span style="font-size:18px;line-height:1">🧭</span><span>Guía</span></button>
                     <button type="button" id="moreAdminItem" class="sheet-tile hidden" onclick="moreAction(promptAdminAccess)"><i class="fa-solid fa-user-shield" style="color:#38bdf8"></i><span>Admin</span></button>
                 </div>
                 <a class="sheet-legal" href="legal.html" target="_blank" rel="noopener" onclick="closeMoreMenu()"><i class="fa-solid fa-scale-balanced"></i> Términos, privacidad y reembolsos</a>
@@ -1299,8 +1303,9 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     </div>
                     <ul style="font-size: 11px; color: var(--text-mid); margin-left: 18px; margin-bottom: 12px; line-height: 1.6;">
                         <li>Todo lo del plan PREMIUM incluido.</li>
-                        <li><strong>Hasta 5 cajeros</strong> que entran con su usuario y contraseña.</li>
-                        <li><strong>Cada cajero con su lineal</strong>: ve todo el inventario, pero agrega y edita solo sus categorías.</li>
+                        <li><strong>Hasta 5 operarios</strong> que entran con su usuario y contraseña.</li>
+                        <li><strong>Cada operario con su lineal</strong>: ve todo el inventario, pero agrega y edita solo sus categorías.</li>
+                        <li><strong>Hasta 3 supervisores</strong> que manejan todo el inventario como tú (sin crear usuarios ni dar claves).</li>
                         <li>Tú controlas: borrar productos, valor del inventario, Excel, importar y copias.</li>
                     </ul>
                     <div class="annual-box"><div><b>📅 Pago anual</b><small>14 meses: pagas 12 y te regalamos 2</small></div><div style="text-align:right"><s id="annualOldEmpresarial"></s><b id="annualEmpresarial"></b><small id="annualMesEmpresarial"></small></div></div>
@@ -2014,28 +2019,37 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             </div>
             <div class="modal-body" style="gap: 10px;">
                 <div class="tm-company">
-                    <small>Código de empresa (tus cajeros lo usan para entrar)</small>
+                    <small>Código de empresa (tus operarios y supervisores lo usan para entrar)</small>
                     <div class="tm-code-row"><b id="teamCode">—</b><button type="button" onclick="copyCompanyCode()">📋 Copiar</button></div>
                     <label>Nombre de la empresa<input id="teamCompanyName" type="text" maxlength="60" placeholder="Ej: Supermercado La 10" onchange="saveCompanyName(this.value)"></label>
                 </div>
-                <div class="tm-usage"><span id="teamUsage">0 de 5 cajeros</span><div class="tm-bar"><i id="teamUsageBar"></i></div></div>
-                <p class="po-hint" style="margin: 0;">Cada cajero <b>ve todo el inventario</b>, pero solo <b>agrega y edita</b> productos de su lineal. No puede borrar productos, ver el valor del inventario, ni usar Excel, importar o copias.</p>
+                <span class="tm-section">👔 Supervisores</span>
+                <div class="tm-usage"><span id="teamSupUsage">0 de 3 supervisores</span><div class="tm-bar"><i id="teamSupUsageBar"></i></div></div>
+                <p class="po-hint" style="margin: 0;">El supervisor maneja <b>todo el inventario como tú</b>: edita y borra productos, ve el valor del inventario, usa Excel, importar, copias, pedidos y revisa los conteos. <b>No puede</b> crear usuarios, dar claves ni cambiar el plan.</p>
+                <div id="teamSupList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                <button type="button" id="teamAddSupBtn" class="btn-gold-action" style="width: 100%; padding: 10px; font-size: 12px;" onclick="newCajeroForm('supervisor')">＋ Agregar supervisor</button>
+                <p id="teamSupFull" class="po-hint hidden" style="text-align: center;">Llegaste al máximo de 3 supervisores de tu plan.</p>
+                <span class="tm-section">🧑‍🔧 Operarios</span>
+                <div class="tm-usage"><span id="teamUsage">0 de 5 operarios</span><div class="tm-bar"><i id="teamUsageBar"></i></div></div>
+                <p class="po-hint" style="margin: 0;">Cada operario <b>ve todo el inventario</b>, pero solo <b>agrega y edita</b> productos de su lineal. No puede borrar productos, ver el valor del inventario, ni usar Excel, importar o copias.</p>
                 <div id="teamList" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                <button type="button" id="teamAddBtn" class="btn-gold-action" style="width: 100%; padding: 10px; font-size: 12px;" onclick="newCajeroForm()">＋ Agregar cajero</button>
-                <p id="teamFull" class="po-hint hidden" style="text-align: center;">Llegaste al máximo de 5 cajeros de tu plan.</p>
+                <button type="button" id="teamAddBtn" class="btn-gold-action" style="width: 100%; padding: 10px; font-size: 12px;" onclick="newCajeroForm('cajero')">＋ Agregar operario</button>
+                <p id="teamFull" class="po-hint hidden" style="text-align: center;">Llegaste al máximo de 5 operarios de tu plan.</p>
                 <div id="teamForm" class="po-sec hidden">
-                    <span class="po-label">Nuevo cajero</span>
+                    <span id="tmFormTitle" class="po-label">Nuevo operario</span>
                     <div class="po-grid">
                         <label class="po-full">Nombre<input id="tmName" type="text" maxlength="40" placeholder="Ej: Andrés Gómez" oninput="suggestUsuario()"></label>
                         <label class="po-full">Usuario (para entrar)<input id="tmUser" type="text" maxlength="20" autocapitalize="none" placeholder="Ej: andres" oninput="this.dataset.touched=1; this.value=cleanUsuario(this.value)"></label>
-                        <label class="po-full">WhatsApp del cajero (opcional)<span class="phone-row"><input id="tmPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej: 3001234567"><button type="button" class="contact-pick" onclick="pickContactInto('tmPhone', 'tmName')" aria-label="Elegir de mis contactos">📇</button></span></label>
+                        <label class="po-full">WhatsApp (opcional)<span class="phone-row"><input id="tmPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej: 3001234567"><button type="button" class="contact-pick" onclick="pickContactInto('tmPhone', 'tmName')" aria-label="Elegir de mis contactos">📇</button></span></label>
                     </div>
-                    <span class="po-label" style="margin-top: 6px;">Su lineal (categorías que maneja)</span>
-                    <div id="tmCats" class="tm-cats-pick"></div>
-                    <p class="po-hint">La app genera una <b>clave temporal</b> para que se la envíes. Al entrar la primera vez, el cajero crea <b>su propia contraseña</b>.</p>
+                    <div id="tmCatsBox">
+                        <span class="po-label" style="margin-top: 6px;">Su lineal (categorías que maneja)</span>
+                        <div id="tmCats" class="tm-cats-pick"></div>
+                    </div>
+                    <p class="po-hint">La app genera una <b>clave temporal</b> para que se la envíes. Al entrar la primera vez, crea <b>su propia contraseña</b>.</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <button type="button" class="btn-dark-action" style="padding: 9px; font-size: 12px;" onclick="cancelCajeroForm()">Cancelar</button>
-                        <button type="button" id="tmSaveBtn" class="btn-green-action" style="padding: 9px; font-size: 12px;" onclick="createCajero()">Crear cajero</button>
+                        <button type="button" id="tmSaveBtn" class="btn-green-action" style="padding: 9px; font-size: 12px;" onclick="createCajero()">Crear operario</button>
                     </div>
                 </div>
                 <div id="teamEdit" class="po-sec hidden">
@@ -2242,26 +2256,32 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         window.alert = (m) => { uiAlert(m); };
 
         // ==========================================
-        // PLAN EMPRESARIAL: EQUIPO DE CAJEROS
-        // Cada cajero es un usuario de Firebase con un correo interno (nadie lo ve) y una
+        // PLAN EMPRESARIAL: EQUIPO DE OPERARIOS
+        // Cada operario es un usuario de Firebase con un correo interno (nadie lo ve) y una
         // contraseña generada por la app. Ve todo el inventario de la empresa, pero solo
         // agrega y edita productos de las categorías de su lineal.
         //   empresas_codigo/{CODIGO}                 → { owner, nombre }
         //   empresas_codigo/{CODIGO}/accesos/{usuario} → { email, owner }   (para el ingreso)
-        //   users/{dueño}/equipo/{1..5}               → { uid, usuario, nombre, categorias, activo, email, ver }
+        //   users/{dueño}/equipo/{1..5}  (operarios)  → { uid, usuario, nombre, categorias, activo, email, ver, rol:'cajero' }
+        //   users/{dueño}/equipo/{6..8}  (supervisores) → { ..., rol:'supervisor' }  (todo el inventario, sin panel de equipo)
         //   miembros/{uidCajero}                      → { owner, slot }
         // ==========================================
         const CAJERO_DOMAIN = 'cajeros.dlstockpro.app';
-        const TEAM_MAX = 5;
+        const TEAM_MAX = 5;      // operarios
+        const SUP_MAX = 3;       // supervisores
+        const OP_SLOTS = ['1', '2', '3', '4', '5'];
+        const SUP_SLOTS = ['6', '7', '8'];
         let teamCache = [];
+        let teamFormRol = 'cajero';
+        function seatRol(m) { return (m && m.rol === 'supervisor') || SUP_SLOTS.includes(String(m && m.slot)) ? 'supervisor' : 'cajero'; }
 
         function isCajeroEmail(email) {
             return String(email || '').toLowerCase().endsWith('.' + CAJERO_DOMAIN);
         }
         function isEmpresarialOwner() {
-            return !!currentUser && !isCajero() && (currentUser.plan === 'empresarial' || currentUser.isMaster);
+            return !!currentUser && !isMiembro() && (currentUser.plan === 'empresarial' || currentUser.isMaster);
         }
-        // El cajero puede editar un producto solo si es de una categoría de su lineal
+        // El operario puede editar un producto solo si es de una categoría de su lineal
         function canEditItem(item) {
             if (!isCajero()) return true;
             // Igual que en las reglas de Firebase: la categoría debe coincidir exactamente
@@ -2294,7 +2314,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             return `${usuario}.${ver}@${String(code).toLowerCase()}.${CAJERO_DOMAIN}`;
         }
 
-        // Segunda conexión de Firebase: crea al cajero sin cerrar la sesión del dueño
+        // Segunda conexión de Firebase: crea al operario sin cerrar la sesión del dueño
         function secondaryAuth() {
             let app = (firebase.apps || []).find(a => a && a.name === 'dl-cajeros');
             if (!app) app = firebase.initializeApp(firebaseConfig, 'dl-cajeros');
@@ -2340,10 +2360,10 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
 
         async function openTeamModal() {
             closeMoreMenu();
-            if (isCajero()) return;
+            if (isMiembro()) return;
             if (!isEmpresarialOwner()) {
                 const t = PLAN_PRICES.COP.empresarial;
-                if (await uiConfirm(`🏢 Plan EMPRESARIAL\nAgrega hasta ${TEAM_MAX} cajeros con su propio usuario y contraseña. Cada uno maneja su lineal (sus categorías) y tú controlas todo. Hoy con 50% de descuento: ${t.oferta}/mes (antes ${t.normal}).`, { okText: '👑 Ver planes', cancelText: 'Ahora no' })) openSubscriptionModal();
+                if (await uiConfirm(`🏢 Plan EMPRESARIAL\nAgrega hasta ${TEAM_MAX} operarios y ${SUP_MAX} supervisores con su propio usuario y contraseña. Cada operario maneja su lineal (sus categorías), los supervisores te ayudan con todo el inventario y tú controlas el equipo. Hoy con 50% de descuento: ${t.oferta}/mes (antes ${t.normal}).`, { okText: '👑 Ver planes', cancelText: 'Ahora no' })) openSubscriptionModal();
                 return;
             }
             if (!firebaseReady()) { uiAlert("⚠️ Sin conexión\nEl equipo se administra con internet. Conéctate e intenta de nuevo."); return; }
@@ -2374,15 +2394,9 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             return cats.map(c => `<label class="tm-cat"><input type="checkbox" name="${name}" value="${esc(c)}"${sel.includes(normCat(c)) ? ' checked' : ''}><span>${esc(c)}</span></label>`).join('');
         }
 
-        function renderTeam() {
-            document.getElementById('teamCode').textContent = currentUser.empresaCodigo || '—';
-            document.getElementById('teamCompanyName').value = currentUser.empresaNombre || '';
-            const active = teamCache.length;
-            document.getElementById('teamUsage').textContent = `${active} de ${TEAM_MAX} cajeros`;
-            document.getElementById('teamUsageBar').style.width = Math.min(100, active / TEAM_MAX * 100) + '%';
-            document.getElementById('teamAddBtn').classList.toggle('hidden', active >= TEAM_MAX);
-            document.getElementById('teamFull').classList.toggle('hidden', active < TEAM_MAX);
-            document.getElementById('teamList').innerHTML = teamCache.length ? teamCache.map(m => `
+        function teamCardHtml(m) {
+            const sup = seatRol(m) === 'supervisor';
+            return `
                 <div class="tm-card${m.activo ? '' : ' off'}">
                     <div class="tm-head">
                         <div style="min-width:0;">
@@ -2390,26 +2404,51 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                             <small>Usuario: <code>${esc(m.usuario)}</code> · ${m.activo ? '🟢 Activo' : '⏸️ Desactivado'}${m.telefono ? ' · 📱 ' + esc(m.telefono) : ''}</small>
                         </div>
                     </div>
-                    <div class="tm-cats">${(m.categorias || []).length ? m.categorias.map(c => `<span>${esc(c)}</span>`).join('') : '<em>Sin lineal asignado</em>'}</div>
+                    <div class="tm-cats">${sup ? '<span>👔 Supervisor · todo el inventario</span>' : ((m.categorias || []).length ? m.categorias.map(c => `<span>${esc(c)}</span>`).join('') : '<em>Sin lineal asignado</em>')}</div>
                     <div class="tm-actions">
                         <button type="button" class="wa" onclick="sendCajeroAccess('${m.slot}')">📲 WhatsApp</button>
-                        <button type="button" onclick="editCajeroLineal('${m.slot}')">✏️ Lineal</button>
+                        ${sup ? '' : `<button type="button" onclick="editCajeroLineal('${m.slot}')">✏️ Lineal</button>`}
                         <button type="button" onclick="regenCajeroPass('${m.slot}')">🔑 Clave temporal</button>
                         <button type="button" onclick="toggleCajero('${m.slot}')">${m.activo ? '⏸️ Desactivar' : '▶️ Activar'}</button>
                         <button type="button" class="danger" onclick="deleteCajero('${m.slot}')" aria-label="Eliminar">🗑️</button>
                     </div>
-                </div>`).join('') : '<p class="po-empty">Aún no tienes cajeros. Agrega el primero.</p>';
+                </div>`;
         }
 
-        function newCajeroForm() {
+        function renderTeam() {
+            document.getElementById('teamCode').textContent = currentUser.empresaCodigo || '—';
+            document.getElementById('teamCompanyName').value = currentUser.empresaNombre || '';
+            const ops = teamCache.filter(m => seatRol(m) === 'cajero');
+            const sups = teamCache.filter(m => seatRol(m) === 'supervisor');
+            const formOpen = !document.getElementById('teamForm').classList.contains('hidden');
+            document.getElementById('teamUsage').textContent = `${ops.length} de ${TEAM_MAX} operarios`;
+            document.getElementById('teamUsageBar').style.width = Math.min(100, ops.length / TEAM_MAX * 100) + '%';
+            document.getElementById('teamAddBtn').classList.toggle('hidden', formOpen || ops.length >= TEAM_MAX);
+            document.getElementById('teamFull').classList.toggle('hidden', ops.length < TEAM_MAX);
+            document.getElementById('teamSupUsage').textContent = `${sups.length} de ${SUP_MAX} supervisores`;
+            document.getElementById('teamSupUsageBar').style.width = Math.min(100, sups.length / SUP_MAX * 100) + '%';
+            document.getElementById('teamAddSupBtn').classList.toggle('hidden', formOpen || sups.length >= SUP_MAX);
+            document.getElementById('teamSupFull').classList.toggle('hidden', sups.length < SUP_MAX);
+            document.getElementById('teamList').innerHTML = ops.length ? ops.map(teamCardHtml).join('') : '<p class="po-empty">Aún no tienes operarios. Agrega el primero.</p>';
+            document.getElementById('teamSupList').innerHTML = sups.length ? sups.map(teamCardHtml).join('') : '<p class="po-empty">Aún no tienes supervisores.</p>';
+        }
+
+        function newCajeroForm(rol) {
+            teamFormRol = rol === 'supervisor' ? 'supervisor' : 'cajero';
+            const sup = teamFormRol === 'supervisor';
             const f = document.getElementById('teamForm');
             f.classList.remove('hidden');
+            document.getElementById('tmFormTitle').textContent = sup ? 'Nuevo supervisor' : 'Nuevo operario';
+            document.getElementById('tmCatsBox').classList.toggle('hidden', sup);
+            document.getElementById('tmSaveBtn').textContent = sup ? 'Crear supervisor' : 'Crear operario';
+            document.getElementById('teamAddSupBtn').classList.add('hidden');
             document.getElementById('tmName').value = '';
             document.getElementById('tmUser').value = '';
             document.getElementById('tmUser').dataset.touched = '';
             document.getElementById('tmPhone').value = '';
             document.getElementById('tmCats').innerHTML = catCheckboxes([], 'tmcat');
             document.getElementById('teamAddBtn').classList.add('hidden');
+            f.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setTimeout(() => document.getElementById('tmName').focus(), 80);
         }
         function cancelCajeroForm() {
@@ -2433,14 +2472,14 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             } catch (e) { showToast('No se pudo guardar el nombre'); }
         }
 
-        // Mensaje de acceso para el cajero (con o sin contraseña)
-        function accessMessage(usuario, pass, nombre) {
+        // Mensaje de acceso para el operario (con o sin contraseña)
+        function accessMessage(usuario, pass, nombre, rol) {
             const name = currentUser.empresaNombre || 'mi empresa';
             const saludo = nombre ? `Hola ${String(nombre).split(' ')[0]} 👋` : 'Hola 👋';
-            return `${saludo} Este es tu acceso de cajero a DL STOCK PRO para *${name}*:\n\n` +
+            return `${saludo} Este es tu acceso de ${rol === 'supervisor' ? 'supervisor' : 'operario'} a DL STOCK PRO para *${name}*:\n\n` +
                 `🏢 Código de empresa: *${currentUser.empresaCodigo}*\n👤 Usuario: *${usuario}*\n` +
                 (pass ? `🔑 Contraseña temporal: *${pass}*\n(al entrar la primera vez, la app te pide crear tu propia contraseña)\n\n` : `🔑 Contraseña: la tuya (si la olvidaste, en el ingreso toca "¿Olvidaste tu contraseña?")\n\n`) +
-                `Abre ${location.origin}${location.pathname} y toca "👥 Entrar como cajero".`;
+                `Abre ${location.origin}${location.pathname} y toca "👥 Entrar como operario o supervisor".`;
         }
         function waLink(phone, msg) {
             let d = String(phone || '').replace(/\D/g, '');
@@ -2448,22 +2487,22 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             return `https://wa.me/${d}?text=${encodeURIComponent(msg)}`;
         }
 
-        function shareCredentials(title, usuario, pass, telefono, nombre) {
-            const msg = accessMessage(usuario, pass, nombre);
+        function shareCredentials(title, usuario, pass, telefono, nombre, rol) {
+            const msg = accessMessage(usuario, pass, nombre, rol);
             try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
-            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Clave temporal: ${pass}\n\nEnvíasela ahora (ya quedó copiada). Al entrar la primera vez, el cajero crea su propia contraseña.`,
+            uiConfirm(`${title}\n🏢 Código de empresa: ${currentUser.empresaCodigo}\n👤 Usuario: ${usuario}\n🔑 Clave temporal: ${pass}\n\nEnvíasela ahora (ya quedó copiada). Al entrar la primera vez, crea su propia contraseña.`,
                 { okText: telefono ? '📲 Enviar a su WhatsApp' : '📲 Enviar por WhatsApp', cancelText: 'Listo' }).then(ok => {
                     if (ok) window.open(waLink(telefono, msg), '_blank');
                 });
         }
 
-        // Botón 📲 de cada cajero: reenvía código y usuario (la contraseña no se guarda)
+        // Botón 📲 de cada operario: reenvía código y usuario (la contraseña no se guarda)
         async function sendCajeroAccess(slot) {
             const m = teamCache.find(x => x.slot === slot);
             if (!m) return;
             let tel = m.telefono || '';
             if (!tel && canPickContacts()) {
-                // Abre los contactos del celular para elegir el WhatsApp del cajero
+                // Abre los contactos del celular para elegir el WhatsApp del operario
                 const c = await pickContact();
                 if (c) {
                     tel = c.tel;
@@ -2478,7 +2517,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     try { await db.collection(`users/${currentUser.uid}/equipo`).doc(slot).set({ telefono: tel }, { merge: true }); m.telefono = tel; } catch (e) {}
                 } else tel = '';
             }
-            const msg = accessMessage(m.usuario, '', m.nombre);
+            const msg = accessMessage(m.usuario, '', m.nombre, seatRol(m));
             try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (e) {}
             window.open(waLink(tel, msg), '_blank');
             showToast('📲 Se envía el código y el usuario. Si olvidó su contraseña, usa 🔑 Clave temporal.');
@@ -2488,15 +2527,17 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         async function createCajero() {
             const nombre = document.getElementById('tmName').value.trim().slice(0, 40);
             const usuario = cleanUsuario(document.getElementById('tmUser').value).slice(0, 20);
-            const categorias = [...document.querySelectorAll('input[name="tmcat"]:checked')].map(x => x.value);
+            const sup = teamFormRol === 'supervisor';
+            const rolTxt = sup ? 'supervisor' : 'operario';
+            const categorias = sup ? [] : [...document.querySelectorAll('input[name="tmcat"]:checked')].map(x => x.value);
             const telefono = String(document.getElementById('tmPhone').value || '').replace(/\D/g, '').slice(0, 15);
             if (telefono && telefono.length < 7) { uiAlert("⚠️ WhatsApp no válido\nEscribe el número con 10 dígitos (ej: 3001234567) o déjalo vacío."); return; }
-            if (!nombre) { uiAlert("⚠️ Falta el nombre\nEscribe el nombre del cajero."); return; }
+            if (!nombre) { uiAlert(`⚠️ Falta el nombre\nEscribe el nombre del ${rolTxt}.`); return; }
             if (usuario.length < 3) { uiAlert("⚠️ Usuario no válido\nEl usuario debe tener al menos 3 letras o números (sin espacios)."); return; }
-            if (!categorias.length) { uiAlert("⚠️ Asigna su lineal\nMarca al menos una categoría que maneja este cajero."); return; }
+            if (!sup && !categorias.length) { uiAlert("⚠️ Asigna su lineal\nMarca al menos una categoría que maneja este operario."); return; }
             const used = new Set(teamCache.map(m => m.slot));
-            const slot = ['1', '2', '3', '4', '5'].find(x => !used.has(x));
-            if (!slot) { uiAlert(`Tu plan permite hasta ${TEAM_MAX} cajeros.`); return; }
+            const slot = (sup ? SUP_SLOTS : OP_SLOTS).find(x => !used.has(x));
+            if (!slot) { uiAlert(sup ? `Tu plan permite hasta ${SUP_MAX} supervisores.` : `Tu plan permite hasta ${TEAM_MAX} operarios.`); return; }
             const code = currentUser.empresaCodigo;
             const btn = document.getElementById('tmSaveBtn');
             btn.disabled = true; btn.textContent = 'Creando…';
@@ -2508,7 +2549,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 const uid = await createCajeroAuth(email, pass);
                 const batch = db.batch();
                 batch.set(db.collection(`users/${currentUser.uid}/equipo`).doc(slot), {
-                    uid, usuario, nombre, categorias, activo: true, email, ver: 1, telefono, temporal: true, creado: firebase.firestore.FieldValue.serverTimestamp()
+                    uid, usuario, nombre, categorias, rol: sup ? 'supervisor' : 'cajero', activo: true, email, ver: 1, telefono, temporal: true, creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 batch.set(db.collection('miembros').doc(uid), { owner: currentUser.uid, slot });
                 batch.set(accRef, { email, owner: currentUser.uid });
@@ -2516,12 +2557,12 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 document.getElementById('teamForm').classList.add('hidden');
                 await loadTeam();
                 renderTeam();
-                shareCredentials(`✅ Cajero creado: ${nombre}`, usuario, pass, telefono, nombre);
+                shareCredentials(`✅ ${sup ? 'Supervisor' : 'Operario'} creado: ${nombre}`, usuario, pass, telefono, nombre, teamFormRol);
             } catch (e) {
-                console.log("Crear cajero:", e);
-                uiAlert(e && e.code === 'auth/email-already-in-use' ? "⚠️ Ese usuario ya existe\nElige otro nombre de usuario." : "❌ No se pudo crear el cajero\nRevisa tu conexión y que las reglas de Firebase estén actualizadas.");
+                console.log("Crear operario:", e);
+                uiAlert(e && e.code === 'auth/email-already-in-use' ? "⚠️ Ese usuario ya existe\nElige otro nombre de usuario." : `❌ No se pudo crear el ${rolTxt}\nRevisa tu conexión y que las reglas de Firebase estén actualizadas.`);
             } finally {
-                btn.disabled = false; btn.textContent = 'Crear cajero';
+                btn.disabled = false; btn.textContent = sup ? 'Crear supervisor' : 'Crear operario';
             }
         }
 
@@ -2575,7 +2616,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 batch.set(db.collection(`empresas_codigo/${currentUser.empresaCodigo}/accesos`).doc(m.usuario), { email, owner: currentUser.uid });
                 await batch.commit();
                 await loadTeam(); renderTeam();
-                shareCredentials(`🔑 Clave temporal para ${m.nombre || m.usuario}`, m.usuario, pass, m.telefono, m.nombre);
+                shareCredentials(`🔑 Clave temporal para ${m.nombre || m.usuario}`, m.usuario, pass, m.telefono, m.nombre, seatRol(m));
             } catch (e) {
                 console.log("Nueva clave:", e);
                 uiAlert("❌ No se pudo generar la contraseña\nRevisa tu conexión e intenta de nuevo.");
@@ -2585,7 +2626,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         async function deleteCajero(slot) {
             const m = teamCache.find(x => x.slot === slot);
             if (!m) return;
-            if (!(await uiConfirm(`Eliminar cajero\n¿Eliminar a ${m.nombre || m.usuario}? Ya no podrá entrar. Los productos y movimientos que registró se conservan.`, { danger: true, okText: 'Eliminar' }))) return;
+            if (!(await uiConfirm(`Eliminar ${seatRol(m) === 'supervisor' ? 'supervisor' : 'operario'}\n¿Eliminar a ${m.nombre || m.usuario}? Ya no podrá entrar. Los productos y movimientos que registró se conservan.`, { danger: true, okText: 'Eliminar' }))) return;
             try {
                 const batch = db.batch();
                 batch.delete(db.collection(`users/${currentUser.uid}/equipo`).doc(slot));
@@ -2643,7 +2684,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         }
         document.addEventListener('DOMContentLoaded', applyContactPickers);
 
-        // ---------- Ingreso del cajero ----------
+        // ---------- Ingreso del operario ----------
         function toggleCajeroLogin(show) {
             document.getElementById('cajeroLogin').classList.toggle('hidden', !show);
             document.getElementById('authOwnerArea').classList.toggle('hidden', show);
@@ -2687,11 +2728,11 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 uiAlert(authErrorMessage(err).replace('Correo o contraseña incorrectos.', 'Código de empresa, usuario o contraseña incorrectos.'));
             } finally {
                 authFlowInProgress = false;
-                btn.disabled = false; btn.textContent = 'Entrar como cajero ›';
+                btn.disabled = false; btn.textContent = 'Entrar ›';
             }
         }
 
-        // Perfil del cajero: su empresa, su lineal y el plan de la empresa
+        // Perfil del operario: su empresa, su lineal y el plan de la empresa
         async function loadCajeroProfile(fbUser) {
             try {
                 const mem = await db.collection('miembros').doc(fbUser.uid).get();
@@ -2713,18 +2754,19 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     } catch (e) {}
                 }
                 const s = seat.data();
+                const rol = seatRol(Object.assign({ slot: String(slot) }, s));
                 return {
                     uid: fbUser.uid,
                     username: `${s.usuario}@${ownerProfile.empresaCodigo || owner}`,
                     name: s.nombre || s.usuario,
-                    zone: 'Cajero',
-                    rol: 'cajero',
+                    zone: rol === 'supervisor' ? 'Supervisor' : 'Operario',
+                    rol,
                     usuario: s.usuario,
                     empresaUid: owner,
                     empresaCodigo: ownerProfile.empresaCodigo || '',
                     empresaNombre,
                     slot: String(slot),
-                    categorias: s.categorias || [],
+                    categorias: rol === 'supervisor' ? [] : (s.categorias || []),
                     temporal: s.temporal === true,
                     plan: 'empresarial',
                     planExpiresAt: eff.expiresAt,
@@ -2743,7 +2785,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             }
         }
 
-        // ---------- Contraseña propia del cajero ----------
+        // ---------- Contraseña propia del operario ----------
         async function askNewCajeroPass(title) {
             while (true) {
                 const p1 = await uiPrompt(`${title}\nEscribe tu nueva contraseña (mínimo 6 caracteres). Úsala desde ahora para entrar.`, '', { inputType: 'password', placeholder: 'Nueva contraseña', okText: 'Continuar' });
@@ -2768,7 +2810,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         // Primera entrada con clave temporal: debe crear su propia contraseña
         let cajeroPassPrompting = false;
         async function ensureOwnCajeroPass() {
-            if (!isCajero() || !currentUser.temporal || cajeroPassPrompting) return;
+            if (!isMiembro() || !currentUser.temporal || cajeroPassPrompting) return;
             cajeroPassPrompting = true;
             try { await ensureOwnCajeroPassInner(); } finally { cajeroPassPrompting = false; }
         }
@@ -2788,10 +2830,10 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             }
         }
 
-        // Más → 🔑 Mi contraseña (el cajero la cambia cuando quiera)
+        // Más → 🔑 Mi contraseña (el operario la cambia cuando quiera)
         async function changeCajeroPass() {
             closeMoreMenu();
-            if (!isCajero()) return;
+            if (!isMiembro()) return;
             const cur = await uiPrompt("Cambiar contraseña\nEscribe tu contraseña actual.", '', { inputType: 'password', placeholder: 'Contraseña actual', okText: 'Continuar' });
             if (cur === null) return;
             try {
@@ -2807,11 +2849,11 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             catch (e) { uiAlert("❌ No se pudo cambiar la contraseña\nRevisa tu conexión e intenta de nuevo."); }
         }
 
-        // ¿Olvidaste tu contraseña? (cajero): el dueño le genera una clave temporal
+        // ¿Olvidaste tu contraseña? (operario): el dueño le genera una clave temporal
         function cajeroForgotPass() {
             const code = String(document.getElementById('cjCode').value || '').trim().toUpperCase();
             const usuario = cleanUsuario(document.getElementById('cjUser').value);
-            const msg = `Hola 👋 Olvidé mi contraseña de cajero en DL STOCK PRO.` +
+            const msg = `Hola 👋 Olvidé mi contraseña en DL STOCK PRO.` +
                 (usuario ? `\n👤 Usuario: ${usuario}` : '') + (code ? `\n🏢 Empresa: ${code}` : '') +
                 `\n¿Me generas una clave temporal? (Más → 👥 Equipo → 🔑 Clave temporal)`;
             uiConfirm("¿Olvidaste tu contraseña?\nPídele al dueño de tu empresa una clave temporal: él la genera en segundos desde su app. Al entrar con ella, creas una contraseña nueva.",
@@ -2820,9 +2862,9 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 });
         }
 
-        // Si el dueño desactiva al cajero o vence el plan, se cierra su sesión
+        // Si el dueño desactiva al operario o vence el plan, se cierra su sesión
         async function cajeroAccessLost(msg) {
-            uiAlert(msg || "🔒 Acceso cerrado\nTu usuario de cajero fue desactivado o el plan de la empresa venció. Habla con el dueño.");
+            uiAlert(msg || "🔒 Acceso cerrado\nTu usuario fue desactivado o el plan de la empresa venció. Habla con el dueño.");
             try { await auth.signOut(); } catch (e) {}
         }
 
@@ -3064,17 +3106,27 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             ],
             empresarial: [
                 { emoji: '🏢', title: '¡Ahora tienes el plan EMPRESARIAL!', text: 'Tu inventario queda **en la nube** y ahora puedes trabajar **con tu equipo**.' },
-                { targets: [{ sel: '#headerTeamBtn' }, { sel: '#moreTeamItem', menu: 'more' }], title: 'Tu equipo', text: 'Aquí creas **hasta 5 cajeros** con su usuario y contraseña, y le asignas a cada uno **su lineal** (sus categorías).' },
-                { emoji: '🔑', title: 'Cómo entran tus cajeros', text: 'En la pantalla de ingreso tocan **👥 Entrar como cajero** y escriben el **código de empresa**, su **usuario** y su **contraseña**.' },
-                { targets: [{ sel: '#syncStatusBadge' }], title: 'Todo sincronizado', text: 'Lo que hagan tus cajeros se ve **en tiempo real** en tu celular. Tú sigues controlando el valor del inventario, Excel y las copias.' }
+                { targets: [{ sel: '#headerTeamBtn' }, { sel: '#moreTeamItem', menu: 'more' }], title: 'Tu equipo', text: 'Aquí creas **hasta 5 operarios** (cada uno con **su lineal**) y **hasta 3 supervisores** que manejan todo el inventario contigo. Solo tú das usuarios y claves.' },
+                { emoji: '🔑', title: 'Cómo entra tu equipo', text: 'En la pantalla de ingreso tocan **👥 Entrar como operario o supervisor** y escriben el **código de empresa**, su **usuario** y su **contraseña**.' },
+                { targets: [{ sel: '#syncStatusBadge' }], title: 'Todo sincronizado', text: 'Lo que hagan tus operarios se ve **en tiempo real** en tu celular. Tú sigues controlando el valor del inventario, Excel y las copias.' }
             ],
             cajero: [
-                { emoji: '👋', title: '¡Hola! Eres cajero', textFn: () => `Trabajas en **${currentUser.empresaNombre || 'tu empresa'}**. Tu lineal: **${lineLabel()}**. Ves todo el inventario, pero solo editas lo de tu lineal.` },
+                { emoji: '👋', title: '¡Hola! Eres operario', textFn: () => `Trabajas en **${currentUser.empresaNombre || 'tu empresa'}**. Tu lineal: **${lineLabel()}**. Ves todo el inventario, pero solo editas lo de tu lineal.` },
                 { targets: [{ sel: '#searchInput' }], title: 'Buscar', text: 'Busca por **nombre, ubicación o código**. No importan las tildes.' },
                 { targets: [{ sel: '#navScanBtn' }, { sel: '#deskScanBtn' }], title: 'Escanear', text: 'Busca un producto con la **cámara**. Si es nuevo y de tu lineal, lo registras.' },
                 { targets: [{ sel: '#inventoryCards .inv-card:not(.not-mine)' }, { sel: '#inventoryTableBody tr[data-idx]:first-child' }], title: 'Sumar y restar', text: 'En los productos de tu lineal usa **+ y −** para sumar o restar unidades. Los que tienen 🔒 son de otro lineal: solo los ves.' },
                 { targets: [{ sel: '#navAddBtn' }, { sel: '#deskAddActions, #deskAddActions + .quick-actions' }], title: 'Agregar productos', text: 'Agrega productos **nuevos de tu lineal** con foto, escáner o a mano.' },
                 { targets: [{ sel: '#navAlertsBtn' }, { sel: '#headerAlertsBtn' }], title: 'Alertas', text: 'Aquí ves los productos que **se vencen**.' },
+                { targets: [{ sel: '.sheet-logout', menu: 'more' }], title: 'Cerrar sesión', text: 'Al terminar tu turno, **cierra sesión** para que nadie use tu usuario.' },
+                { emoji: '✅', title: '¡Listo!', text: 'Puedes repetir esta guía desde **Más → 🧭 Guía**.' }
+            ],
+            supervisor: [
+                { emoji: '👋', title: '¡Hola! Eres supervisor', textFn: () => `Trabajas en **${currentUser.empresaNombre || 'tu empresa'}**. Manejas **todo el inventario** igual que el administrador: agregar, editar, borrar, valor del inventario, Excel, copias y pedidos.` },
+                { targets: [{ sel: '#searchInput' }], title: 'Buscar', text: 'Busca por **nombre, ubicación o código**. No importan las tildes.' },
+                { targets: [{ sel: '#navScanBtn' }, { sel: '#deskScanBtn' }], title: 'Escanear', text: 'Busca un producto con la **cámara** o registra uno nuevo.' },
+                { targets: [{ sel: '#navAddBtn' }, { sel: '#deskAddActions, #deskAddActions + .quick-actions' }], title: 'Agregar productos', text: 'Agrega productos **de cualquier categoría** con foto, escáner o a mano.' },
+                { targets: [{ sel: '#navAlertsBtn' }, { sel: '#headerAlertsBtn' }], title: 'Alertas y conteos', text: 'Aquí ves los productos que **se vencen** y las **diferencias de conteo** de los operarios para revisarlas.' },
+                { emoji: '🔐', title: 'Lo que solo hace el administrador', text: 'Crear usuarios, dar **claves temporales** y cambiar el **plan** solo lo hace el administrador.' },
                 { targets: [{ sel: '.sheet-logout', menu: 'more' }], title: 'Cerrar sesión', text: 'Al terminar tu turno, **cierra sesión** para que nadie use tu usuario.' },
                 { emoji: '✅', title: '¡Listo!', text: 'Puedes repetir esta guía desde **Más → 🧭 Guía**.' }
             ],
@@ -3431,7 +3483,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 return localStorage.getItem('guia_login_dispositivo') ? null : 'login';
             }
             if (!currentUser) return null;
-            if (isCajero()) return localStorage.getItem(guideKey('cajero')) ? null : 'cajero';
+            if (isMiembro()) return localStorage.getItem(guideKey(memberGuide())) ? null : memberGuide();
             const plan = guidePlan();
             const planKey = guideKey('plan');
             const lastPlan = localStorage.getItem(planKey);
@@ -4202,7 +4254,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             const allCats = getAllCategories();
             const optionsHtml = allCats.map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('');
             filterSel.innerHTML += optionsHtml;
-            // El cajero solo puede guardar productos en las categorías de su lineal
+            // El operario solo puede guardar productos en las categorías de su lineal
             formSel.innerHTML = isCajero() ? (currentUser.categorias || []).map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('') : optionsHtml;
 
             if (currentFilterVal) selectCategoryValue(filterSel, currentFilterVal);
@@ -4390,7 +4442,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             } else if (plan === 'empresarial') {
                 if (btnEmp) btnEmp.classList.add('selected');
                 badge.className = 'badge badge-cyan';
-                badge.textContent = 'EMPRESARIAL (NUBE + CAJEROS)';
+                badge.textContent = 'EMPRESARIAL (NUBE + OPERARIOS)';
             } else {
                 if (btnPremium) btnPremium.classList.add('selected');
                 badge.className = 'badge badge-cyan';
@@ -4506,7 +4558,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 'auth/too-many-requests': 'Demasiados intentos. Espera unos minutos e intenta de nuevo.',
                 'auth/network-request-failed': 'Sin conexión a internet. Revisa tu red e intenta de nuevo.',
                 'auth/operation-not-allowed': 'El acceso con correo no está activado en Firebase.',
-                'dl/cajero-inactivo': 'Tu usuario de cajero está desactivado o ya no existe. Habla con el dueño de la empresa.',
+                'dl/cajero-inactivo': 'Tu usuario está desactivado o ya no existe. Habla con el dueño de la empresa.',
                 'dl/empresa-sin-plan': 'El plan EMPRESARIAL de tu empresa no está activo. Pídele al dueño que lo renueve.'
             };
             return '❌ ' + (map[code] || ('No se pudo completar la operación. ' + (err && err.message ? err.message : '')));
@@ -4767,7 +4819,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
 
         // Usuarios que ya tenían cuenta: aceptan una sola vez
         async function ensureTermsAccepted() {
-            if (!currentUser || currentUser.isMaster || isCajero() || termsPromptOpen) return;
+            if (!currentUser || currentUser.isMaster || isMiembro() || termsPromptOpen) return;
             if (currentUser.termsVersion === TERMS_VERSION) return;
             if (termsAcceptedLocally()) {
                 // ya aceptó en este dispositivo: sincroniza la constancia si falta en la nube
@@ -4821,7 +4873,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 document.body.classList.add('in-app');
 
                 let planText = currentUser.isMaster ? 'ADMIN' : currentUser.plan.toUpperCase();
-                if (isCajero()) planText = 'CAJERO' + (currentUser.empresaNombre ? ' · ' + currentUser.empresaNombre : '');
+                if (isMiembro()) planText = (isSupervisor() ? 'SUPERVISOR' : 'OPERARIO') + (currentUser.empresaNombre ? ' · ' + currentUser.empresaNombre : '');
                 else if (!currentUser.isMaster && currentUser.plan !== 'gratis' && currentUser.planExpiresAt) {
                     planText += ' (vence ' + formatDate(currentUser.planExpiresAt) + ')';
                 }
@@ -4857,15 +4909,17 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             }
             applyPlanLocks();
             document.body.classList.toggle('rol-cajero', isCajero());
+            document.body.classList.toggle('rol-supervisor', isSupervisor());
+            document.body.classList.toggle('rol-miembro', isMiembro());
             applyContactPickers();
-            if (isCajero() && currentUser.temporal && !authFlowInProgress) setTimeout(ensureOwnCajeroPass, 900);
+            if (isMiembro() && currentUser.temporal && !authFlowInProgress) setTimeout(ensureOwnCajeroPass, 900);
             document.body.classList.toggle('team-owner', isEmpresarialOwner());
             scheduleGuides();
         }
 
         // Avisos de plan vencido o por vencer (una vez por día)
         function showPlanNotices() {
-            if (!currentUser || currentUser.isMaster || isCajero()) return;
+            if (!currentUser || currentUser.isMaster || isMiembro()) return;
             const today = localDateStamp();
             const key = 'dl_plan_notice_' + (currentUser.uid || '');
             if (localStorage.getItem(key) === today) return;
@@ -4918,7 +4972,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 try {
                     currentUser = await loadProfile(fbUser);
                 } catch (err) {
-                    // Cajero desactivado o empresa sin plan: se cierra la sesión
+                    // Operario desactivado o empresa sin plan: se cierra la sesión
                     currentUser = null;
                     localStorage.removeItem('canasto_current_user');
                     try { await auth.signOut(); } catch (e) {}
@@ -5003,7 +5057,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                         badge.className = "badge badge-cyan";
                         badge.innerHTML = '<i class="fa-solid fa-cloud"></i> Nube OK';
                     }
-                    if (isCajero()) {
+                    if (isMiembro()) {
                         inventory = [];
                         saveUserInventoryToLocal();
                         renderTable();
@@ -5022,7 +5076,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 }
             }, err => {
                 console.log("Modo local activo:", err);
-                if (isCajero() && err && err.code === 'permission-denied') { cajeroAccessLost(); return; }
+                if (isMiembro() && err && err.code === 'permission-denied') { cajeroAccessLost(); return; }
                 if (badge) {
                     badge.className = "badge badge-amber";
                     badge.innerHTML = '<i class="fa-solid fa-database"></i> Local';
@@ -5835,7 +5889,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         const COUNT_CAUSE_LABEL = { venta: 'Fue venta', perdida: 'Pérdida o daño', ingreso: 'Mercancía sin ingresar', error: 'Error de registro', otro: 'Otro' };
 
         function useCloudReports() {
-            return !!(db && currentUser && currentUser.uid && (isCajero() || isCloudPlan(currentUser.plan)));
+            return !!(db && currentUser && currentUser.uid && (isMiembro() || isCloudPlan(currentUser.plan)));
         }
         function countReportsCol() {
             return db.collection(`users/${companyUid()}/conteos`);
@@ -5861,7 +5915,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 fecha: nowStamp(),
                 por: currentUser ? (currentUser.name || currentUser.username || '') : '',
                 porUid: currentUser ? currentUser.uid : '',
-                rol: isCajero() ? 'cajero' : 'dueno',
+                rol: isCajero() ? 'cajero' : (isSupervisor() ? 'supervisor' : 'dueno'),
                 lineal: isCajero() ? lineLabel() : '',
                 scope: scope || '',
                 items: diffs.slice(0, 400).map(r => ({
@@ -5921,7 +5975,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
             const list = countReports.slice().sort((a, b) => (reportPending(b) > 0) - (reportPending(a) > 0) || b.ts - a.ts);
             el.innerHTML = list.map(r => {
                 const pend = reportPending(r);
-                const who = `${esc(r.por || '')}${r.rol === 'cajero' ? ' (cajero' + (r.lineal ? ' • ' + esc(r.lineal) : '') + ')' : ''}`;
+                const who = `${esc(r.por || '')}${r.rol === 'cajero' ? ' (operario' + (r.lineal ? ' • ' + esc(r.lineal) : '') + ')' : (r.rol === 'supervisor' ? ' (supervisor)' : '')}`;
                 const items = (r.items || []).map((it, idx) => {
                     const falta = it.diff < 0;
                     const opts = COUNT_CAUSES[falta ? 'falta' : 'sobra'];
@@ -7450,11 +7504,16 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
 
         // Planes con inventario en la nube
         function isCloudPlan(p) { return p === 'premium' || p === 'empresarial'; }
-        // Cajero del plan Empresarial (entra con usuario y contraseña de la empresa)
+        // Operario del plan Empresarial (entra con usuario y contraseña de la empresa)
         function isCajero() { return !!(currentUser && currentUser.rol === 'cajero'); }
-        // Dueño del inventario en la nube: el mismo usuario o, si es cajero, su empresa
+        // Supervisor del plan Empresarial: maneja todo el inventario como el dueño, sin panel de equipo ni planes
+        function isSupervisor() { return !!(currentUser && currentUser.rol === 'supervisor'); }
+        // Cualquier miembro del equipo (operario o supervisor)
+        function isMiembro() { return isCajero() || isSupervisor(); }
+        function memberGuide() { return isSupervisor() ? 'supervisor' : 'cajero'; }
+        // Dueño del inventario en la nube: el mismo usuario o, si es operario, su empresa
         function companyUid() { return currentUser ? (currentUser.empresaUid || currentUser.uid) : null; }
-        // El valor del inventario lo ve el dueño (PREMIUM/EMPRESARIAL), nunca el cajero
+        // El valor del inventario lo ve el dueño (PREMIUM/EMPRESARIAL), nunca el operario
         function canSeeValue() { return hasPremiumAccess() && !isCajero(); }
 
         // ---------- Orden de la lista ----------
@@ -7689,7 +7748,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
         }
 
         function orderConfigRef() {
-            try { return (db && currentUser && currentUser.uid && hasPremiumAccess() && !isCajero()) ? db.collection(`users/${currentUser.uid}/config`).doc('pedidos') : null; } catch (e) { return null; }
+            try { return (db && currentUser && currentUser.uid && hasPremiumAccess() && !isCajero()) ? db.collection(`users/${companyUid()}/config`).doc('pedidos') : null; } catch (e) { return null; }
         }
 
         async function syncOrderConfigFromCloud() {

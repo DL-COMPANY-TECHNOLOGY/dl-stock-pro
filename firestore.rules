@@ -54,7 +54,17 @@ service cloud.firestore {
         && hasEmpresarial(owner);
     }
 
-    // La categoría del producto está en el lineal del cajero
+    // Supervisor activo: maneja todo el inventario como el dueño (sin panel de equipo ni planes)
+    function isSupervisor(owner) {
+      return isMember(owner) && puesto(owner).get('rol', 'cajero') == 'supervisor';
+    }
+
+    // Dueño con plan de nube vigente o supervisor de su empresa
+    function canManage(owner) {
+      return (isOwner(owner) && hasActivePremium(owner)) || isSupervisor(owner);
+    }
+
+    // La categoría del producto está en el lineal del operario
     function enSuLineal(owner, data) {
       return data.category in puesto(owner).categorias;
     }
@@ -95,21 +105,22 @@ service cloud.firestore {
         || isValidRedeem(uid)
       );
 
-      // Inventario en la nube: el dueño con PREMIUM/EMPRESARIAL vigente.
-      // Los cajeros lo ven todo, pero solo crean y editan productos de su lineal, y nunca borran.
+      // Inventario en la nube: el dueño con PREMIUM/EMPRESARIAL vigente y sus supervisores.
+      // Los operarios lo ven todo, pero solo crean y editan productos de su lineal, y nunca borran.
       match /inventory/{docId} {
         allow read: if (isOwner(uid) && hasActivePremium(uid)) || isMember(uid);
-        allow create: if (isOwner(uid) && hasActivePremium(uid))
+        allow create: if canManage(uid)
           || (isMember(uid) && enSuLineal(uid, request.resource.data));
-        allow update: if (isOwner(uid) && hasActivePremium(uid))
+        allow update: if canManage(uid)
           || (isMember(uid) && enSuLineal(uid, resource.data) && enSuLineal(uid, request.resource.data));
-        allow delete: if isOwner(uid) && hasActivePremium(uid);
+        allow delete: if canManage(uid);
       }
 
-      // Configuración de pedidos (proveedores, presentaciones, entrega): solo su dueño
+      // Configuración de pedidos (proveedores, presentaciones, entrega): el dueño y sus supervisores
       match /config/{docId} {
-        allow read, delete: if isOwner(uid) && hasActivePremium(uid);
-        allow write: if isOwner(uid) && hasActivePremium(uid) && docId == 'pedidos'
+        allow read: if canManage(uid);
+        allow delete: if isOwner(uid) && hasActivePremium(uid);
+        allow write: if canManage(uid) && docId == 'pedidos'
           && request.resource.size() < 200000;
       }
 
@@ -122,21 +133,26 @@ service cloud.firestore {
           && request.resource.data == resource.data;
       }
 
-      // Diferencias de conteo: cualquiera del equipo las envía; solo el dueño las ve y las revisa
+      // Diferencias de conteo: cualquiera del equipo las envía; el dueño y sus supervisores las ven y las revisan
       match /conteos/{repId} {
-        allow read, update, delete: if isOwner(uid) && hasActivePremium(uid);
+        allow read, update, delete: if canManage(uid);
         allow create: if ((isOwner(uid) && hasActivePremium(uid)) || isMember(uid))
           && request.resource.data.id == repId
           && request.resource.data.porUid == request.auth.uid
           && request.resource.data.items.size() <= 400;
       }
 
-      // Equipo de cajeros (plan EMPRESARIAL): máximo 5 puestos
+      // Equipo (plan EMPRESARIAL): puestos 1-5 operarios, 6-8 supervisores.
+      // Solo el dueño crea usuarios, da claves y cambia el equipo.
       match /equipo/{slot} {
         allow read: if (isOwner(uid) && hasEmpresarial(uid))
           || (signedIn() && resource.data.uid == request.auth.uid);
-        allow write: if isOwner(uid) && hasEmpresarial(uid) && slot.matches('^[1-5]$');
-        // El cajero solo puede marcar que ya creó su propia contraseña
+        allow create, update: if isOwner(uid) && hasEmpresarial(uid) && (
+          (slot.matches('^[1-5]$') && request.resource.data.get('rol', 'cajero') == 'cajero')
+          || (slot.matches('^[6-8]$') && request.resource.data.get('rol', 'cajero') == 'supervisor')
+        );
+        allow delete: if isOwner(uid) && hasEmpresarial(uid) && slot.matches('^[1-8]$');
+        // El operario o supervisor solo puede marcar que ya creó su propia contraseña
         allow update: if signedIn() && resource.data.uid == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['temporal'])
           && request.resource.data.temporal == false;

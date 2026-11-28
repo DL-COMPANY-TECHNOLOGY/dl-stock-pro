@@ -176,6 +176,10 @@
             justify-content: center;
         }
         .header-btn:hover { background: var(--bg-table-hover); }
+        /* Botón de guía siempre visible en el encabezado del celular */
+        .guide-pill { display: none; align-items: center; gap: 5px; flex-shrink: 0; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.45); color: var(--cyan-tech); padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 900; cursor: pointer; font-family: inherit; }
+        .guide-pill:active { transform: scale(.96); }
+        @media (max-width: 768px) { .guide-pill { display: inline-flex; } }
 
         main { max-width: 1240px; margin: 0 auto; width: 100%; padding: 16px; flex: 1; }
         
@@ -980,6 +984,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                     </div>
                 </div>
 
+                <button type="button" id="headerGuidePill" class="guide-pill" onclick="startGuide(isMiembro() ? memberGuide() : 'inicio', true)" title="Ver la guía de la app">🧭 Guía</button>
                 <div class="header-actions" style="display: flex; align-items: center; gap: 8px;">
                     <button type="button" id="btnAdminPanel" onclick="promptAdminAccess()" class="header-btn hidden" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);" title="Panel de Administrador">
                         <i class="fa-solid fa-shield-halved"></i>
@@ -3098,7 +3103,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 { targets: [{ sel: '#headerPlansBtn' }, { sel: '#morePlansItem', menu: 'more' }], title: 'Planes', textFn: () => 'Mira qué incluye cada plan. Con **PREMIUM** tu inventario queda **en la nube** y sincronizado entre varios celulares.' + (guidePlan() === 'gratis' ? ' Tu plan permite **hasta 100 productos**.' : '') },
                 { targets: [{ sel: '#syncStatusBadge' }], title: 'Dónde se guardan tus datos', text: 'Aquí ves si tus datos están guardados **en el celular** o **en la nube**.' },
                 { targets: [{ sel: '#themeToggleBtn' }, { sel: '#moreThemeItem', menu: 'more' }], title: 'Tema', text: 'Cambia entre **modo oscuro** y **claro**.' },
-                { emoji: '✅', title: '¡Listo para empezar!', text: 'Ya conoces lo básico. Puedes repetir esta guía cuando quieras desde **Más → 🧭 Guía**.', finalLabel: 'Agregar mi primer producto', finalAction: () => navAdd() }
+                { targets: [{ sel: '#headerGuidePill' }, { sel: '#headerGuideBtn' }], title: '¡Listo para empezar!', text: 'Ya conoces lo básico. Puedes repetir esta guía cuando quieras con este botón **🧭 Guía**.', finalLabel: 'Agregar mi primer producto', finalAction: () => navAdd() }
             ],
             pro: [
                 { emoji: '🎉', title: '¡Ahora tienes el plan PRO!', text: 'Te muestro **lo nuevo** que tienes.' },
@@ -3119,7 +3124,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 { targets: [{ sel: '#navAddBtn' }, { sel: '#deskAddActions, #deskAddActions + .quick-actions' }], title: 'Agregar productos', text: 'Agrega productos **nuevos de tu lineal** con foto, escáner o a mano.' },
                 { targets: [{ sel: '#navAlertsBtn' }, { sel: '#headerAlertsBtn' }], title: 'Alertas', text: 'Aquí ves los productos que **se vencen**.' },
                 { targets: [{ sel: '.sheet-logout', menu: 'more' }], title: 'Cerrar sesión', text: 'Al terminar tu turno, **cierra sesión** para que nadie use tu usuario.' },
-                { emoji: '✅', title: '¡Listo!', text: 'Puedes repetir esta guía desde **Más → 🧭 Guía**.' }
+                { targets: [{ sel: '#headerGuidePill' }, { sel: '#headerGuideBtn' }], title: '¡Listo!', text: 'Puedes repetir esta guía cuando quieras con este botón **🧭 Guía**.' }
             ],
             supervisor: [
                 { emoji: '👋', title: '¡Hola! Eres supervisor', textFn: () => `Trabajas en **${currentUser.empresaNombre || 'tu empresa'}**. Manejas **todo el inventario** igual que el administrador: agregar, editar, borrar, valor del inventario, Excel, copias y pedidos.` },
@@ -3129,7 +3134,7 @@ footer.dlf .dlf-copy{font-size:10.5px;letter-spacing:1.2px;text-transform:upperc
                 { targets: [{ sel: '#navAlertsBtn' }, { sel: '#headerAlertsBtn' }], title: 'Alertas y conteos', text: 'Aquí ves los productos que **se vencen** y las **diferencias de conteo** de los operarios para revisarlas.' },
                 { emoji: '🔐', title: 'Lo que solo hace el administrador', text: 'Crear usuarios, dar **claves temporales** y cambiar el **plan** solo lo hace el administrador.' },
                 { targets: [{ sel: '.sheet-logout', menu: 'more' }], title: 'Cerrar sesión', text: 'Al terminar tu turno, **cierra sesión** para que nadie use tu usuario.' },
-                { emoji: '✅', title: '¡Listo!', text: 'Puedes repetir esta guía desde **Más → 🧭 Guía**.' }
+                { targets: [{ sel: '#headerGuidePill' }, { sel: '#headerGuideBtn' }], title: '¡Listo!', text: 'Puedes repetir esta guía cuando quieras con este botón **🧭 Guía**.' }
             ],
             premium: [
                 { emoji: '🎉', title: '¡Ahora tienes el plan PREMIUM!', text: 'Te muestro **lo nuevo** que tienes.' },
